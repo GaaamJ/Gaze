@@ -17,6 +17,8 @@ namespace ProjectT.Dialogue
         bool nodeCompleted;
         bool endRequested;
 
+        public bool IsPlaying => isPlaying;
+
         public event Action QuitNormallyRequested;
 
         void Awake()

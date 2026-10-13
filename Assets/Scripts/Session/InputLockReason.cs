@@ -4,5 +4,6 @@ namespace ProjectT.Session
     {
         Dialogue,
         RoomTransition,
+        Death,
     }
 }
