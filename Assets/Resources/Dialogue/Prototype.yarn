@@ -17,3 +17,23 @@ title: Temp_Interactable_Recheck
 ---
 라리스: 웩 보기싫어
 ===
+
+title: Test_Options
+---
+라리스: 선택지 테스트
+-> 첫째
+    라리스: 첫째를 골랐다
+-> 둘째
+    라리스: 둘째를 골랐다
+-> 게임 끄기
+    <<QuitNormally>>
+라리스: 선택지 뒤 대사
+===
+
+title: Test_RespawnQuit
+---
+라리스: 여기서 그만둘까?
+-> 게임 끄기
+    <<QuitNormally>>
+-> 계속
+===
