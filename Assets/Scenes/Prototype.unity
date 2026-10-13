@@ -247,14 +247,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 4426110340149335456, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 1959098016170282566, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1360490994}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
 --- !u!114 &99290339 stripped
 MonoBehaviour:
@@ -2571,6 +2567,7 @@ GameObject:
   - component: {fileID: 817688607}
   - component: {fileID: 817688609}
   - component: {fileID: 817688610}
+  - component: {fileID: 817688611}
   m_Layer: 9
   m_Name: respawn
   m_TagString: Untagged
@@ -2664,7 +2661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: 0eb1727b77492fb48b61595fcd0690ff, type: 2}
+  data: {fileID: 11400000, guid: c869d1bc94d8c454097eb28b9c353c63, type: 2}
 --- !u!61 &817688610
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2711,6 +2708,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
+--- !u!114 &817688611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817688606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72325f420554c164a813079d7fc2d0d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.RespawnArea
+  area: {fileID: 11400000, guid: bec9576bd6f537b4bb12bd1a438fa81c, type: 2}
 --- !u!1 &911437277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2836,37 +2846,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1360490988 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1959098016170282566, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-  m_PrefabInstance: {fileID: 99290338}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1360490994
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1360490988}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.VerticalLayoutGroup
-  m_Padding:
-    m_Left: 40
-    m_Right: 40
-    m_Top: 24
-    m_Bottom: 24
-  m_ChildAlignment: 4
-  m_Spacing: 24
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 1
-  m_ChildControlHeight: 1
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
 --- !u!1 &1472917246
 GameObject:
   m_ObjectHideFlags: 0
