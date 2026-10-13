@@ -3,6 +3,7 @@
     "rootNamespace": "ProjectT.Core.Tests",
     "references": [
         "ProjectT.Core",
+        "ProjectT.Save",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

@@ -1,26 +1,32 @@
 using System.IO;
+using ProjectT.Save;
 using UnityEditor;
 using UnityEngine;
 
 public static class SaveManagerTools
 {
-    private static string SavePath => Path.Combine(Application.persistentDataPath, "save.json");
-
     [MenuItem("Tools/Save/Delete Save File")]
     private static void DeleteSaveFile()
     {
-        if (!File.Exists(SavePath))
+        string path = SaveManager.SavePath;
+        if (!File.Exists(path))
         {
-            Debug.Log("[SaveManagerTools] save.json 없음.");
+            Debug.Log($"[SaveManagerTools] 세이브 없음: {path}");
             return;
         }
-        File.Delete(SavePath);
-        Debug.Log($"[SaveManagerTools] 삭제 완료: {SavePath}");
+        File.Delete(path);
+        Debug.Log($"[SaveManagerTools] 삭제 완료: {path}");
     }
 
     [MenuItem("Tools/Save/Open Save Folder")]
     private static void OpenSaveFolder()
     {
-        EditorUtility.RevealInFinder(Application.persistentDataPath);
+        string root = SaveManager.Paths.Root;
+        if (!Directory.Exists(root))
+        {
+            Debug.Log($"[SaveManagerTools] 게임 폴더 없음: {root}");
+            return;
+        }
+        EditorUtility.RevealInFinder(root);
     }
 }
