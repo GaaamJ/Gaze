@@ -94,6 +94,8 @@ namespace ProjectT.Area
                     laris.Face(facing);
                 if (to.CameraBounds != null)
                     SwitchCameraBounds(to.CameraBounds);
+                // 이전 위치에서 감쇠로 따라오면 페이드 인 동안 화면이 미끄러지므로 다음 프레임에 바로 붙인다.
+                CinemachineCore.ResetCameraState();
 
                 // 옮긴 위치의 트리거 접촉이 전환 중에 들어오도록 물리 단계를 한 번 기다린다.
                 yield return new WaitForFixedUpdate();
@@ -158,9 +160,6 @@ namespace ProjectT.Area
                 return;
             confiner.BoundingShape2D = shape;
             confiner.InvalidateBoundingShapeCache();
-            // 이전 방 위치에서 감쇠로 따라오면 옆 방이 비치므로 다음 프레임에 바로 붙인다.
-            if (confiner.TryGetComponent(out CinemachineCamera cinemachineCamera))
-                cinemachineCamera.PreviousStateIsValid = false;
         }
     }
 }

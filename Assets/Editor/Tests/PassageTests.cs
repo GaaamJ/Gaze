@@ -146,6 +146,17 @@ namespace ProjectT.Area.Tests
         }
 
         [Test]
+        public void WithoutBounds_StillSnapsCameraRightAfterMove()
+        {
+            var camera = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>();
+            camera.PreviousStateIsValid = true;
+
+            RunToPhysicsWait(passage.Prepare(endA, larisBody));
+            Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
+            Assert.IsFalse(camera.PreviousStateIsValid);
+        }
+
+        [Test]
         public void EndB_MovesBackToEndA()
         {
             laris.transform.position = endB.transform.position;
