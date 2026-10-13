@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Data.ObjectData
   id: Respawn
   kind: 4
-  dialogueNode: 
-  recheckDialogueNode: 
+  dialogueNode: Test_RespawnQuit
+  recheckDialogueNode: Test_RespawnQuit
   link: 

@@ -5,5 +5,6 @@ namespace ProjectT.Dialogue
         Completed,
         Rejected,
         Interrupted,
+        Cancelled,
     }
 }

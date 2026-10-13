@@ -2567,6 +2567,7 @@ GameObject:
   - component: {fileID: 817688607}
   - component: {fileID: 817688609}
   - component: {fileID: 817688610}
+  - component: {fileID: 817688611}
   m_Layer: 9
   m_Name: respawn
   m_TagString: Untagged
@@ -2660,7 +2661,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: 0eb1727b77492fb48b61595fcd0690ff, type: 2}
+  data: {fileID: 11400000, guid: c869d1bc94d8c454097eb28b9c353c63, type: 2}
 --- !u!61 &817688610
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2707,6 +2708,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
+--- !u!114 &817688611
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817688606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72325f420554c164a813079d7fc2d0d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.RespawnArea
+  area: {fileID: 11400000, guid: bec9576bd6f537b4bb12bd1a438fa81c, type: 2}
 --- !u!1 &911437277
 GameObject:
   m_ObjectHideFlags: 0
