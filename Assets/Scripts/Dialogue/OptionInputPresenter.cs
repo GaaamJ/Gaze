@@ -46,15 +46,15 @@ namespace ProjectT.Dialogue
             cancelAction!.action.performed -= OnCancel;
         }
 
-        public bool TryEndNode()
+        public bool TryCancelDialogue()
         {
             if (!enabled || !OptionsShowing)
                 return false;
 
-            return dialogueService!.RequestEnd();
+            return dialogueService!.RequestCancel();
         }
 
-        void OnCancel(InputAction.CallbackContext context) => TryEndNode();
+        void OnCancel(InputAction.CallbackContext context) => TryCancelDialogue();
 
         public override async YarnTask<DialogueOption?> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken cancellationToken)
         {
@@ -71,6 +71,7 @@ namespace ProjectT.Dialogue
             try
             {
                 await YarnTask.WaitUntilCanceled(optionsToken);
+                // OnDialogueCompleteAsync와 같은 Yarn 3.2.7 우회: OptionsPresenter가 OptionItem을 다 정리할 때까지 optionsRunning을 유지한다.
                 while (AnyItemActive())
                     await YarnTask.Yield();
             }
@@ -78,6 +79,7 @@ namespace ProjectT.Dialogue
             {
                 optionsRunning = false;
             }
+            // 선택 결과는 OptionsPresenter가 돌려주고 러너는 null이 아닌 결과를 쓰므로, 이 프레젠터는 X 입력만 감시하고 null을 돌려준다.
             return null;
         }
 
@@ -116,6 +118,7 @@ namespace ProjectT.Dialogue
 
             while (optionsRunning)
                 await YarnTask.Yield();
+            // optionsRunning이 꺼진 같은 프레임에는 러너가 아직 선택지 취소를 처리하기 전이라 한 프레임 더 늦춘다.
             await YarnTask.Yield();
         }
 

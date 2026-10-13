@@ -4,7 +4,7 @@ using ProjectT.Save;
 
 namespace ProjectT.Session
 {
-    // 씬을 다시 불러와도 유지되고, 게임을 다시 켜면 비워지는 값만 둔다.
+    // 게임을 켤 때마다 세션 메모리(씬을 다시 불러와도 유지)를 비우고 세이브를 한 번 불러온다.
     public static class GameSession
     {
         // 조사한 ObjectData.Id
@@ -15,6 +15,7 @@ namespace ProjectT.Session
         static void Begin()
         {
             Investigated = new HashSet<string>();
+            // 첫 씬의 컴포넌트가 SaveManager.Data를 읽기 전에 로드해 두려고 BeforeSceneLoad 시점에 부른다.
             SaveManager.Load();
         }
     }

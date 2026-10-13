@@ -37,16 +37,16 @@ namespace ProjectT.Dialogue.Tests
             new LineCancellationToken { NextContentToken = source.Token, HurryUpToken = source.Token };
 
         [Test]
-        public void RequestEnd_WhenNotPlaying_DoesNothing()
+        public void RequestCancel_WhenNotPlaying_DoesNothing()
         {
-            Assert.IsFalse(service.RequestEnd());
+            Assert.IsFalse(service.RequestCancel());
         }
 
         [Test]
         public void Cancel_WithoutOptions_DoesNothing()
         {
             Assert.IsFalse(presenter.OptionsShowing);
-            Assert.IsFalse(presenter.TryEndNode());
+            Assert.IsFalse(presenter.TryCancelDialogue());
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace ProjectT.Dialogue.Tests
 
             source.Cancel();
             Assert.IsFalse(presenter.OptionsShowing);
-            Assert.IsFalse(presenter.TryEndNode());
+            Assert.IsFalse(presenter.TryCancelDialogue());
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace ProjectT.Dialogue.Tests
             using var source = new CancellationTokenSource();
             presenter.RunOptionsAsync(Options(true), Token(source));
 
-            Assert.IsFalse(presenter.TryEndNode());
+            Assert.DoesNotThrow(() => Assert.IsFalse(presenter.TryCancelDialogue()));
             source.Cancel();
         }
 
@@ -106,7 +106,7 @@ namespace ProjectT.Dialogue.Tests
         }
 
         [Test]
-        public void DialogueLock_IsReleasedAfterUnlock()
+        public void InputLock_DialogueReason_IsReleasedAfterUnlock()
         {
             var inputLock = go.AddComponent<InputLock>();
             inputLock.Lock(InputLockReason.Dialogue);

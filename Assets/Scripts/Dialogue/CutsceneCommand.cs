@@ -28,14 +28,14 @@ namespace ProjectT.Dialogue
         {
             runner.AddCommandHandler<string>(ShowCommandName, Show);
             runner.AddCommandHandler(EndCommandName, Hide);
-            runner.onDialogueComplete?.AddListener(Hide);
+            runner.onDialogueComplete.AddListener(Hide);
         }
 
         void OnDisable()
         {
             runner.RemoveCommandHandler(ShowCommandName);
             runner.RemoveCommandHandler(EndCommandName);
-            runner.onDialogueComplete?.RemoveListener(Hide);
+            runner.onDialogueComplete.RemoveListener(Hide);
             Hide();
         }
 
