@@ -1,0 +1,16 @@
+{
+    "name": "ProjectT.Save",
+    "rootNamespace": "ProjectT.Save",
+    "references": [
+        "ProjectT.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

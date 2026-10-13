@@ -9,6 +9,7 @@ namespace ProjectT.Core.GameFolder
         public const string AreasFolderName = "Areas";
         public const string CorpsesFolderName = "Corpses";
         public const string SaveFileName = "save.json";
+        public const string ElevatorFileName = "elevator.ev";
 
         public static string DefaultRoot =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), RootFolderName);
@@ -37,6 +38,9 @@ namespace ProjectT.Core.GameFolder
                 throw new ArgumentException($"Invalid floor folder name: '{folderName}'.", nameof(folderName));
             return Path.Combine(Areas, name);
         }
+
+        public string ElevatorFile(string floorFolderName) =>
+            Path.Combine(FloorFolder(floorFolderName), ElevatorFileName);
 
         public static bool TryNormalizeFolderName(string raw, out string name)
         {
