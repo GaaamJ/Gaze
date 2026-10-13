@@ -17,3 +17,11 @@ title: Temp_Interactable_Recheck
 ---
 라리스: 웩 보기싫어
 ===
+
+title: Test_RespawnQuit
+---
+라리스: 여기서 그만둘까?
+-> 게임 끄기
+    <<QuitNormally>>
+-> 계속
+===

@@ -11,6 +11,8 @@ namespace ProjectT.Player
         [SerializeField] DetectZone detectZone;
         [SerializeField] DialogueService dialogueService;
 
+        public ObjectResultHandlers ResultHandlers { get; } = new();
+
         void Awake()
         {
             if (input == null)
@@ -39,7 +41,7 @@ namespace ProjectT.Player
             if (!target.IsAlive() || !target.CanInteract)
                 return;
 
-            target.Interact(new InteractContext(dialogueService, GameSession.Investigated));
+            target.Interact(new InteractContext(dialogueService, GameSession.Investigated, ResultHandlers));
         }
     }
 }

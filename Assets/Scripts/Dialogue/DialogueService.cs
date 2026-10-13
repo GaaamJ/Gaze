@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Yarn.Unity;
 using ProjectT.Session;
@@ -7,11 +8,16 @@ namespace ProjectT.Dialogue
     [RequireComponent(typeof(DialogueRunner))]
     public class DialogueService : MonoBehaviour
     {
+        const string QuitNormallyCommandName = "QuitNormally";
+
         [SerializeField] InputLock inputLock;
 
         DialogueRunner runner;
         bool isPlaying;
         bool nodeCompleted;
+        bool endRequested;
+
+        public event Action QuitNormallyRequested;
 
         void Awake()
         {
@@ -19,6 +25,26 @@ namespace ProjectT.Dialogue
 
             if (inputLock == null)
                 Debug.LogError("[DialogueService] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+        }
+
+        void OnEnable()
+        {
+            runner.AddCommandHandler(QuitNormallyCommandName, OnQuitNormally);
+        }
+
+        void OnDisable()
+        {
+            runner.RemoveCommandHandler(QuitNormallyCommandName);
+        }
+
+        public bool RequestEnd()
+        {
+            if (!isPlaying || endRequested || !runner.IsDialogueRunning)
+                return false;
+
+            endRequested = true;
+            runner.Stop().Forget();
+            return true;
         }
 
         public async YarnTask<DialogueResult> Play(string nodeName)
@@ -44,6 +70,7 @@ namespace ProjectT.Dialogue
             inputLock.Lock(InputLockReason.Dialogue);
             isPlaying = true;
             nodeCompleted = false;
+            endRequested = false;
             runner.onNodeStart.AddListener(OnNodeStart);
             runner.onNodeComplete.AddListener(OnNodeComplete);
 
@@ -65,7 +92,20 @@ namespace ProjectT.Dialogue
                 inputLock.Unlock(InputLockReason.Dialogue);
             }
 
+            if (endRequested)
+                return DialogueResult.Cancelled;
             return nodeCompleted ? DialogueResult.Completed : DialogueResult.Interrupted;
+        }
+
+        void OnQuitNormally()
+        {
+            if (QuitNormallyRequested == null)
+            {
+                Debug.Log("[DialogueService] <<QuitNormally>> 호출. 정상 종료 처리(#51)가 아직 연결되지 않았다.", this);
+                return;
+            }
+
+            QuitNormallyRequested.Invoke();
         }
 
         // 노드 끝이나 <<stop>>에서는 NodeComplete가 오지만, runner.Stop()·파괴로 끊기면 오지 않는다.
