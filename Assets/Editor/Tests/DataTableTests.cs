@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
-using ProjectT.Data;
 
 namespace ProjectT.Data.Tests
 {

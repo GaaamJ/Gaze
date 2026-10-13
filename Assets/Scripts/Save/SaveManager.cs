@@ -38,7 +38,7 @@ namespace ProjectT.Save
             }
             catch (Exception e)
             {
-                // 손상 파일은 지우지 않는다. 플레이어가 원본을 확인할 여지를 남긴다.
+                // 손상 파일은 여기서 지우지 않지만 다음 Save()가 기본값 기준 데이터로 덮어쓴다.
                 Debug.LogWarning($"[SaveManager] 세이브 로드 실패, 기본값으로 시작: {path}\n{e.Message}");
                 Data = new SaveData();
             }

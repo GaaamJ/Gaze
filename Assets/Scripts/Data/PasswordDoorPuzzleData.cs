@@ -31,9 +31,9 @@ namespace ProjectT.Data
             var warnings = new List<string>();
             if (string.IsNullOrWhiteSpace(id))
                 warnings.Add("id가 비어 있다.");
-            if (symbols == null || symbols.Length != SymbolCount)
+            if (symbols.Length != SymbolCount)
                 warnings.Add($"문양은 {SymbolCount}개여야 한다.");
-            if (answerIndices == null || answerIndices.Length != AnswerCount)
+            if (answerIndices.Length != AnswerCount)
             {
                 warnings.Add($"정답은 {AnswerCount}개여야 한다.");
             }

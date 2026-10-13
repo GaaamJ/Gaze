@@ -39,7 +39,7 @@ namespace ProjectT.Core.GameFolder
             return Path.Combine(Areas, name);
         }
 
-        public string ElevatorFile(string floorFolderName) =>
+        public string ElevatorFilePath(string floorFolderName) =>
             Path.Combine(FloorFolder(floorFolderName), ElevatorFileName);
 
         public static bool TryNormalizeFolderName(string raw, out string name)
