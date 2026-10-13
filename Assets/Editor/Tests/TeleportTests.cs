@@ -72,25 +72,6 @@ namespace ProjectT.Area.Tests
             return fader;
         }
 
-        (CinemachineConfiner2D confiner, CinemachineCamera camera) NewCamera(Collider2D startBounds)
-        {
-            var go = new GameObject("CinemachineCamera");
-            var camera = go.AddComponent<CinemachineCamera>();
-            var confiner = go.AddComponent<CinemachineConfiner2D>();
-            confiner.BoundingShape2D = startBounds;
-            return (confiner, camera);
-        }
-
-        static T NewBounds<T>(string name) where T : Collider2D
-        {
-            var collider = new GameObject(name).AddComponent<T>();
-            collider.isTrigger = true;
-            return collider;
-        }
-
-        static void SetBounds(TeleportEnd end, Collider2D bounds) =>
-            Set(end, so => so.FindProperty("cameraBounds").objectReferenceValue = bounds);
-
         static void SetFacing(TeleportEnd end, ArrivalFacing facing) =>
             Set(end, so => so.FindProperty("arrivalFacing").enumValueIndex = (int)facing);
 
@@ -118,13 +99,11 @@ namespace ProjectT.Area.Tests
         Vector2 LarisPosition => laris.transform.position;
 
         [Test]
-        public void EndA_LocksFadesMovesToEndB_SwitchesBounds_ThenReleases()
+        public void EndA_LocksFadesMovesToEndB_SnapsCamera_ThenReleases()
         {
             var fader = NewFader();
-            var startBounds = NewBounds<BoxCollider2D>("RoomA");
-            var roomB = NewBounds<PolygonCollider2D>("RoomB");
-            var (confiner, camera) = NewCamera(startBounds);
-            SetBounds(endB, roomB);
+            var camera = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>();
+            camera.PreviousStateIsValid = true;
 
             IEnumerator routine = teleport.Prepare(endA, larisBody);
             Assert.IsNotNull(routine);
@@ -135,7 +114,6 @@ namespace ProjectT.Area.Tests
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
             Assert.AreEqual(Vector2.zero, laris.GetComponent<Rigidbody2D>().linearVelocity);
             Assert.AreEqual(1f, fader.Alpha);
-            Assert.AreSame(roomB, confiner.BoundingShape2D);
             Assert.IsFalse(camera.PreviousStateIsValid);
             Assert.IsTrue(inputLock.IsLocked);
 
@@ -143,17 +121,6 @@ namespace ProjectT.Area.Tests
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsFalse(teleport.IsTransitioning);
             Assert.AreEqual(0f, fader.Alpha);
-        }
-
-        [Test]
-        public void WithoutBounds_StillSnapsCameraRightAfterMove()
-        {
-            var camera = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>();
-            camera.PreviousStateIsValid = true;
-
-            RunToPhysicsWait(teleport.Prepare(endA, larisBody));
-            Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
-            Assert.IsFalse(camera.PreviousStateIsValid);
         }
 
         [Test]
@@ -254,17 +221,6 @@ namespace ProjectT.Area.Tests
         }
 
         [Test]
-        public void UnusableBoundsShape_WarnsWithoutMovingOrLocking()
-        {
-            SetBounds(endB, NewBounds<CircleCollider2D>("RoundRoom"));
-
-            LogAssert.Expect(LogType.Warning, new Regex("카메라 경계 'RoundRoom'"));
-            Assert.IsNull(teleport.Prepare(endA, larisBody));
-            Assert.IsFalse(inputLock.IsLocked);
-            Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
-        }
-
-        [Test]
         public void ExceptionMidway_ReleasesLockAndFade()
         {
             var fader = NewFader();
@@ -281,7 +237,6 @@ namespace ProjectT.Area.Tests
         public void WithoutFaderCameraOrInputLock_StillMoves()
         {
             Object.DestroyImmediate(inputLock);
-            SetBounds(endB, NewBounds<BoxCollider2D>("RoomB"));
 
             RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);

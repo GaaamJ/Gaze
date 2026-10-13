@@ -7,7 +7,7 @@ using ProjectT.UI;
 
 namespace ProjectT.Area
 {
-    // 두 끝 중 하나에 라리스가 닿으면 반대쪽 끝으로 옮긴다. ScreenFader·CinemachineConfiner2D는 있으면 쓰고 없으면 건너뛴다.
+    // 두 끝 중 하나에 라리스가 닿으면 반대쪽 끝으로 옮긴다. ScreenFader는 있으면 쓰고 없으면 건너뛴다.
     public class Teleport : MonoBehaviour
     {
         [SerializeField] TeleportEnd endA;
@@ -60,11 +60,6 @@ namespace ProjectT.Area
                 Debug.LogWarning($"[Teleport] '{name}': '{from.name}'의 반대쪽 끝이 없어 옮기지 않는다.", this);
                 return null;
             }
-            if (to.CameraBounds != null && !IsConfinerShape(to.CameraBounds))
-            {
-                Debug.LogWarning($"[Teleport] '{name}': '{to.name}'의 카메라 경계 '{to.CameraBounds.name}'는 BoxCollider2D·PolygonCollider2D·CompositeCollider2D가 아니어서 옮기지 않는다.", this);
-                return null;
-            }
 
             IsTransitioning = true;
             if (inputLock != null)
@@ -92,8 +87,6 @@ namespace ProjectT.Area
                 to.WaitingForExit = true;
                 if (to.TryGetFacing(out Vector2Int facing))
                     laris.Face(facing);
-                if (to.CameraBounds != null)
-                    SwitchCameraBounds(to.CameraBounds);
                 // 이전 위치에서 감쇠로 따라오면 페이드 인 동안 화면이 미끄러지므로 다음 프레임에 바로 붙인다.
                 CinemachineCore.ResetCameraState();
 
@@ -142,24 +135,12 @@ namespace ProjectT.Area
             return other.attachedRigidbody.TryGetComponent(out laris);
         }
 
-        static bool IsConfinerShape(Collider2D shape) =>
-            shape is BoxCollider2D || shape is PolygonCollider2D || shape is CompositeCollider2D;
-
         static void MoveTo(Rigidbody2D body, Vector3 position)
         {
             position.z = body.transform.position.z;
             body.position = position;
             body.linearVelocity = Vector2.zero;
             body.transform.position = position;
-        }
-
-        static void SwitchCameraBounds(Collider2D shape)
-        {
-            var confiner = FindAnyObjectByType<CinemachineConfiner2D>();
-            if (confiner == null)
-                return;
-            confiner.BoundingShape2D = shape;
-            confiner.InvalidateBoundingShapeCache();
         }
     }
 }

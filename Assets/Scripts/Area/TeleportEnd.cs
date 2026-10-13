@@ -22,13 +22,9 @@ namespace ProjectT.Area
         [Tooltip("이 끝에 도착한 뒤 라리스가 바라볼 방향. Keep이면 그대로 둔다.")]
         [SerializeField] ArrivalFacing arrivalFacing;
 
-        [Tooltip("이 끝이 있는 방의 카메라 경계(BoxCollider2D·PolygonCollider2D·CompositeCollider2D). 비우면 경계를 바꾸지 않는다.")]
-        [SerializeField] Collider2D cameraBounds;
-
         Teleport teleport;
 
         public ArrivalFacing ArrivalFacing => arrivalFacing;
-        public Collider2D CameraBounds => cameraBounds;
 
         // 라리스가 이 끝에 도착한 뒤 트리거 밖으로 나가기 전까지 true다.
         public bool WaitingForExit { get; internal set; }
