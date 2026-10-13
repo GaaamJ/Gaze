@@ -15,25 +15,25 @@ using Object = UnityEngine.Object;
 
 namespace ProjectT.Area.Tests
 {
-    public class PassageTests
+    public class TeleportTests
     {
-        Passage passage;
-        PassageEnd endA;
-        PassageEnd endB;
+        Teleport teleport;
+        TeleportEnd endA;
+        TeleportEnd endB;
         PlayerMovement laris;
         BoxCollider2D larisBody;
         InputLock inputLock;
 
-        // Passage는 페이드·카메라를 씬에서 찾으므로 열린 씬의 오브젝트와 섞이지 않게 빈 씬에서 돌린다.
+        // Teleport는 페이드·카메라를 씬에서 찾으므로 열린 씬의 오브젝트와 섞이지 않게 빈 씬에서 돌린다.
         [SetUp]
         public void SetUp()
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
-            passage = new GameObject("Passage").AddComponent<Passage>();
+            teleport = new GameObject("Teleport").AddComponent<Teleport>();
             endA = NewEnd("EndA", new Vector3(-10f, 0f, 0f));
             endB = NewEnd("EndB", new Vector3(10f, 5f, 0f));
-            Set(passage, so =>
+            Set(teleport, so =>
             {
                 so.FindProperty("endA").objectReferenceValue = endA;
                 so.FindProperty("endB").objectReferenceValue = endB;
@@ -48,13 +48,13 @@ namespace ProjectT.Area.Tests
             Physics2D.SyncTransforms();
         }
 
-        PassageEnd NewEnd(string name, Vector3 position)
+        TeleportEnd NewEnd(string name, Vector3 position)
         {
             var go = new GameObject(name);
-            go.transform.SetParent(passage.transform);
+            go.transform.SetParent(teleport.transform);
             go.transform.position = position;
             go.AddComponent<BoxCollider2D>().isTrigger = true;
-            return go.AddComponent<PassageEnd>();
+            return go.AddComponent<TeleportEnd>();
         }
 
         ScreenFader NewFader()
@@ -88,10 +88,10 @@ namespace ProjectT.Area.Tests
             return collider;
         }
 
-        static void SetBounds(PassageEnd end, Collider2D bounds) =>
+        static void SetBounds(TeleportEnd end, Collider2D bounds) =>
             Set(end, so => so.FindProperty("cameraBounds").objectReferenceValue = bounds);
 
-        static void SetFacing(PassageEnd end, ArrivalFacing facing) =>
+        static void SetFacing(TeleportEnd end, ArrivalFacing facing) =>
             Set(end, so => so.FindProperty("arrivalFacing").enumValueIndex = (int)facing);
 
         static void Set(Object target, Action<SerializedObject> edit)
@@ -126,10 +126,10 @@ namespace ProjectT.Area.Tests
             var (confiner, camera) = NewCamera(startBounds);
             SetBounds(endB, roomB);
 
-            IEnumerator routine = passage.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.Prepare(endA, larisBody);
             Assert.IsNotNull(routine);
             Assert.IsTrue(inputLock.IsLocked);
-            Assert.IsTrue(passage.IsTransitioning);
+            Assert.IsTrue(teleport.IsTransitioning);
 
             RunToPhysicsWait(routine);
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
@@ -141,7 +141,7 @@ namespace ProjectT.Area.Tests
 
             RunToEnd(routine);
             Assert.IsFalse(inputLock.IsLocked);
-            Assert.IsFalse(passage.IsTransitioning);
+            Assert.IsFalse(teleport.IsTransitioning);
             Assert.AreEqual(0f, fader.Alpha);
         }
 
@@ -151,7 +151,7 @@ namespace ProjectT.Area.Tests
             var camera = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>();
             camera.PreviousStateIsValid = true;
 
-            RunToPhysicsWait(passage.Prepare(endA, larisBody));
+            RunToPhysicsWait(teleport.Prepare(endA, larisBody));
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
             Assert.IsFalse(camera.PreviousStateIsValid);
         }
@@ -162,7 +162,7 @@ namespace ProjectT.Area.Tests
             laris.transform.position = endB.transform.position;
             Physics2D.SyncTransforms();
 
-            RunToEnd(passage.Prepare(endB, larisBody));
+            RunToEnd(teleport.Prepare(endB, larisBody));
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             Assert.IsFalse(inputLock.IsLocked);
         }
@@ -172,22 +172,22 @@ namespace ProjectT.Area.Tests
         {
             laris.Face(Vector2Int.left);
             SetFacing(endB, ArrivalFacing.UpRight);
-            RunToEnd(passage.Prepare(endA, larisBody));
+            RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.AreEqual(new Vector2Int(1, 1), laris.Facing);
 
-            passage.OnEndExited(endB, larisBody);
-            RunToEnd(passage.Prepare(endB, larisBody));
+            teleport.OnEndExited(endB, larisBody);
+            RunToEnd(teleport.Prepare(endB, larisBody));
             Assert.AreEqual(new Vector2Int(1, 1), laris.Facing);
         }
 
         [Test]
         public void ReentryWhileRunning_IsIgnored()
         {
-            IEnumerator routine = passage.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.Prepare(endA, larisBody);
             RunToPhysicsWait(routine);
 
-            Assert.IsNull(passage.Prepare(endA, larisBody));
-            Assert.IsNull(passage.Prepare(endB, larisBody));
+            Assert.IsNull(teleport.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.Prepare(endB, larisBody));
 
             RunToEnd(routine);
             Assert.IsFalse(inputLock.IsLocked);
@@ -196,15 +196,15 @@ namespace ProjectT.Area.Tests
         [Test]
         public void ArrivedEnd_StaysInactiveUntilLarisLeavesIt()
         {
-            RunToEnd(passage.Prepare(endA, larisBody));
+            RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.IsTrue(endB.WaitingForExit);
-            Assert.IsNull(passage.Prepare(endB, larisBody));
+            Assert.IsNull(teleport.Prepare(endB, larisBody));
             Assert.IsFalse(inputLock.IsLocked);
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
 
-            passage.OnEndExited(endB, larisBody);
+            teleport.OnEndExited(endB, larisBody);
             Assert.IsFalse(endB.WaitingForExit);
-            Assert.IsNotNull(passage.Prepare(endB, larisBody));
+            Assert.IsNotNull(teleport.Prepare(endB, larisBody));
         }
 
         [Test]
@@ -212,9 +212,9 @@ namespace ProjectT.Area.Tests
         {
             endB.GetComponent<BoxCollider2D>().offset = new Vector2(5f, 0f);
 
-            RunToEnd(passage.Prepare(endA, larisBody));
+            RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.IsFalse(endB.WaitingForExit);
-            Assert.IsNotNull(passage.Prepare(endB, larisBody));
+            Assert.IsNotNull(teleport.Prepare(endB, larisBody));
         }
 
         [Test]
@@ -222,13 +222,13 @@ namespace ProjectT.Area.Tests
         {
             var detect = laris.gameObject.AddComponent<CircleCollider2D>();
             detect.isTrigger = true;
-            Assert.IsNull(passage.Prepare(endA, detect));
+            Assert.IsNull(teleport.Prepare(endA, detect));
 
             var box = new GameObject("Box");
             box.AddComponent<Rigidbody2D>();
-            Assert.IsNull(passage.Prepare(endA, box.AddComponent<BoxCollider2D>()));
+            Assert.IsNull(teleport.Prepare(endA, box.AddComponent<BoxCollider2D>()));
 
-            Assert.IsNull(passage.Prepare(endA, new GameObject("Static").AddComponent<BoxCollider2D>()));
+            Assert.IsNull(teleport.Prepare(endA, new GameObject("Static").AddComponent<BoxCollider2D>()));
             Assert.IsFalse(inputLock.IsLocked);
         }
 
@@ -236,7 +236,7 @@ namespace ProjectT.Area.Tests
         public void AlreadyLocked_DoesNotStart()
         {
             inputLock.Lock(InputLockReason.Dialogue);
-            Assert.IsNull(passage.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.Prepare(endA, larisBody));
             inputLock.Unlock(InputLockReason.Dialogue);
             Assert.IsFalse(inputLock.IsLocked);
         }
@@ -244,12 +244,12 @@ namespace ProjectT.Area.Tests
         [Test]
         public void MissingOppositeEnd_WarnsWithoutMovingOrLocking()
         {
-            Set(passage, so => so.FindProperty("endB").objectReferenceValue = null);
+            Set(teleport, so => so.FindProperty("endB").objectReferenceValue = null);
 
             LogAssert.Expect(LogType.Warning, new Regex("반대쪽 끝이 없어"));
-            Assert.IsNull(passage.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.Prepare(endA, larisBody));
             Assert.IsFalse(inputLock.IsLocked);
-            Assert.IsFalse(passage.IsTransitioning);
+            Assert.IsFalse(teleport.IsTransitioning);
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
         }
 
@@ -259,7 +259,7 @@ namespace ProjectT.Area.Tests
             SetBounds(endB, NewBounds<CircleCollider2D>("RoundRoom"));
 
             LogAssert.Expect(LogType.Warning, new Regex("카메라 경계 'RoundRoom'"));
-            Assert.IsNull(passage.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.Prepare(endA, larisBody));
             Assert.IsFalse(inputLock.IsLocked);
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
         }
@@ -268,12 +268,12 @@ namespace ProjectT.Area.Tests
         public void ExceptionMidway_ReleasesLockAndFade()
         {
             var fader = NewFader();
-            IEnumerator routine = passage.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.Prepare(endA, larisBody);
             Object.DestroyImmediate(endB.gameObject);
 
             Assert.That(() => routine.MoveNext(), Throws.InstanceOf<Exception>());
             Assert.IsFalse(inputLock.IsLocked);
-            Assert.IsFalse(passage.IsTransitioning);
+            Assert.IsFalse(teleport.IsTransitioning);
             Assert.AreEqual(0f, fader.Alpha);
         }
 
@@ -283,9 +283,9 @@ namespace ProjectT.Area.Tests
             Object.DestroyImmediate(inputLock);
             SetBounds(endB, NewBounds<BoxCollider2D>("RoomB"));
 
-            RunToEnd(passage.Prepare(endA, larisBody));
+            RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
-            Assert.IsFalse(passage.IsTransitioning);
+            Assert.IsFalse(teleport.IsTransitioning);
             LogAssert.NoUnexpectedReceived();
         }
     }

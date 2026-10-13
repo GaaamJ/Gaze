@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5100000000000000002}
   - component: {fileID: 5100000000000000003}
   m_Layer: 0
-  m_Name: Passage
+  m_Name: Teleport
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: da85838e775747999ac80799ac02729b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.Passage
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.Teleport
   endA: {fileID: 5100000000000000014}
   endB: {fileID: 5100000000000000024}
 --- !u!1 &5100000000000000011
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb63ce66972c4d59b2b96d0f6c087b81, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.PassageEnd
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.TeleportEnd
   arrivalFacing: 0
   cameraBounds: {fileID: 0}
 --- !u!1 &5100000000000000021
@@ -231,6 +231,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb63ce66972c4d59b2b96d0f6c087b81, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.PassageEnd
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.TeleportEnd
   arrivalFacing: 0
   cameraBounds: {fileID: 0}

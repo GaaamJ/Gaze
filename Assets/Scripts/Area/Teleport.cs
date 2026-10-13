@@ -8,16 +8,16 @@ using ProjectT.UI;
 namespace ProjectT.Area
 {
     // 두 끝 중 하나에 라리스가 닿으면 반대쪽 끝으로 옮긴다. ScreenFader·CinemachineConfiner2D는 있으면 쓰고 없으면 건너뛴다.
-    public class Passage : MonoBehaviour
+    public class Teleport : MonoBehaviour
     {
-        [SerializeField] PassageEnd endA;
-        [SerializeField] PassageEnd endB;
+        [SerializeField] TeleportEnd endA;
+        [SerializeField] TeleportEnd endB;
 
         InputLock heldLock;
         ScreenFader activeFader;
 
-        public PassageEnd EndA => endA;
-        public PassageEnd EndB => endB;
+        public TeleportEnd EndA => endA;
+        public TeleportEnd EndB => endB;
         public bool IsTransitioning { get; private set; }
 
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금과 페이드를 되돌린다.
@@ -29,20 +29,20 @@ namespace ProjectT.Area
             End();
         }
 
-        internal void OnEndEntered(PassageEnd end, Collider2D other)
+        internal void OnEndEntered(TeleportEnd end, Collider2D other)
         {
             IEnumerator routine = Prepare(end, other);
             if (routine != null)
                 StartCoroutine(routine);
         }
 
-        internal void OnEndExited(PassageEnd end, Collider2D other)
+        internal void OnEndExited(TeleportEnd end, Collider2D other)
         {
             if (TryGetLaris(other, out _))
                 end.WaitingForExit = false;
         }
 
-        internal IEnumerator Prepare(PassageEnd from, Collider2D body)
+        internal IEnumerator Prepare(TeleportEnd from, Collider2D body)
         {
             if (!TryGetLaris(body, out PlayerMovement laris))
                 return null;
@@ -54,15 +54,15 @@ namespace ProjectT.Area
             if (inputLock != null && inputLock.IsLocked)
                 return null;
 
-            PassageEnd to = from == endA ? endB : from == endB ? endA : null;
+            TeleportEnd to = from == endA ? endB : from == endB ? endA : null;
             if (to == null)
             {
-                Debug.LogWarning($"[Passage] '{name}': '{from.name}'의 반대쪽 끝이 없어 옮기지 않는다.", this);
+                Debug.LogWarning($"[Teleport] '{name}': '{from.name}'의 반대쪽 끝이 없어 옮기지 않는다.", this);
                 return null;
             }
             if (to.CameraBounds != null && !IsConfinerShape(to.CameraBounds))
             {
-                Debug.LogWarning($"[Passage] '{name}': '{to.name}'의 카메라 경계 '{to.CameraBounds.name}'는 BoxCollider2D·PolygonCollider2D·CompositeCollider2D가 아니어서 옮기지 않는다.", this);
+                Debug.LogWarning($"[Teleport] '{name}': '{to.name}'의 카메라 경계 '{to.CameraBounds.name}'는 BoxCollider2D·PolygonCollider2D·CompositeCollider2D가 아니어서 옮기지 않는다.", this);
                 return null;
             }
 
@@ -75,7 +75,7 @@ namespace ProjectT.Area
             return Run(to, laris, body);
         }
 
-        IEnumerator Run(PassageEnd to, PlayerMovement laris, Collider2D body)
+        IEnumerator Run(TeleportEnd to, PlayerMovement laris, Collider2D body)
         {
             try
             {

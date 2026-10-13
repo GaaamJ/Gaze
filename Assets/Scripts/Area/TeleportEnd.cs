@@ -17,7 +17,7 @@ namespace ProjectT.Area
 
     // 도착 위치는 이 오브젝트의 위치다.
     [RequireComponent(typeof(Collider2D))]
-    public class PassageEnd : MonoBehaviour
+    public class TeleportEnd : MonoBehaviour
     {
         [Tooltip("이 끝에 도착한 뒤 라리스가 바라볼 방향. Keep이면 그대로 둔다.")]
         [SerializeField] ArrivalFacing arrivalFacing;
@@ -25,7 +25,7 @@ namespace ProjectT.Area
         [Tooltip("이 끝이 있는 방의 카메라 경계(BoxCollider2D·PolygonCollider2D·CompositeCollider2D). 비우면 경계를 바꾸지 않는다.")]
         [SerializeField] Collider2D cameraBounds;
 
-        Passage passage;
+        Teleport teleport;
 
         public ArrivalFacing ArrivalFacing => arrivalFacing;
         public Collider2D CameraBounds => cameraBounds;
@@ -35,21 +35,21 @@ namespace ProjectT.Area
 
         void Awake()
         {
-            passage = GetComponentInParent<Passage>();
-            if (passage == null)
-                Debug.LogError("[PassageEnd] 부모에서 Passage를 찾지 못했다.", this);
+            teleport = GetComponentInParent<Teleport>();
+            if (teleport == null)
+                Debug.LogError("[TeleportEnd] 부모에서 Teleport를 찾지 못했다.", this);
         }
 
         void OnTriggerEnter2D(Collider2D other)
         {
-            if (passage != null)
-                passage.OnEndEntered(this, other);
+            if (teleport != null)
+                teleport.OnEndEntered(this, other);
         }
 
         void OnTriggerExit2D(Collider2D other)
         {
-            if (passage != null)
-                passage.OnEndExited(this, other);
+            if (teleport != null)
+                teleport.OnEndExited(this, other);
         }
 
         public bool TryGetFacing(out Vector2Int direction)
