@@ -100,7 +100,7 @@ namespace ProjectT.Area
 
                 if (activeFader != null)
                 {
-                    IEnumerator fadeIn = activeFader.FadeIn();
+                    IEnumerator fadeIn = activeFader.HoldThenFadeIn();
                     while (fadeIn.MoveNext())
                         yield return fadeIn.Current;
                 }

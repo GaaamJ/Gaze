@@ -9,6 +9,8 @@ namespace ProjectT.UI
         [SerializeField] Image image;
         [Tooltip("페이드 아웃·인 각각에 걸리는 시간(초)")]
         [SerializeField, Min(0f)] float duration = 0.3f;
+        [Tooltip("완전히 검은 상태로 유지하는 시간(초)")]
+        [SerializeField, Min(0f)] float holdDuration = 0.15f;
 
         float alpha;
 
@@ -27,6 +29,19 @@ namespace ProjectT.UI
 
         public IEnumerator FadeOut() => FadeTo(1f);
         public IEnumerator FadeIn() => FadeTo(0f);
+
+        public IEnumerator HoldThenFadeIn()
+        {
+            // duration이 0이면 연출 전체를 즉시로 본다. 시간이 흐르지 않는 테스트에서 유지 대기에 멈추지 않게 하기 위함.
+            if (duration > 0f)
+            {
+                for (float t = 0f; t < holdDuration; t += Time.unscaledDeltaTime)
+                    yield return null;
+            }
+            IEnumerator fadeIn = FadeIn();
+            while (fadeIn.MoveNext())
+                yield return fadeIn.Current;
+        }
 
         public IEnumerator FadeTo(float target)
         {
