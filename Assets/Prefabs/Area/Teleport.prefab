@@ -48,6 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.Teleport
   endA: {fileID: 5100000000000000014}
   endB: {fileID: 5100000000000000024}
+  faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
 --- !u!1 &5100000000000000011
 GameObject:
   m_ObjectHideFlags: 0
@@ -139,8 +140,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb63ce66972c4d59b2b96d0f6c087b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.TeleportEnd
-  arrivalFacing: 0
-  cameraBounds: {fileID: 0}
 --- !u!1 &5100000000000000021
 GameObject:
   m_ObjectHideFlags: 0
@@ -232,5 +231,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb63ce66972c4d59b2b96d0f6c087b81, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.TeleportEnd
-  arrivalFacing: 0
-  cameraBounds: {fileID: 0}

@@ -72,6 +72,23 @@ namespace ProjectT.Area.Tests
             return fader;
         }
 
+        const string FaderPrefabPath = "Assets/TeleportTestsFader.prefab";
+
+        // 실제 ScreenFader.prefab은 페이드 시간이 있어 에디트 모드에서 끝나지 않으므로 시간 0인 임시 프리팹을 만든다.
+        ScreenFader NewFaderPrefab()
+        {
+            GameObject source = NewFader().gameObject;
+            GameObject asset = PrefabUtility.SaveAsPrefabAsset(source, FaderPrefabPath);
+            Object.DestroyImmediate(source);
+            return asset.GetComponent<ScreenFader>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            AssetDatabase.DeleteAsset(FaderPrefabPath);
+        }
+
         static void Set(Object target, Action<SerializedObject> edit)
         {
             var so = new SerializedObject(target);
@@ -218,13 +235,40 @@ namespace ProjectT.Area.Tests
         }
 
         [Test]
-        public void WithoutFaderCameraOrInputLock_StillMoves()
+        public void NoFaderInScene_UsesFaderPrefabOnceAndReusesIt()
+        {
+            ScreenFader prefab = NewFaderPrefab();
+            Set(teleport, so => so.FindProperty("faderPrefab").objectReferenceValue = prefab);
+            Assert.IsNull(Object.FindAnyObjectByType<ScreenFader>());
+
+            IEnumerator routine = teleport.Prepare(endA, larisBody);
+            RunToPhysicsWait(routine);
+            ScreenFader[] faders = Object.FindObjectsByType<ScreenFader>(FindObjectsSortMode.None);
+            Assert.AreEqual(1, faders.Length);
+            Assert.AreEqual(1f, faders[0].Alpha);
+            RunToEnd(routine);
+            Assert.AreEqual(0f, faders[0].Alpha);
+
+            teleport.OnEndExited(endB, larisBody);
+            RunToEnd(teleport.Prepare(endB, larisBody));
+            Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
+            Assert.AreEqual(1, Object.FindObjectsByType<ScreenFader>(FindObjectsSortMode.None).Length);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void NoFaderAndNoPrefab_WarnsOnceAndStillMoves()
         {
             Object.DestroyImmediate(inputLock);
 
+            LogAssert.Expect(LogType.Warning, new Regex("ScreenFader가 없고 'faderPrefab'도 비어"));
             RunToEnd(teleport.Prepare(endA, larisBody));
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
             Assert.IsFalse(teleport.IsTransitioning);
+
+            teleport.OnEndExited(endB, larisBody);
+            RunToEnd(teleport.Prepare(endB, larisBody));
+            Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             LogAssert.NoUnexpectedReceived();
         }
     }

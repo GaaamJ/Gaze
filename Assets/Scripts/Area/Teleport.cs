@@ -7,14 +7,17 @@ using ProjectT.UI;
 
 namespace ProjectT.Area
 {
-    // 두 끝 중 하나에 라리스가 닿으면 반대쪽 끝으로 옮긴다. ScreenFader는 있으면 쓰고 없으면 건너뛴다.
+    // 두 끝 중 하나에 라리스가 닿으면 반대쪽 끝으로 옮긴다. 씬에 ScreenFader가 없으면 faderPrefab을 꺼내 쓴다.
     public class Teleport : MonoBehaviour
     {
         [SerializeField] TeleportEnd endA;
         [SerializeField] TeleportEnd endB;
+        [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
+        [SerializeField] ScreenFader faderPrefab;
 
         InputLock heldLock;
         ScreenFader activeFader;
+        bool warnedNoFader;
 
         public TeleportEnd EndA => endA;
         public TeleportEnd EndB => endB;
@@ -74,7 +77,7 @@ namespace ProjectT.Area
         {
             try
             {
-                activeFader = FindAnyObjectByType<ScreenFader>();
+                activeFader = FindOrCreateFader();
                 // 하위 페이드를 Unity에 넘기면 예외 때 이 코루틴의 finally가 돌지 않아 직접 돌린다.
                 if (activeFader != null)
                 {
@@ -122,6 +125,22 @@ namespace ProjectT.Area
             activeFader = null;
             if (fader != null)
                 fader.SetAlpha(0f);
+        }
+
+        // 만든 페이더는 씬 루트에 두어 다음 전환·다른 통로가 FindAnyObjectByType으로 다시 쓰고, 씬과 함께 정리되게 한다.
+        ScreenFader FindOrCreateFader()
+        {
+            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
+            if (fader != null)
+                return fader;
+            if (faderPrefab != null)
+                return Instantiate(faderPrefab);
+            if (!warnedNoFader)
+            {
+                warnedNoFader = true;
+                Debug.LogWarning($"[Teleport] '{name}': 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 옮긴다.", this);
+            }
+            return null;
         }
 
         static bool TryGetLaris(Collider2D other, out PlayerMovement laris)
