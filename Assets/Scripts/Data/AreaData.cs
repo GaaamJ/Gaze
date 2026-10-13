@@ -6,7 +6,7 @@ namespace ProjectT.Data
     [CreateAssetMenu(fileName = "AreaData", menuName = "ProjectT/Area Data")]
     public class AreaData : ScriptableObject
     {
-        [Tooltip("지역 고유 이름. 씬 마커가 이 지역을 가리킬 때 쓴다.")]
+        [Tooltip("지역 고유 이름. 리스폰 지점처럼 이 지역을 저장·비교할 때 쓴다.")]
         [SerializeField] string areaId;
 
         [Tooltip("게임 폴더 Areas 아래의 층 폴더 이름. 예) Temp")]

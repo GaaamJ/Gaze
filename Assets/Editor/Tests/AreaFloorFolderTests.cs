@@ -34,6 +34,23 @@ namespace ProjectT.Data.Tests
                 .Select(g => AssetDatabase.LoadAssetAtPath<AreaData>(AssetDatabase.GUIDToAssetPath(g)))
                 .ToArray();
 
+        [TestCase("Temp", "Temp", "Temp")]
+        [TestCase("UndergroundParking", "UndergroundParking", "UndergroundParking")]
+        public void AreaAsset_HasOnlyIdAndFloorFolderName(string assetName, string expectedId, string expectedFolder)
+        {
+            var area = LoadArea(assetName);
+            Assert.IsNotNull(area);
+            Assert.AreEqual(expectedId, area.AreaId);
+            Assert.AreEqual(expectedFolder, area.FloorFolderName);
+
+            var fields = new System.Collections.Generic.List<string>();
+            var property = new SerializedObject(area).GetIterator();
+            for (bool enter = true; property.NextVisible(enter); enter = false)
+                if (property.name != "m_Script")
+                    fields.Add(property.name);
+            CollectionAssert.AreEqual(new[] { "areaId", "floorFolderName" }, fields);
+        }
+
         [TestCase("Temp", "Temp")]
         [TestCase("UndergroundParking", "UndergroundParking")]
         public void FloorFolder_IsBuiltFromAreaDataName(string assetName, string expectedFolder)
