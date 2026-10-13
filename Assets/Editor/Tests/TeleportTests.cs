@@ -119,7 +119,7 @@ namespace ProjectT.Area.Tests
             var camera = new GameObject("CinemachineCamera").AddComponent<CinemachineCamera>();
             camera.PreviousStateIsValid = true;
 
-            IEnumerator routine = teleport.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.TryBegin(endA, larisBody);
             Assert.IsNotNull(routine);
             Assert.IsTrue(inputLock.IsLocked);
             Assert.IsTrue(teleport.IsTransitioning);
@@ -143,7 +143,7 @@ namespace ProjectT.Area.Tests
             laris.transform.position = endB.transform.position;
             Physics2D.SyncTransforms();
 
-            RunToEnd(teleport.Prepare(endB, larisBody));
+            RunToEnd(teleport.TryBegin(endB, larisBody));
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             Assert.IsFalse(inputLock.IsLocked);
         }
@@ -151,11 +151,11 @@ namespace ProjectT.Area.Tests
         [Test]
         public void ReentryWhileRunning_IsIgnored()
         {
-            IEnumerator routine = teleport.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.TryBegin(endA, larisBody);
             RunToPhysicsWait(routine);
 
-            Assert.IsNull(teleport.Prepare(endA, larisBody));
-            Assert.IsNull(teleport.Prepare(endB, larisBody));
+            Assert.IsNull(teleport.TryBegin(endA, larisBody));
+            Assert.IsNull(teleport.TryBegin(endB, larisBody));
 
             RunToEnd(routine);
             Assert.IsFalse(inputLock.IsLocked);
@@ -164,15 +164,15 @@ namespace ProjectT.Area.Tests
         [Test]
         public void ArrivedEnd_StaysInactiveUntilLarisLeavesIt()
         {
-            RunToEnd(teleport.Prepare(endA, larisBody));
+            RunToEnd(teleport.TryBegin(endA, larisBody));
             Assert.IsTrue(endB.WaitingForExit);
-            Assert.IsNull(teleport.Prepare(endB, larisBody));
+            Assert.IsNull(teleport.TryBegin(endB, larisBody));
             Assert.IsFalse(inputLock.IsLocked);
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
 
             teleport.OnEndExited(endB, larisBody);
             Assert.IsFalse(endB.WaitingForExit);
-            Assert.IsNotNull(teleport.Prepare(endB, larisBody));
+            Assert.IsNotNull(teleport.TryBegin(endB, larisBody));
         }
 
         [Test]
@@ -180,9 +180,9 @@ namespace ProjectT.Area.Tests
         {
             endB.GetComponent<BoxCollider2D>().offset = new Vector2(5f, 0f);
 
-            RunToEnd(teleport.Prepare(endA, larisBody));
+            RunToEnd(teleport.TryBegin(endA, larisBody));
             Assert.IsFalse(endB.WaitingForExit);
-            Assert.IsNotNull(teleport.Prepare(endB, larisBody));
+            Assert.IsNotNull(teleport.TryBegin(endB, larisBody));
         }
 
         [Test]
@@ -190,13 +190,13 @@ namespace ProjectT.Area.Tests
         {
             var detect = laris.gameObject.AddComponent<CircleCollider2D>();
             detect.isTrigger = true;
-            Assert.IsNull(teleport.Prepare(endA, detect));
+            Assert.IsNull(teleport.TryBegin(endA, detect));
 
             var box = new GameObject("Box");
             box.AddComponent<Rigidbody2D>();
-            Assert.IsNull(teleport.Prepare(endA, box.AddComponent<BoxCollider2D>()));
+            Assert.IsNull(teleport.TryBegin(endA, box.AddComponent<BoxCollider2D>()));
 
-            Assert.IsNull(teleport.Prepare(endA, new GameObject("Static").AddComponent<BoxCollider2D>()));
+            Assert.IsNull(teleport.TryBegin(endA, new GameObject("Static").AddComponent<BoxCollider2D>()));
             Assert.IsFalse(inputLock.IsLocked);
         }
 
@@ -204,7 +204,7 @@ namespace ProjectT.Area.Tests
         public void AlreadyLocked_DoesNotStart()
         {
             inputLock.Lock(InputLockReason.Dialogue);
-            Assert.IsNull(teleport.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.TryBegin(endA, larisBody));
             inputLock.Unlock(InputLockReason.Dialogue);
             Assert.IsFalse(inputLock.IsLocked);
         }
@@ -215,7 +215,7 @@ namespace ProjectT.Area.Tests
             Set(teleport, so => so.FindProperty("endB").objectReferenceValue = null);
 
             LogAssert.Expect(LogType.Warning, new Regex("반대쪽 끝이 없어"));
-            Assert.IsNull(teleport.Prepare(endA, larisBody));
+            Assert.IsNull(teleport.TryBegin(endA, larisBody));
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsFalse(teleport.IsTransitioning);
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
@@ -225,7 +225,7 @@ namespace ProjectT.Area.Tests
         public void ExceptionMidway_ReleasesLockAndFade()
         {
             var fader = NewFader();
-            IEnumerator routine = teleport.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.TryBegin(endA, larisBody);
             Object.DestroyImmediate(endB.gameObject);
 
             Assert.That(() => routine.MoveNext(), Throws.InstanceOf<Exception>());
@@ -241,7 +241,7 @@ namespace ProjectT.Area.Tests
             Set(teleport, so => so.FindProperty("faderPrefab").objectReferenceValue = prefab);
             Assert.IsNull(Object.FindAnyObjectByType<ScreenFader>());
 
-            IEnumerator routine = teleport.Prepare(endA, larisBody);
+            IEnumerator routine = teleport.TryBegin(endA, larisBody);
             RunToPhysicsWait(routine);
             ScreenFader[] faders = Object.FindObjectsByType<ScreenFader>(FindObjectsSortMode.None);
             Assert.AreEqual(1, faders.Length);
@@ -250,24 +250,24 @@ namespace ProjectT.Area.Tests
             Assert.AreEqual(0f, faders[0].Alpha);
 
             teleport.OnEndExited(endB, larisBody);
-            RunToEnd(teleport.Prepare(endB, larisBody));
+            RunToEnd(teleport.TryBegin(endB, larisBody));
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             Assert.AreEqual(1, Object.FindObjectsByType<ScreenFader>(FindObjectsSortMode.None).Length);
             LogAssert.NoUnexpectedReceived();
         }
 
         [Test]
-        public void NoFaderAndNoPrefab_WarnsOnceAndStillMoves()
+        public void NoFaderAndNoPrefabAndNoInputLock_WarnsOnceAndStillMoves()
         {
             Object.DestroyImmediate(inputLock);
 
             LogAssert.Expect(LogType.Warning, new Regex("ScreenFader가 없고 'faderPrefab'도 비어"));
-            RunToEnd(teleport.Prepare(endA, larisBody));
+            RunToEnd(teleport.TryBegin(endA, larisBody));
             Assert.AreEqual((Vector2)endB.transform.position, LarisPosition);
             Assert.IsFalse(teleport.IsTransitioning);
 
             teleport.OnEndExited(endB, larisBody);
-            RunToEnd(teleport.Prepare(endB, larisBody));
+            RunToEnd(teleport.TryBegin(endB, larisBody));
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             LogAssert.NoUnexpectedReceived();
         }

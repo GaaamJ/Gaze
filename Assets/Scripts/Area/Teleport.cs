@@ -19,8 +19,6 @@ namespace ProjectT.Area
         ScreenFader activeFader;
         bool warnedNoFader;
 
-        public TeleportEnd EndA => endA;
-        public TeleportEnd EndB => endB;
         public bool IsTransitioning { get; private set; }
 
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금과 페이드를 되돌린다.
@@ -34,7 +32,7 @@ namespace ProjectT.Area
 
         internal void OnEndEntered(TeleportEnd end, Collider2D other)
         {
-            IEnumerator routine = Prepare(end, other);
+            IEnumerator routine = TryBegin(end, other);
             if (routine != null)
                 StartCoroutine(routine);
         }
@@ -45,15 +43,15 @@ namespace ProjectT.Area
                 end.WaitingForExit = false;
         }
 
-        internal IEnumerator Prepare(TeleportEnd from, Collider2D body)
+        internal IEnumerator TryBegin(TeleportEnd from, Collider2D other)
         {
-            if (!TryGetLaris(body, out PlayerMovement laris))
+            if (!TryGetLaris(other, out PlayerMovement laris))
                 return null;
-            if (IsTransitioning || !isActiveAndEnabled || from == null || from.WaitingForExit)
+            if (IsTransitioning || !isActiveAndEnabled || from.WaitingForExit)
                 return null;
 
             InputLock inputLock = laris.GetComponent<InputLock>();
-            // 다른 통로로 옮겨지는 중이거나 대화 중이면 넘어가지 않는다.
+            // 다른 텔레포트로 옮겨지는 중이거나 대화 중이면 넘어가지 않는다.
             if (inputLock != null && inputLock.IsLocked)
                 return null;
 
@@ -67,13 +65,13 @@ namespace ProjectT.Area
             IsTransitioning = true;
             if (inputLock != null)
             {
-                inputLock.Lock(InputLockReason.RoomTransition);
+                inputLock.Lock(InputLockReason.Teleport);
                 heldLock = inputLock;
             }
-            return Run(to, body);
+            return Run(to, other);
         }
 
-        IEnumerator Run(TeleportEnd to, Collider2D body)
+        IEnumerator Run(TeleportEnd to, Collider2D other)
         {
             try
             {
@@ -86,7 +84,7 @@ namespace ProjectT.Area
                         yield return fadeOut.Current;
                 }
 
-                MoveTo(body.attachedRigidbody, to.transform.position);
+                MoveTo(other.attachedRigidbody, to.transform.position);
                 to.WaitingForExit = true;
                 // 이전 위치에서 감쇠로 따라오면 페이드 인 동안 화면이 미끄러지므로 다음 프레임에 바로 붙인다.
                 CinemachineCore.ResetCameraState();
@@ -95,7 +93,7 @@ namespace ProjectT.Area
                 yield return new WaitForFixedUpdate();
 
                 // 도착 위치가 트리거 밖이면 나가는 이벤트가 오지 않으므로 바로 다시 쓸 수 있게 한다.
-                if (to.TryGetComponent(out Collider2D trigger) && !Physics2D.Distance(trigger, body).isOverlapped)
+                if (!Physics2D.Distance(to.GetComponent<Collider2D>(), other).isOverlapped)
                     to.WaitingForExit = false;
 
                 if (activeFader != null)
@@ -114,20 +112,16 @@ namespace ProjectT.Area
         void End()
         {
             if (heldLock != null)
-            {
-                InputLock released = heldLock;
-                heldLock = null;
-                released.Unlock(InputLockReason.RoomTransition);
-            }
+                heldLock.Unlock(InputLockReason.Teleport);
+            heldLock = null;
             IsTransitioning = false;
 
-            ScreenFader fader = activeFader;
+            if (activeFader != null)
+                activeFader.SetAlpha(0f);
             activeFader = null;
-            if (fader != null)
-                fader.SetAlpha(0f);
         }
 
-        // 만든 페이더는 씬 루트에 두어 다음 전환·다른 통로가 FindAnyObjectByType으로 다시 쓰고, 씬과 함께 정리되게 한다.
+        // 만든 페이더는 씬 루트에 두어 다음 전환·다른 텔레포트가 FindAnyObjectByType으로 다시 쓰고, 씬과 함께 정리되게 한다.
         ScreenFader FindOrCreateFader()
         {
             ScreenFader fader = FindAnyObjectByType<ScreenFader>();
@@ -157,6 +151,7 @@ namespace ProjectT.Area
             position.z = body.transform.position.z;
             body.position = position;
             body.linearVelocity = Vector2.zero;
+            // body.position은 다음 물리 단계에야 transform에 반영되므로, 카메라 스냅이 새 위치를 보도록 transform도 바로 옮긴다.
             body.transform.position = position;
         }
     }
