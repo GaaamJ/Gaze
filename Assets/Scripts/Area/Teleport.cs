@@ -67,10 +67,10 @@ namespace ProjectT.Area
                 inputLock.Lock(InputLockReason.RoomTransition);
                 heldLock = inputLock;
             }
-            return Run(to, laris, body);
+            return Run(to, body);
         }
 
-        IEnumerator Run(TeleportEnd to, PlayerMovement laris, Collider2D body)
+        IEnumerator Run(TeleportEnd to, Collider2D body)
         {
             try
             {
@@ -85,8 +85,6 @@ namespace ProjectT.Area
 
                 MoveTo(body.attachedRigidbody, to.transform.position);
                 to.WaitingForExit = true;
-                if (to.TryGetFacing(out Vector2Int facing))
-                    laris.Face(facing);
                 // 이전 위치에서 감쇠로 따라오면 페이드 인 동안 화면이 미끄러지므로 다음 프레임에 바로 붙인다.
                 CinemachineCore.ResetCameraState();
 

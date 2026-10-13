@@ -72,9 +72,6 @@ namespace ProjectT.Area.Tests
             return fader;
         }
 
-        static void SetFacing(TeleportEnd end, ArrivalFacing facing) =>
-            Set(end, so => so.FindProperty("arrivalFacing").enumValueIndex = (int)facing);
-
         static void Set(Object target, Action<SerializedObject> edit)
         {
             var so = new SerializedObject(target);
@@ -132,19 +129,6 @@ namespace ProjectT.Area.Tests
             RunToEnd(teleport.Prepare(endB, larisBody));
             Assert.AreEqual((Vector2)endA.transform.position, LarisPosition);
             Assert.IsFalse(inputLock.IsLocked);
-        }
-
-        [Test]
-        public void ArrivalFacing_IsAppliedOnlyWhenSet()
-        {
-            laris.Face(Vector2Int.left);
-            SetFacing(endB, ArrivalFacing.UpRight);
-            RunToEnd(teleport.Prepare(endA, larisBody));
-            Assert.AreEqual(new Vector2Int(1, 1), laris.Facing);
-
-            teleport.OnEndExited(endB, larisBody);
-            RunToEnd(teleport.Prepare(endB, larisBody));
-            Assert.AreEqual(new Vector2Int(1, 1), laris.Facing);
         }
 
         [Test]
