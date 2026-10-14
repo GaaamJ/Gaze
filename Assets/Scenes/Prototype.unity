@@ -8671,7 +8671,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: cbf1a1ed1c409f9498fae5e1bb197fd0, type: 2}
+  nodeId: 
 --- !u!61 &233710591
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -8765,7 +8765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: cbf1a1ed1c409f9498fae5e1bb197fd0, type: 2}
+  nodeId: 
 --- !u!61 &246149923
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9520,7 +9520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 0}
+  nodeId: 
 --- !u!61 &626637753
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -9951,7 +9951,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: cbf1a1ed1c409f9498fae5e1bb197fd0, type: 2}
+  nodeId: 
 --- !u!61 &683386299
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10117,7 +10117,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 0}
+  nodeId: 
 --- !u!61 &758199512
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -10536,7 +10536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: b3ea66805acddd248ac477551d834141, type: 2}
+  nodeId: TempRespawn
 --- !u!61 &817688610
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -11616,7 +11616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: 9e5a720a069a3714db4cd7d5884cd4bd, type: 2}
+  nodeId: ParkingLotRespawn
 --- !u!212 &1111389132
 SpriteRenderer:
   serializedVersion: 2
@@ -12133,7 +12133,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: cbf1a1ed1c409f9498fae5e1bb197fd0, type: 2}
+  nodeId: 
 --- !u!61 &1533925763
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12653,7 +12653,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: cbf1a1ed1c409f9498fae5e1bb197fd0, type: 2}
+  nodeId: 
 --- !u!61 &1946907319
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -12819,7 +12819,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 0}
+  nodeId: 
 --- !u!61 &1964163261
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -13313,7 +13313,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: db3b989b4bda17c4e80dc4e3f61fb658, type: 2}
+  nodeId: 
 --- !u!1001 &2132577340
 PrefabInstance:
   m_ObjectHideFlags: 0
