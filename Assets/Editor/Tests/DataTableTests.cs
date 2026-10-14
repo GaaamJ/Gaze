@@ -41,6 +41,13 @@ namespace ProjectT.Data.Tests
         }
 
         [Test]
+        public void NodeNames_FollowObjectIdRule()
+        {
+            Assert.AreEqual("Obj_TempRespawn", DialogueNodeNames.Obj("TempRespawn"));
+            Assert.AreEqual("Obj_TempRespawn_Recheck", DialogueNodeNames.ObjRecheck("TempRespawn"));
+        }
+
+        [Test]
         public void FindMissing_ReturnsOnlyAbsentNonEmptyNodesOnce()
         {
             var existing = new HashSet<string> { "A", "B" };
@@ -52,7 +59,7 @@ namespace ProjectT.Data.Tests
         public void ProjectNodeNames_ContainExistingPrototypeNode()
         {
             var names = YarnNodeCheck.LoadProjectNodeNames();
-            Assert.Contains("Temp_Respawn", new List<string>(names));
+            Assert.Contains("Obj_TempRespawn", new List<string>(names));
             Assert.IsFalse(names.Contains("Death_NoSuchNode"));
         }
 
