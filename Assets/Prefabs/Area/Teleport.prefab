@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5100000000000000002}
   - component: {fileID: 5100000000000000003}
+  - component: {fileID: 1489640253259884009}
   m_Layer: 0
   m_Name: Teleport
   m_TagString: Untagged
@@ -49,6 +50,19 @@ MonoBehaviour:
   endA: {fileID: 5100000000000000014}
   endB: {fileID: 5100000000000000024}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
+--- !u!114 &1489640253259884009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5100000000000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.PixelSnap
+  pixelsPerUnit: 16
 --- !u!1 &5100000000000000011
 GameObject:
   m_ObjectHideFlags: 0
@@ -76,7 +90,7 @@ Transform:
   m_GameObject: {fileID: 5100000000000000011}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1, y: 0, z: 0}
+  m_LocalPosition: {x: -1, y: -3.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -126,7 +140,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.625, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &5100000000000000014
 MonoBehaviour:
