@@ -1,0 +1,127 @@
+// 본문에 문장이 하나도 없는 노드는 Yarn 컴파일에서 빠지므로 대사 작성 전 노드에는 <<stop>>을 둔다.
+
+title: Obj_TempRespawn
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_TempRespawn_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_ParkingLotRespawn
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_ParkingLotRespawn_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_HintGapA
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_HintGapA_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_HintGapB
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_HintGapB_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Obj_PasswordDoor_Open
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_FallingDeath
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_FallingDeath_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_FallingDeath_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_PasswordWrong
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_PasswordWrong_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_CloseWindow
+---
+// 대사 작성 전
+<<stop>>
+===
