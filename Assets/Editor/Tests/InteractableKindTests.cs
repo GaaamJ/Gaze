@@ -102,8 +102,6 @@ namespace ProjectT.Interaction.Tests
         public void LinkedKind_CallsRegisteredHandlerOnce(ObjectKind kind)
         {
             var target = NewInteractable(NewData($"Obj_{kind}", kind, link: "L"));
-            if (kind == ObjectKind.Respawn)
-                target.gameObject.AddComponent<RespawnArea>();
 
             var calls = new List<(Interactable, ObjectKind)>();
             foreach (var k in LinkedKinds)

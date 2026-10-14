@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -34,16 +35,16 @@ namespace ProjectT.Data.Tests
                 .Select(g => AssetDatabase.LoadAssetAtPath<AreaData>(AssetDatabase.GUIDToAssetPath(g)))
                 .ToArray();
 
-        [TestCase("Temp", "Temp", "Temp")]
-        [TestCase("UndergroundParking", "UndergroundParking", "UndergroundParking")]
-        public void AreaAsset_HasOnlyIdAndFloorFolderName(string assetName, string expectedId, string expectedFolder)
+        [TestCase("Temp")]
+        [TestCase("UndergroundParking")]
+        public void AreaAsset_HasOnlyIdAndFloorFolderName(string name)
         {
-            var area = LoadArea(assetName);
+            var area = LoadArea(name);
             Assert.IsNotNull(area);
-            Assert.AreEqual(expectedId, area.AreaId);
-            Assert.AreEqual(expectedFolder, area.FloorFolderName);
+            Assert.AreEqual(name, area.AreaId);
+            Assert.AreEqual(name, area.FloorFolderName);
 
-            var fields = new System.Collections.Generic.List<string>();
+            var fields = new List<string>();
             var property = new SerializedObject(area).GetIterator();
             for (bool enter = true; property.NextVisible(enter); enter = false)
                 if (property.name != "m_Script")
@@ -51,15 +52,15 @@ namespace ProjectT.Data.Tests
             CollectionAssert.AreEqual(new[] { "areaId", "floorFolderName" }, fields);
         }
 
-        [TestCase("Temp", "Temp")]
-        [TestCase("UndergroundParking", "UndergroundParking")]
-        public void FloorFolder_IsBuiltFromAreaDataName(string assetName, string expectedFolder)
+        [TestCase("Temp")]
+        [TestCase("UndergroundParking")]
+        public void FloorFolder_IsBuiltFromAreaDataName(string name)
         {
-            var area = LoadArea(assetName);
+            var area = LoadArea(name);
             Assert.IsNotNull(area);
 
-            Assert.AreEqual(Path.Combine(_paths.Root, "Areas", expectedFolder), AreaFloorFolders.FloorFolder(_paths, area));
-            Assert.AreEqual(Path.Combine(_paths.Root, "Areas", expectedFolder, "elevator.ev"), AreaFloorFolders.ElevatorFile(_paths, area));
+            Assert.AreEqual(Path.Combine(_paths.Root, "Areas", name), AreaFloorFolders.FloorFolder(_paths, area));
+            Assert.AreEqual(Path.Combine(_paths.Root, "Areas", name, "elevator.ev"), AreaFloorFolders.ElevatorFile(_paths, area));
         }
 
         [Test]

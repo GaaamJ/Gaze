@@ -33,7 +33,7 @@ namespace ProjectT.Core.GameFolder
                 }
                 return true;
             }
-            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is NotSupportedException || e is ArgumentException)
+            catch (Exception e) when (IsFileError(e))
             {
                 return false;
             }
@@ -51,12 +51,15 @@ namespace ProjectT.Core.GameFolder
                 // UTF8 디코딩은 BOM을 제거한다. 메모장 저장으로 BOM이 붙어도 같은 값으로 읽힌다.
                 text = File.ReadAllText(filePath, Encoding.UTF8);
             }
-            catch (Exception e) when (e is IOException || e is UnauthorizedAccessException || e is NotSupportedException || e is ArgumentException)
+            catch (Exception e) when (IsFileError(e))
             {
                 return false;
             }
 
             return TryNormalizeId(text, out id);
         }
+
+        static bool IsFileError(Exception e) =>
+            e is IOException || e is UnauthorizedAccessException || e is NotSupportedException || e is ArgumentException;
     }
 }

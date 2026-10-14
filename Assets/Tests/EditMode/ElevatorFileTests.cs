@@ -21,7 +21,7 @@ namespace ProjectT.Core.Tests
             _tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
             _paths = new GameFolderPaths(Path.Combine(_tempBase, GameFolderPaths.RootFolderName));
             GameFolderStructure.EnsureStructure(_paths, new[] { "Temp", "UndergroundParking" });
-            _file = _paths.ElevatorFile("Temp");
+            _file = _paths.ElevatorFilePath("Temp");
             SaveManager.Paths = _paths;
             SaveManager.Load();
         }
@@ -184,7 +184,7 @@ namespace ProjectT.Core.Tests
         {
             var real = GameFolderPaths.CreateDefault();
             string realSave = real.SaveFile;
-            string realElevator = real.ElevatorFile("Temp");
+            string realElevator = real.ElevatorFilePath("Temp");
             bool saveExisted = File.Exists(realSave);
             bool elevatorExisted = File.Exists(realElevator);
             DateTime saveBefore = saveExisted ? File.GetLastWriteTimeUtc(realSave) : default;

@@ -22,7 +22,7 @@ namespace ProjectT.Data
             paths.FloorFolder(area.FloorFolderName);
 
         public static string ElevatorFile(GameFolderPaths paths, AreaData area) =>
-            paths.ElevatorFile(area.FloorFolderName);
+            paths.ElevatorFilePath(area.FloorFolderName);
 
         public static EnsureResult EnsureStructure(GameFolderPaths paths, IEnumerable<AreaData> areas) =>
             GameFolderStructure.EnsureStructure(paths, Names(areas));

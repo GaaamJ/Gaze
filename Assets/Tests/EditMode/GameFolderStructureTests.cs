@@ -74,14 +74,14 @@ namespace ProjectT.Core.Tests
         public void Ensure_AfterDeletingOne_RecreatesOnlyThatOne()
         {
             GameFolderStructure.EnsureStructure(_paths, Floors);
-            var marker = Path.Combine(_paths.FloorFolder("Temp"), "elevator.ev");
-            File.WriteAllText(marker, "keep");
+            var elevatorFile = Path.Combine(_paths.FloorFolder("Temp"), "elevator.ev");
+            File.WriteAllText(elevatorFile, "keep");
             Directory.Delete(_paths.FloorFolder("UndergroundParking"));
 
             var result = GameFolderStructure.EnsureStructure(_paths, Floors);
 
             CollectionAssert.AreEqual(new[] { _paths.FloorFolder("UndergroundParking") }, result.Created);
-            Assert.AreEqual("keep", File.ReadAllText(marker));
+            Assert.AreEqual("keep", File.ReadAllText(elevatorFile));
         }
 
         [Test]

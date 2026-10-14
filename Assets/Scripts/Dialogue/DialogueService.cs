@@ -15,7 +15,7 @@ namespace ProjectT.Dialogue
         DialogueRunner runner;
         bool isPlaying;
         bool nodeCompleted;
-        bool endRequested;
+        bool cancelRequested;
 
         public bool IsPlaying => isPlaying;
 
@@ -39,12 +39,12 @@ namespace ProjectT.Dialogue
             runner.RemoveCommandHandler(QuitNormallyCommandName);
         }
 
-        public bool RequestEnd()
+        public bool RequestCancel()
         {
-            if (!isPlaying || endRequested || !runner.IsDialogueRunning)
+            if (!isPlaying || cancelRequested || !runner.IsDialogueRunning)
                 return false;
 
-            endRequested = true;
+            cancelRequested = true;
             runner.Stop().Forget();
             return true;
         }
@@ -72,7 +72,7 @@ namespace ProjectT.Dialogue
             inputLock.Lock(InputLockReason.Dialogue);
             isPlaying = true;
             nodeCompleted = false;
-            endRequested = false;
+            cancelRequested = false;
             runner.onNodeStart.AddListener(OnNodeStart);
             runner.onNodeComplete.AddListener(OnNodeComplete);
 
@@ -94,7 +94,7 @@ namespace ProjectT.Dialogue
                 inputLock.Unlock(InputLockReason.Dialogue);
             }
 
-            if (endRequested)
+            if (cancelRequested)
                 return DialogueResult.Cancelled;
             return nodeCompleted ? DialogueResult.Completed : DialogueResult.Interrupted;
         }
@@ -110,9 +110,9 @@ namespace ProjectT.Dialogue
             QuitNormallyRequested.Invoke();
         }
 
-        // 노드 끝이나 <<stop>>에서는 NodeComplete가 오지만, runner.Stop()·파괴로 끊기면 오지 않는다.
         void OnNodeStart(string nodeName) => nodeCompleted = false;
 
+        // 노드 끝이나 <<stop>>에서는 NodeComplete가 오지만, runner.Stop()·파괴로 끊기면 오지 않는다.
         void OnNodeComplete(string nodeName) => nodeCompleted = true;
     }
 }

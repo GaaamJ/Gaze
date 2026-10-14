@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using ProjectT.Core.GameFolder;
 
 namespace ProjectT.Save
@@ -13,7 +12,6 @@ namespace ProjectT.Save
             id = ElevatorFile.NewId();
             var data = SaveManager.Data;
             data.elevatorFileId = id;
-            data.elevatorFileIdHistory ??= new List<string>();
             data.elevatorFileIdHistory.Add(id);
             return SaveManager.Save();
         }
