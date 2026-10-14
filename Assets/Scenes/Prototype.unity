@@ -8925,6 +8925,54 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &327527550
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 327527552}
+  - component: {fileID: 327527551}
+  m_Layer: 0
+  m_Name: DeathSceneEntry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &327527551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 327527550}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d44245330c1e794a9fd532f2ab56e9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathSceneEntry
+  inputLock: {fileID: 1846355020}
+  dialogueService: {fileID: 99290339}
+  laris: {fileID: 1846355017}
+  faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
+--- !u!4 &327527552
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 327527550}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &407550444
 GameObject:
   m_ObjectHideFlags: 0
@@ -9129,6 +9177,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 420215713}
+  - component: {fileID: 420215716}
+  - component: {fileID: 420215715}
+  - component: {fileID: 420215714}
   m_Layer: 0
   m_Name: GrayScaleDeathCrack
   m_TagString: Untagged
@@ -9153,6 +9204,111 @@ Transform:
   - {fileID: 863144094}
   m_Father: {fileID: 1556776377}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &420215714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420215712}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94cb57576cef117418b7adee4bf3ba7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathZone
+  deathNodeId: Death_FallingDeath
+--- !u!61 &420215715
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420215712}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
+--- !u!61 &420215716
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420215712}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -2.0625, y: 2.25}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &430894168
 GameObject:
   m_ObjectHideFlags: 0
@@ -11457,6 +11613,7 @@ MonoBehaviour:
   openSprite: {fileID: -2136551548243413280, guid: e36de77f9a6663d45ae76a69ac2355af, type: 3}
   activateOnOpen:
   - {fileID: 453309934}
+  wrongDeathNodeId: Death_PasswordWrong
 --- !u!1 &1040953798
 GameObject:
   m_ObjectHideFlags: 0
@@ -13017,9 +13174,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1964163256}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93aa6133b876f0c40a4d98fd08943303, type: 3}
+  m_Script: {fileID: 11500000, guid: 7abb02c4410132a459c6ff883231164d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Puzzle.DangerousGap
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathInteractable
+  deathNodeId: Death_DangerousGap
 --- !u!1 &2007013525
 GameObject:
   m_ObjectHideFlags: 0
@@ -13468,10 +13626,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2110457238}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
+  m_Script: {fileID: 11500000, guid: 7abb02c4410132a459c6ff883231164d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  dialogueNodeId: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathInteractable
+  deathNodeId: Death_DeathObject
 --- !u!1001 &2132577340
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13577,3 +13735,4 @@ SceneRoots:
   - {fileID: 479603783}
   - {fileID: 921890466}
   - {fileID: 1556776377}
+  - {fileID: 327527552}
