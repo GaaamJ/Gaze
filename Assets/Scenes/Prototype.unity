@@ -9000,7 +9000,7 @@ GameObject:
   m_Component:
   - component: {fileID: 420215713}
   m_Layer: 0
-  m_Name: GrayScaleCrack
+  m_Name: GrayScaleDeathCrack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10231,7 +10231,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: c869d1bc94d8c454097eb28b9c353c63, type: 2}
+  data: {fileID: 0}
 --- !u!61 &817688610
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -11311,7 +11311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: c869d1bc94d8c454097eb28b9c353c63, type: 2}
+  data: {fileID: 0}
 --- !u!212 &1111389132
 SpriteRenderer:
   serializedVersion: 2
@@ -12825,7 +12825,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
-  data: {fileID: 11400000, guid: 76382a7d9460d0e4cbaa47c6ff926673, type: 2}
+  data: {fileID: 0}
 --- !u!1001 &2132577340
 PrefabInstance:
   m_ObjectHideFlags: 0
