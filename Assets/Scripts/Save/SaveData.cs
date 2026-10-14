@@ -46,6 +46,12 @@ namespace ProjectT.Save
         // 비어 있으면 시작 지점
         public string respawnAreaId = "";
 
+        // false면 씬의 라리스 기본 위치에서 시작
+        public bool hasRespawnPosition;
+        public Vector2 respawnPosition;
+
+        public List<string> investigatedNodeIds = new List<string>();
+
         public string elevatorAreaId = "";
 
         public string elevatorFileId = "";

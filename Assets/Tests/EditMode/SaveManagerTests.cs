@@ -41,6 +41,10 @@ namespace ProjectT.Core.Tests
             d.corpses.Add(new CorpseRecord { id = "CloseWindow", position = Vector3.zero, areaId = "Temp", kind = CorpseKind.File, fileName = "CloseWindow_1.txt" });
             d.corpses.Add(new CorpseRecord { id = "CloseWindow", position = Vector3.zero, areaId = "Temp", kind = CorpseKind.File, fileName = "corpse_002.txt" });
             d.respawnAreaId = "UndergroundParking";
+            d.hasRespawnPosition = true;
+            d.respawnPosition = new Vector2(3.25f, -7.5f);
+            d.investigatedNodeIds.Add("HintGapA");
+            d.investigatedNodeIds.Add("TempRespawn");
             d.elevatorAreaId = "Temp";
             d.elevatorFileId = "b3c1e2d4-0000-4000-8000-000000000002";
             d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000001");
@@ -105,6 +109,9 @@ namespace ProjectT.Core.Tests
                 Assert.AreEqual(e.corpses[i].fileName, d.corpses[i].fileName);
             }
             Assert.AreEqual(e.respawnAreaId, d.respawnAreaId);
+            Assert.AreEqual(e.hasRespawnPosition, d.hasRespawnPosition);
+            Assert.AreEqual(e.respawnPosition, d.respawnPosition);
+            CollectionAssert.AreEqual(e.investigatedNodeIds, d.investigatedNodeIds);
             Assert.AreEqual(e.elevatorAreaId, d.elevatorAreaId);
             Assert.AreEqual(e.elevatorFileId, d.elevatorFileId);
             CollectionAssert.AreEqual(e.elevatorFileIdHistory, d.elevatorFileIdHistory);
@@ -185,6 +192,26 @@ namespace ProjectT.Core.Tests
             AssertDefaults(SaveManager.Data);
         }
 
+        [Test]
+        public void Load_OldSaveWithoutNewFields_HasNoRespawnPositionAndNoInvestigated()
+        {
+            Directory.CreateDirectory(_paths.Root);
+            File.WriteAllText(_paths.SaveFile,
+                "{\n    \"solvedPuzzleIds\": [\"PasswordDoor\"],\n    \"deathRecords\": [],\n    \"corpses\": [],\n" +
+                "    \"respawnAreaId\": \"Temp\",\n    \"elevatorAreaId\": \"\",\n    \"elevatorFileId\": \"\",\n" +
+                "    \"elevatorFileIdHistory\": [],\n    \"exitState\": 0\n}");
+
+            SaveManager.Load();
+            var d = SaveManager.Data;
+
+            Assert.IsFalse(d.hasRespawnPosition);
+            Assert.AreEqual(Vector2.zero, d.respawnPosition);
+            Assert.IsNotNull(d.investigatedNodeIds);
+            CollectionAssert.IsEmpty(d.investigatedNodeIds);
+            CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
+            Assert.AreEqual("Temp", d.respawnAreaId);
+        }
+
         static void AssertDefaults(SaveData d)
         {
             Assert.IsNotNull(d);
@@ -192,6 +219,8 @@ namespace ProjectT.Core.Tests
             CollectionAssert.IsEmpty(d.deathRecords);
             CollectionAssert.IsEmpty(d.corpses);
             Assert.AreEqual("", d.respawnAreaId);
+            Assert.IsFalse(d.hasRespawnPosition);
+            CollectionAssert.IsEmpty(d.investigatedNodeIds);
             Assert.AreEqual("", d.elevatorAreaId);
             Assert.AreEqual("", d.elevatorFileId);
             CollectionAssert.IsEmpty(d.elevatorFileIdHistory);
