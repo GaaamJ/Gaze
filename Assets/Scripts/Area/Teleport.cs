@@ -39,13 +39,13 @@ namespace ProjectT.Area
 
         internal void OnEndExited(TeleportEnd end, Collider2D other)
         {
-            if (TryGetLaris(other, out _))
+            if (PlayerMovement.TryFrom(other, out _))
                 end.WaitingForExit = false;
         }
 
         internal IEnumerator TryBegin(TeleportEnd from, Collider2D other)
         {
-            if (!TryGetLaris(other, out PlayerMovement laris))
+            if (!PlayerMovement.TryFrom(other, out PlayerMovement laris))
                 return null;
             if (IsTransitioning || !isActiveAndEnabled || from.WaitingForExit)
                 return null;
@@ -135,15 +135,6 @@ namespace ProjectT.Area
                 Debug.LogWarning($"[Teleport] '{name}': 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 옮긴다.", this);
             }
             return null;
-        }
-
-        static bool TryGetLaris(Collider2D other, out PlayerMovement laris)
-        {
-            laris = null;
-            // 라리스의 조사 감지 원(트리거)이 먼저 닿아도 넘어가지 않도록 몸 콜라이더만 본다.
-            if (other == null || other.isTrigger || other.attachedRigidbody == null)
-                return false;
-            return other.attachedRigidbody.TryGetComponent(out laris);
         }
 
         static void MoveTo(Rigidbody2D body, Vector3 position)
