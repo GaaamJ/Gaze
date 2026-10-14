@@ -9,7 +9,7 @@ namespace ProjectT.Session
         int total;
 
         // 씬을 다시 불러와도 사망 잠금이 이어지도록 정적으로 둔다. DeathSequence가 켜고 끈다.
-        public static bool KeepDeathLock { get; set; }
+        public static bool KeepDeathLock { get; internal set; }
 
         public bool IsLocked => total > 0;
 

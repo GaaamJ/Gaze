@@ -52,32 +52,32 @@ namespace ProjectT.Death.Tests
             DeathSequence.Begin(data);
             Assert.IsTrue(DeathSequence.IsActive);
             Assert.IsTrue(inputLock.IsLocked);
-            Assert.IsNotNull(DeathSequence.Screen);
-            Assert.AreEqual(RenderMode.ScreenSpaceOverlay, DeathSequence.Screen.GetComponent<Canvas>().renderMode);
-            Assert.AreEqual(Color.black, DeathSequence.Screen.GetComponent<UnityEngine.UI.Image>().color);
+            Assert.IsNotNull(DeathSequence.BlackScreen);
+            Assert.AreEqual(RenderMode.ScreenSpaceOverlay, DeathSequence.BlackScreen.GetComponent<Canvas>().renderMode);
+            Assert.AreEqual(Color.black, DeathSequence.BlackScreen.GetComponent<UnityEngine.UI.Image>().color);
             Assert.AreEqual(1, startedCount);
             Assert.AreSame(data, startedWith);
 
-            GameObject screen = DeathSequence.Screen;
+            GameObject screen = DeathSequence.BlackScreen;
             DeathSequence.End();
             Assert.IsFalse(DeathSequence.IsActive);
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsTrue(screen == null);
-            Assert.IsNull(DeathSequence.Screen);
+            Assert.IsNull(DeathSequence.BlackScreen);
         }
 
         [Test]
         public void SecondBegin_IsIgnored()
         {
             DeathSequence.Begin(data);
-            GameObject screen = DeathSequence.Screen;
+            GameObject screen = DeathSequence.BlackScreen;
             var other = ScriptableObject.CreateInstance<DeathData>();
             DeathSequence.Begin(other);
             Object.DestroyImmediate(other);
 
             Assert.AreEqual(1, startedCount);
             Assert.AreSame(data, startedWith);
-            Assert.AreSame(screen, DeathSequence.Screen);
+            Assert.AreSame(screen, DeathSequence.BlackScreen);
 
             DeathSequence.End();
             Assert.IsFalse(inputLock.IsLocked);

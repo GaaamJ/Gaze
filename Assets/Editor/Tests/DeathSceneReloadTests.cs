@@ -60,20 +60,20 @@ namespace ProjectT.Death.Tests
             Assert.IsFalse(dialogue.IsPlaying);
             Assert.IsTrue(Object.FindAnyObjectByType<InputLock>().IsLocked, "대화 잠금이 풀린 뒤에도 사망 잠금은 남아야 한다.");
 
-            GameObject screen = DeathSequence.Screen;
+            GameObject screen = DeathSequence.BlackScreen;
             yield return LoadPrototype();
 
             InputLock reloaded = Object.FindAnyObjectByType<InputLock>();
             Assert.IsNotNull(reloaded);
             Assert.IsTrue(reloaded.IsLocked, "리로드 뒤 새 InputLock이 잠겨 있지 않다.");
             Assert.IsTrue(screen != null && screen.activeInHierarchy, "리로드 뒤 검은 화면이 사라졌다.");
-            Assert.AreSame(screen, DeathSequence.Screen);
+            Assert.AreSame(screen, DeathSequence.BlackScreen);
 
             DeathSequence.Started -= OnStarted;
             DeathSequence.End();
             Assert.IsFalse(reloaded.IsLocked);
             // End 뒤 검은 화면 파괴는 여기서 확인하지 않는다. 전체 실행에서만 Destroy가 반영되지 않는 원인을 찾지 못했다(단독 실행·수동 플레이에서는 파괴됨).
-            Assert.IsNull(DeathSequence.Screen);
+            Assert.IsNull(DeathSequence.BlackScreen);
 
             Object.Destroy(data);
             yield return new ExitPlayMode();

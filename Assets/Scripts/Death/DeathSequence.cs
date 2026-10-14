@@ -28,7 +28,7 @@ namespace ProjectT.Death
 
         public static event Action<DeathData> Started;
 
-        internal static GameObject Screen { get; private set; }
+        internal static GameObject BlackScreen { get; private set; }
 
         public static void Begin(DeathData data)
         {
@@ -43,7 +43,7 @@ namespace ProjectT.Death
             InputLock.KeepDeathLock = true;
             foreach (InputLock inputLock in Object.FindObjectsByType<InputLock>(FindObjectsSortMode.None))
                 inputLock.Lock(InputLockReason.Death);
-            Screen = CreateScreen();
+            BlackScreen = CreateScreen();
 
             DialogueService dialogue = Object.FindAnyObjectByType<DialogueService>();
             if (dialogue != null && dialogue.IsPlaying)
@@ -64,9 +64,9 @@ namespace ProjectT.Death
             InputLock.KeepDeathLock = false;
             foreach (InputLock inputLock in Object.FindObjectsByType<InputLock>(FindObjectsSortMode.None))
                 inputLock.Unlock(InputLockReason.Death);
-            if (Screen != null)
-                DestroyScreen(Screen);
-            Screen = null;
+            if (BlackScreen != null)
+                DestroyScreen(BlackScreen);
+            BlackScreen = null;
         }
 
         static async YarnTask StartAfterDialogue(DialogueService dialogue, DeathData data, int startedRun)
@@ -108,7 +108,7 @@ namespace ProjectT.Death
         {
             InputLock.KeepDeathLock = false;
             Started = null;
-            Screen = null;
+            BlackScreen = null;
             run++;
         }
     }
