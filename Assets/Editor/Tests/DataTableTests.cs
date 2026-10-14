@@ -24,8 +24,9 @@ namespace ProjectT.Data.Tests
         public void ProjectNodeNames_ContainExistingPrototypeNode()
         {
             var names = YarnNodeCheck.LoadProjectNodeNames();
-            Assert.Contains("Obj_TempRespawn", new List<string>(names));
-            Assert.IsFalse(names.Contains("Obj_NoSuchNode"));
+            Assert.Contains("TempRespawn", new List<string>(names));
+            Assert.Contains("TempRespawn_Recheck", new List<string>(names));
+            Assert.IsFalse(names.Contains("NoSuchNode"));
         }
     }
 }
