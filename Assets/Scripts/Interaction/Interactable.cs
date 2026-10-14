@@ -26,6 +26,12 @@ namespace ProjectT.Interaction
             if (TryGetComponent(out RespawnArea respawn))
                 UpdateRespawn(respawn);
 
+            if (TryGetComponent(out IInteractionOverride handler))
+            {
+                handler.Interact(context);
+                return;
+            }
+
             if (string.IsNullOrWhiteSpace(data.DialogueNode))
                 return;
 

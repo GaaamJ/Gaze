@@ -110,6 +110,31 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
+        public void WithOverride_PassesToOverrideInsteadOfDialogue()
+        {
+            var target = NewInteractable(NewData("Desk", "Desk_Recheck"));
+            var handler = target.gameObject.AddComponent<RecordingOverride>();
+
+            target.Interact(Context());
+
+            Assert.AreEqual(1, handler.Calls);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void WithOverrideAndRespawn_SavesRespawnFirst()
+        {
+            var target = NewRespawn("Temp");
+            var handler = target.gameObject.AddComponent<RecordingOverride>();
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장: Temp"));
+
+            target.Interact(Context());
+
+            Assert.AreEqual(1, handler.Calls);
+            Assert.AreEqual("Temp", handler.RespawnAtCall);
+        }
+
+        [Test]
         public void ResolvesFirstThenRecheckNode()
         {
             var target = NewInteractable(NewData("Desk", "Desk_Recheck"));
@@ -184,6 +209,18 @@ namespace ProjectT.Interaction.Tests
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
             Assert.IsFalse(File.Exists(paths.SaveFile));
+        }
+    }
+
+    public class RecordingOverride : MonoBehaviour, IInteractionOverride
+    {
+        public int Calls { get; private set; }
+        public string RespawnAtCall { get; private set; }
+
+        public void Interact(InteractContext context)
+        {
+            Calls++;
+            RespawnAtCall = RespawnAreaIds.Current;
         }
     }
 }
