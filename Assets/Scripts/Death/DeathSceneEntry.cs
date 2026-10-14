@@ -1,7 +1,10 @@
 using System.Collections;
+using Unity.Cinemachine;
 using UnityEngine;
+using ProjectT.Area;
 using ProjectT.Dialogue;
 using ProjectT.Player;
+using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.UI;
 
@@ -12,7 +15,7 @@ namespace ProjectT.Death
     {
         [SerializeField] InputLock inputLock;
         [SerializeField] DialogueService dialogueService;
-        [Tooltip("리스폰 위치 복원(#52 2단계)에 쓴다.")]
+        [Tooltip("세이브에 리스폰 위치가 있으면 씬 시작 때 이 라리스를 옮긴다.")]
         [SerializeField] PlayerMovement laris;
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
@@ -34,6 +37,7 @@ namespace ProjectT.Death
                 Debug.LogError("[DeathSceneEntry] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
 
             EnterScene();
+            RestoreRespawn(SaveManager.Data);
         }
 
         IEnumerator Start()
@@ -64,6 +68,17 @@ namespace ProjectT.Death
                 inputLock.Lock(InputLockReason.Death);
                 holdingLock = true;
             }
+        }
+
+        // 사망 리로드뿐 아니라 첫 시작에도 복원한다. 잠금 해제·페이드 인보다 먼저여야 이동이 보이지 않는다.
+        internal void RestoreRespawn(SaveData data)
+        {
+            if (laris == null || !RespawnPoint.TryGet(data, out Vector2 position))
+                return;
+
+            Teleport.MoveTo(laris.GetComponent<Rigidbody2D>(), position);
+            CinemachineCore.ResetCameraState();
+            Debug.Log($"[DeathSceneEntry] 리스폰 위치로 시작: {position}", this);
         }
 
         internal IEnumerator RunEntry()

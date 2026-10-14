@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using ProjectT.Player;
+using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.UI;
 using UnityEditor;
@@ -185,6 +187,53 @@ namespace ProjectT.Death.Tests
             DeathSequence.Begin("Death_A");
 
             Assert.IsFalse(DeathSequence.IsActive);
+        }
+
+        static DeathSceneEntry NewEntryWithLaris(Vector3 start, out PlayerMovement laris)
+        {
+            var entry = NewEntry(out InputLock _);
+            laris = new GameObject("LarisBody").AddComponent<PlayerMovement>();
+            laris.transform.position = start;
+            PlayerMovement captured = laris;
+            Set(entry, so => so.FindProperty("laris").objectReferenceValue = captured);
+            return entry;
+        }
+
+        [Test]
+        public void RespawnPoint_TryGet_OnlyWhenFlagged()
+        {
+            var data = new SaveData { respawnPosition = new Vector2(3f, 4f) };
+            Assert.IsFalse(RespawnPoint.TryGet(data, out _));
+            Assert.IsFalse(RespawnPoint.TryGet(null, out _));
+
+            data.hasRespawnPosition = true;
+            Assert.IsTrue(RespawnPoint.TryGet(data, out Vector2 position));
+            Assert.AreEqual(new Vector2(3f, 4f), position);
+        }
+
+        [Test]
+        public void RestoreRespawn_WithSavedPosition_MovesLarisKeepingZ()
+        {
+            var entry = NewEntryWithLaris(new Vector3(0f, 0f, -1f), out PlayerMovement laris);
+            var data = new SaveData { hasRespawnPosition = true, respawnPosition = new Vector2(6f, -2f) };
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 위치로 시작"));
+
+            entry.RestoreRespawn(data);
+
+            Assert.AreEqual(new Vector3(6f, -2f, -1f), laris.transform.position);
+            Assert.AreEqual(new Vector2(6f, -2f), laris.GetComponent<Rigidbody2D>().position);
+        }
+
+        [Test]
+        public void RestoreRespawn_WithoutSavedPosition_KeepsScenePosition()
+        {
+            var entry = NewEntryWithLaris(new Vector3(1f, 2f, 0f), out PlayerMovement laris);
+            var data = new SaveData { respawnPosition = new Vector2(6f, -2f) };
+
+            entry.RestoreRespawn(data);
+
+            Assert.AreEqual(new Vector3(1f, 2f, 0f), laris.transform.position);
+            LogAssert.NoUnexpectedReceived();
         }
 
         [Test]

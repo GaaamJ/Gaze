@@ -158,31 +158,88 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void Respawn_SavesAreaIdBeforeDialogue_AndLoadRestoresIt()
+        public void Respawn_SavesPositionBeforeDialogue_AndLoadRestoresIt()
         {
             var target = NewRespawn("UndergroundParking", "Respawn");
-            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장: UndergroundParking"));
+            target.transform.position = new Vector3(2.5f, -4f, 0f);
+            var logs = new List<string>();
+            Application.LogCallback capture = (message, _, _) => logs.Add(message);
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
 
-            target.Interact(Context());
+            Application.logMessageReceived += capture;
+            try
+            {
+                target.Interact(Context());
+            }
+            finally
+            {
+                Application.logMessageReceived -= capture;
+            }
 
-            Assert.AreEqual("UndergroundParking", RespawnAreaIds.Current);
-            StringAssert.Contains("\"respawnAreaId\": \"UndergroundParking\"", File.ReadAllText(paths.SaveFile));
+            int saved = logs.FindIndex(m => m.Contains("리스폰 지점 갱신·저장"));
+            int dialogue = logs.FindIndex(m => m.Contains("DialogueService가 없어"));
+            Assert.That(saved, Is.GreaterThanOrEqualTo(0));
+            Assert.That(saved, Is.LessThan(dialogue), "리스폰 저장이 대사보다 먼저여야 한다.");
 
             SaveManager.Load();
+            Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
+            Assert.AreEqual(new Vector2(2.5f, -4f), SaveManager.Data.respawnPosition);
             Assert.AreEqual("UndergroundParking", SaveManager.Data.respawnAreaId);
         }
 
         [Test]
-        public void Respawn_WithoutArea_KeepsStartPoint()
+        public void Respawn_WithoutArea_SavesPositionOnly()
         {
             var target = NewRespawn(null);
-            LogAssert.Expect(LogType.Warning, new Regex("RespawnArea의 지역이 비어"));
+            target.transform.position = new Vector3(1f, 1f, 0f);
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
             target.Interact(Context());
 
+            SaveManager.Load();
+            Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
+            Assert.AreEqual(new Vector2(1f, 1f), SaveManager.Data.respawnPosition);
             Assert.AreEqual("", RespawnAreaIds.Current);
-            Assert.IsFalse(File.Exists(paths.SaveFile));
+        }
+
+        [Test]
+        public void Respawn_UsesSpawnPointWhenSet()
+        {
+            var target = NewRespawn("Temp");
+            target.transform.position = new Vector3(5f, 5f, 0f);
+            var point = new GameObject("SpawnPoint");
+            created.Add(point);
+            point.transform.position = new Vector3(-3f, 7f, 0f);
+            var so = new SerializedObject(target.GetComponent<RespawnArea>());
+            so.FindProperty("spawnPoint").objectReferenceValue = point.transform;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
+
+            target.Interact(Context());
+
+            Assert.AreEqual(new Vector2(-3f, 7f), SaveManager.Data.respawnPosition);
+        }
+
+        [Test]
+        public void Respawn_LastInvestigatedWins()
+        {
+            var first = NewRespawn("Temp");
+            first.transform.position = new Vector3(1f, 2f, 0f);
+            var second = NewRespawn("Temp");
+            second.transform.position = new Vector3(10f, -20f, 0f);
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
+
+            first.Interact(Context());
+            second.Interact(Context());
+            SaveManager.Load();
+            Assert.AreEqual(new Vector2(10f, -20f), SaveManager.Data.respawnPosition);
+
+            first.Interact(Context());
+            SaveManager.Load();
+            Assert.AreEqual(new Vector2(1f, 2f), SaveManager.Data.respawnPosition);
         }
 
         [Test]
@@ -191,12 +248,15 @@ namespace ProjectT.Interaction.Tests
             Directory.CreateDirectory(tempBase);
             File.WriteAllText(paths.Root, "blocks root folder");
             var target = NewRespawn("Temp");
+            target.transform.position = new Vector3(4f, 0f, 0f);
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
             LogAssert.Expect(LogType.Warning, new Regex("저장에 실패했다"));
             target.Interact(Context());
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
+            Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
+            Assert.AreEqual(new Vector2(4f, 0f), SaveManager.Data.respawnPosition);
             Assert.IsFalse(File.Exists(paths.SaveFile));
         }
 

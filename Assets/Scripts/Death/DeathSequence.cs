@@ -119,7 +119,8 @@ namespace ProjectT.Death
                 fader.SetAlpha(0f);
         }
 
-        // TODO(#52 2단계): 리스폰 위치·메타픽션 사망 대기 저장을 여기서 연결한다.
+        // 리스폰 위치·퍼즐 클리어는 조사·풀이 시점에 이미 저장된다.
+        // TODO(#52 2b): 메타픽션 사망 대기 저장을 여기서 연결한다.
         static void SaveProgress()
         {
         }
