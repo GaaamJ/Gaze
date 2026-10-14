@@ -11233,6 +11233,7 @@ GameObject:
   - component: {fileID: 971100566}
   - component: {fileID: 971100565}
   - component: {fileID: 971100564}
+  - component: {fileID: 971100567}
   m_Layer: 0
   m_Name: PuzzleDoor
   m_TagString: Untagged
@@ -11327,6 +11328,31 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1176768364}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &971100567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 971100563}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9edc0147dcf1ce48a0b889fec7e474a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Puzzle.PasswordPuzzle
+  symbols:
+  - {fileID: 233710592}
+  - {fileID: 246149924}
+  - {fileID: 1946907320}
+  - {fileID: 1533925764}
+  - {fileID: 683386300}
+  answers:
+  - {fileID: 233710592}
+  - {fileID: 1533925764}
+  puzzleId: PasswordDoor
+  doorRenderer: {fileID: 971100565}
+  openSprite: {fileID: -2136551548243413280, guid: e36de77f9a6663d45ae76a69ac2355af, type: 3}
+  doorCollider: {fileID: 0}
 --- !u!1 &1040953798
 GameObject:
   m_ObjectHideFlags: 0
