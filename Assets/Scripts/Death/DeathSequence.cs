@@ -48,7 +48,7 @@ namespace ProjectT.Death
             DialogueService dialogue = Object.FindAnyObjectByType<DialogueService>();
             if (dialogue != null && dialogue.IsPlaying)
             {
-                dialogue.RequestEnd();
+                dialogue.RequestCancel();
                 StartAfterDialogue(dialogue, data, ++run).Forget();
                 return;
             }

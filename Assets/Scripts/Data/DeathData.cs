@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ProjectT.Data
@@ -155,7 +156,7 @@ namespace ProjectT.Data
         {
             foreach (var warning in CollectRuleWarnings())
                 Debug.LogWarning($"[DeathData] '{name}': {warning}", this);
-            YarnNodeCheck.WarnMissingDeferred(this, nameof(DeathData), new List<string>(AllNodes()).ToArray());
+            YarnNodeCheck.WarnMissingDeferred(this, nameof(DeathData), AllNodes().ToArray());
         }
 #endif
     }

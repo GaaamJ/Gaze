@@ -5,7 +5,7 @@ namespace ProjectT.Data
     [CreateAssetMenu(fileName = "DeathSettings", menuName = "ProjectT/Death Settings")]
     public class DeathSettings : ScriptableObject
     {
-        [Tooltip("장소 사망 트리거의 거부 영역 기본 크기. 트리거 콜라이더 바깥으로 이만큼 넓힌다(월드 단위, 사방).")]
+        [Tooltip("장소 사망 트리거의 거부 영역 여백. 트리거 콜라이더 바깥으로 사방 이만큼 넓힌다(월드 단위).")]
         [SerializeField, Min(0.01f)] float refusalAreaMargin = 1f;
 
         public float RefusalAreaMargin => refusalAreaMargin;

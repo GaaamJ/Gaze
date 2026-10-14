@@ -35,10 +35,10 @@ namespace ProjectT.Core.Tests
         {
             d.solvedPuzzleIds.Add("PasswordDoor");
             d.solvedPuzzleIds.Add("GapA");
-            d.deathRecords.Add(new DeathRecord { deathId = "Rockfall", count = 2 });
+            d.deathRecords.Add(new DeathRecord { deathId = "FallingRock", count = 2 });
             d.deathRecords.Add(new DeathRecord { deathId = "CloseWindow", count = 1 });
-            d.corpses.Add(new CorpseRecord { id = "Rockfall", position = new Vector3(1.5f, -2f, 0f), areaId = "UndergroundParking", kind = CorpseKind.World, fileName = "" });
-            d.corpses.Add(new CorpseRecord { id = "CloseWindow", position = Vector3.zero, areaId = "Temp", kind = CorpseKind.File, fileName = "corpse_001.txt" });
+            d.corpses.Add(new CorpseRecord { id = "FallingRock", position = new Vector3(1.5f, -2f, 0f), areaId = "UndergroundParking", kind = CorpseKind.World, fileName = "" });
+            d.corpses.Add(new CorpseRecord { id = "CloseWindow", position = Vector3.zero, areaId = "Temp", kind = CorpseKind.File, fileName = "CloseWindow_1.txt" });
             d.corpses.Add(new CorpseRecord { id = "CloseWindow", position = Vector3.zero, areaId = "Temp", kind = CorpseKind.File, fileName = "corpse_002.txt" });
             d.respawnAreaId = "UndergroundParking";
             d.elevatorAreaId = "Temp";

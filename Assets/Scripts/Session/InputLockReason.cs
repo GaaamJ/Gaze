@@ -3,7 +3,7 @@ namespace ProjectT.Session
     public enum InputLockReason
     {
         Dialogue,
-        RoomTransition,
+        Teleport,
         Death,
     }
 }
