@@ -65,7 +65,14 @@ namespace ProjectT.Interaction
 
             // 대사 중 이 오브젝트가 파괴될 수 있으므로 await 뒤에는 미리 받아 둔 값만 쓴다.
             if (result == DialogueResult.Completed)
-                context.Investigated.Add(record);
+                RecordInvestigated(context.Investigated, record);
+        }
+
+        internal static void RecordInvestigated(ICollection<string> investigated, string nodeId)
+        {
+            investigated.Add(nodeId);
+            if (!InvestigatedNodeIds.Add(nodeId))
+                Debug.LogWarning($"[DialogueInteractable] 조사 기록 '{nodeId}' 저장에 실패했다. 메모리 기록만 남았다.");
         }
 
 #if UNITY_EDITOR

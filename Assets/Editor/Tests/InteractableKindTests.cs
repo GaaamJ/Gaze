@@ -158,6 +158,45 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
+        public void RecordInvestigated_SavesNodeIdOnce()
+        {
+            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
+            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
+
+            CollectionAssert.AreEquivalent(new[] { "HintGapA" }, investigated);
+            SaveManager.Load();
+            CollectionAssert.AreEqual(new[] { "HintGapA" }, SaveManager.Data.investigatedNodeIds);
+        }
+
+        [Test]
+        public void RecordInvestigated_SaveFails_KeepsMemoryRecord()
+        {
+            Directory.CreateDirectory(tempBase);
+            File.WriteAllText(paths.Root, "blocks root folder");
+            LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
+            LogAssert.Expect(LogType.Warning, new Regex("조사 기록 'HintGapA' 저장에 실패했다"));
+
+            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
+
+            Assert.IsTrue(investigated.Contains("HintGapA"));
+            CollectionAssert.AreEqual(new[] { "HintGapA" }, SaveManager.Data.investigatedNodeIds);
+        }
+
+        [Test]
+        public void SessionBegin_WithSavedInvestigated_FirstInteractUsesRecheck()
+        {
+            SaveManager.Data.investigatedNodeIds.Add("HintGapA");
+            Assert.IsTrue(SaveManager.Save());
+            SaveManager.Data.investigatedNodeIds.Clear();
+
+            ProjectT.Session.GameSession.Begin();
+
+            var target = NewInteractable("HintGapA");
+            Assert.IsTrue(ProjectT.Session.GameSession.Investigated.Contains("HintGapA"));
+            Assert.AreEqual("HintGapA_Recheck", target.ResolveDialogueNode(ProjectT.Session.GameSession.Investigated, AllExist));
+        }
+
+        [Test]
         public void Respawn_SavesPositionBeforeDialogue_AndLoadRestoresIt()
         {
             var target = NewRespawn("UndergroundParking", "Respawn");
