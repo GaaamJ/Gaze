@@ -1,5 +1,7 @@
 using System;
 using UnityEngine;
+using ProjectT.Data;
+using ProjectT.Death;
 using ProjectT.Save;
 
 namespace ProjectT.Puzzle
@@ -16,6 +18,8 @@ namespace ProjectT.Puzzle
         [SerializeField] Sprite openSprite;
         [Tooltip("퍼즐이 풀리면 켜지는 오브젝트 (예: 문 너머 텔레포트).")]
         [SerializeField] GameObject[] activateOnOpen = Array.Empty<GameObject>();
+        [Tooltip("오답 문양을 누르면 재생할 사망 노드 이름 (예: Death_PasswordWrong)")]
+        [SerializeField] string wrongDeathNodeId = "";
 
         public event Action WrongSymbolPressed;
 
@@ -49,6 +53,9 @@ namespace ProjectT.Puzzle
         {
             if (string.IsNullOrEmpty(puzzleId))
                 Debug.LogWarning($"[PasswordPuzzle] puzzleId가 비어 있다: {name}", this);
+#if UNITY_EDITOR
+            YarnNodeCheck.WarnMissingDeferred(this, nameof(PasswordPuzzle), wrongDeathNodeId);
+#endif
         }
 
         internal void RestoreFromSave()
@@ -77,7 +84,11 @@ namespace ProjectT.Puzzle
                         other.SetLit(false);
                 }
                 WrongSymbolPressed?.Invoke();
-                Debug.Log("[PasswordPuzzle] 오답 문양: 사망 발동 지점 (#52 연결 전)", this);
+                Debug.Log($"[PasswordPuzzle] 오답 문양: 사망 '{wrongDeathNodeId}'", this);
+                if (string.IsNullOrWhiteSpace(wrongDeathNodeId))
+                    Debug.LogWarning($"[PasswordPuzzle] '{name}': wrongDeathNodeId가 비어 있어 사망시키지 않았다.", this);
+                else
+                    DeathSequence.Begin(wrongDeathNodeId);
                 return;
             }
 

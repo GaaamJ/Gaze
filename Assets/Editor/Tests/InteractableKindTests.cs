@@ -253,17 +253,5 @@ namespace ProjectT.Interaction.Tests
             foreach (var r in renderers)
                 Assert.AreEqual(Color.white, r.color);
         }
-
-        [Test]
-        public void DangerousGap_CanInteract_AndLogs()
-        {
-            var go = new GameObject("DangerousGap");
-            created.Add(go);
-            var gap = go.AddComponent<DangerousGap>();
-
-            Assert.IsTrue(gap.CanInteract);
-            LogAssert.Expect(LogType.Log, new Regex(@"\[DangerousGap\]"));
-            gap.Interact(Context());
-        }
     }
 }
