@@ -22,6 +22,15 @@ namespace ProjectT.Player
         // 8방향. 각 성분은 -1, 0, 1. 멈춰 있으면 마지막 값을 유지한다.
         public Vector2Int Facing { get; private set; } = Vector2Int.down;
 
+        // 라리스의 조사 감지 원(트리거)이 먼저 닿아도 반응하지 않도록 몸 콜라이더만 라리스로 본다.
+        public static bool TryFrom(Collider2D other, out PlayerMovement laris)
+        {
+            laris = null;
+            if (other == null || other.isTrigger || other.attachedRigidbody == null)
+                return false;
+            return other.attachedRigidbody.TryGetComponent(out laris);
+        }
+
         void Awake()
         {
             body = GetComponent<Rigidbody2D>();
