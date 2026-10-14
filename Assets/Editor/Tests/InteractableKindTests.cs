@@ -18,7 +18,7 @@ namespace ProjectT.Interaction.Tests
         readonly List<Object> created = new();
         string tempBase;
         GameFolderPaths paths;
-        HashSet<InteractableData> investigated;
+        HashSet<string> investigated;
 
         [SetUp]
         public void SetUp()
@@ -27,7 +27,7 @@ namespace ProjectT.Interaction.Tests
             paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
             SaveManager.Paths = paths;
             SaveManager.Load();
-            investigated = new HashSet<InteractableData>();
+            investigated = new HashSet<string>();
         }
 
         [TearDown]
@@ -46,31 +46,23 @@ namespace ProjectT.Interaction.Tests
 
         InteractContext Context() => new InteractContext(null, investigated);
 
-        InteractableData NewData(string node = "", string recheck = "")
-        {
-            var data = ScriptableObject.CreateInstance<InteractableData>();
-            created.Add(data);
-            var so = new SerializedObject(data);
-            so.FindProperty("dialogueNode").stringValue = node;
-            so.FindProperty("recheckDialogueNode").stringValue = recheck;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            return data;
-        }
+        static bool AllExist(string node) => true;
+        static bool NoneExist(string node) => false;
 
-        Interactable NewInteractable(InteractableData data)
+        Interactable NewInteractable(string nodeId = "")
         {
             var go = new GameObject("Interactable");
             created.Add(go);
             var interactable = go.AddComponent<Interactable>();
             var so = new SerializedObject(interactable);
-            so.FindProperty("data").objectReferenceValue = data;
+            so.FindProperty("nodeId").stringValue = nodeId;
             so.ApplyModifiedPropertiesWithoutUndo();
             return interactable;
         }
 
-        Interactable NewRespawn(string areaId, string node = "")
+        Interactable NewRespawn(string areaId, string nodeId = "")
         {
-            var interactable = NewInteractable(NewData(node));
+            var interactable = NewInteractable(nodeId);
             var respawn = interactable.gameObject.AddComponent<RespawnArea>();
             if (areaId != null)
             {
@@ -88,9 +80,9 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void WithDialogueNode_TriesDialogue()
+        public void WithNodeId_TriesDialogue()
         {
-            var target = NewInteractable(NewData("Desk", "Desk_Recheck"));
+            var target = NewInteractable("Desk");
 
             target.Interact(Context());
 
@@ -99,9 +91,9 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void WithoutDialogueNode_DoesNothingQuietly()
+        public void WithoutNodeId_DoesNothingQuietly()
         {
-            var target = NewInteractable(NewData());
+            var target = NewInteractable();
 
             target.Interact(Context());
 
@@ -110,9 +102,19 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
+        public void CanInteract_TrueWithoutNodeId()
+        {
+            var target = NewInteractable();
+
+            Assert.IsTrue(target.CanInteract);
+            target.gameObject.SetActive(false);
+            Assert.IsFalse(target.CanInteract);
+        }
+
+        [Test]
         public void WithOverride_PassesToOverrideInsteadOfDialogue()
         {
-            var target = NewInteractable(NewData("Desk", "Desk_Recheck"));
+            var target = NewInteractable("Desk");
             var handler = target.gameObject.AddComponent<RecordingOverride>();
 
             target.Interact(Context());
@@ -137,41 +139,52 @@ namespace ProjectT.Interaction.Tests
         [Test]
         public void ResolvesFirstThenRecheckNode()
         {
-            var target = NewInteractable(NewData("Desk", "Desk_Recheck"));
+            var target = NewInteractable("Desk");
 
-            Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated));
-            investigated.Add(target.Data);
-            Assert.AreEqual("Desk_Recheck", target.ResolveDialogueNode(investigated));
+            Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated, AllExist));
+            investigated.Add("Desk");
+            Assert.AreEqual("Desk_Recheck", target.ResolveDialogueNode(investigated, AllExist));
         }
 
         [Test]
-        public void SharedData_SharesInvestigatedRecord()
+        public void RecheckMissing_RepeatsFirstNodeWithoutWarning()
         {
-            var shared = NewData("Symbol", "Symbol_Recheck");
-            var first = NewInteractable(shared);
-            var second = NewInteractable(shared);
-            var other = NewInteractable(NewData("Symbol", "Symbol_Recheck"));
+            var target = NewInteractable("HintGap");
+            investigated.Add("HintGap");
 
-            investigated.Add(first.Data);
-
-            Assert.AreEqual("Symbol_Recheck", second.ResolveDialogueNode(investigated));
-            Assert.AreEqual("Symbol", other.ResolveDialogueNode(investigated));
-        }
-
-        [Test]
-        public void RecheckEmpty_RepeatsFirstNodeWithoutWarning()
-        {
-            var target = NewInteractable(NewData("HintGap"));
-            investigated.Add(target.Data);
-
-            Assert.AreEqual("HintGap", target.ResolveDialogueNode(investigated));
+            Assert.AreEqual("HintGap", target.ResolveDialogueNode(investigated, NoneExist));
             LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RecheckLookup_AsksForRecheckNodeName()
+        {
+            var target = NewInteractable("Desk");
+            investigated.Add("Desk");
+            var asked = new List<string>();
+
+            target.ResolveDialogueNode(investigated, node => { asked.Add(node); return false; });
+
+            CollectionAssert.AreEqual(new[] { "Desk_Recheck" }, asked);
+        }
+
+        [Test]
+        public void SameNodeId_SharesInvestigatedRecord()
+        {
+            var first = NewInteractable("Symbol");
+            var second = NewInteractable("Symbol");
+            var other = NewInteractable("Other");
+
+            investigated.Add(first.NodeId);
+
+            Assert.AreEqual("Symbol_Recheck", second.ResolveDialogueNode(investigated, AllExist));
+            Assert.AreEqual("Other", other.ResolveDialogueNode(investigated, AllExist));
         }
 
         [Test]
         public void Respawn_SavesAreaIdBeforeDialogue_AndLoadRestoresIt()
         {
-            var target = NewRespawn("UndergroundParking", "Obj_Respawn");
+            var target = NewRespawn("UndergroundParking", "Respawn");
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장: UndergroundParking"));
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
 

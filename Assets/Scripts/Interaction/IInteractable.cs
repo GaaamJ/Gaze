@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectT.Data;
 using ProjectT.Dialogue;
 
 namespace ProjectT.Interaction
@@ -8,9 +7,9 @@ namespace ProjectT.Interaction
     public readonly struct InteractContext
     {
         public readonly DialogueService Dialogue;
-        public readonly HashSet<InteractableData> Investigated;
+        public readonly HashSet<string> Investigated;
 
-        public InteractContext(DialogueService dialogue, HashSet<InteractableData> investigated)
+        public InteractContext(DialogueService dialogue, HashSet<string> investigated)
         {
             Dialogue = dialogue;
             Investigated = investigated;

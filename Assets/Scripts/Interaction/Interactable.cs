@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Yarn.Unity;
@@ -9,16 +10,11 @@ namespace ProjectT.Interaction
 {
     public class Interactable : MonoBehaviour, IInteractable
     {
-        [SerializeField] InteractableData data;
+        [Tooltip("첫 조사 때 재생할 Yarn 노드 이름. 재조사는 '{nodeId}_Recheck'가 있으면 그것, 없으면 첫 노드를 반복한다. 비우면 대사 없이 조사만 된다.")]
+        [SerializeField] string nodeId;
 
-        public InteractableData Data => data;
-        public bool CanInteract => data != null && isActiveAndEnabled;
-
-        void Awake()
-        {
-            if (data == null)
-                Debug.LogWarning($"[Interactable] '{name}': InteractableData가 비어 있어 조사 대상에서 제외한다.", this);
-        }
+        public string NodeId => nodeId;
+        public bool CanInteract => isActiveAndEnabled;
 
         public void Interact(InteractContext context)
         {
@@ -32,18 +28,21 @@ namespace ProjectT.Interaction
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(data.DialogueNode))
+            if (string.IsNullOrWhiteSpace(nodeId))
                 return;
 
             // await 없이 시작해야 Play가 같은 콜백 안에서 입력 잠금을 건다. 예외는 Forget()이 로그로 남긴다.
             PlayDialogue(context).Forget();
         }
 
-        public string ResolveDialogueNode(ICollection<InteractableData> investigated)
+        public string ResolveDialogueNode(ICollection<string> investigated, Func<string, bool> nodeExists)
         {
-            if (investigated.Contains(data) && !string.IsNullOrWhiteSpace(data.RecheckDialogueNode))
-                return data.RecheckDialogueNode;
-            return data.DialogueNode;
+            string first = DialogueNodeNames.First(nodeId);
+            if (!investigated.Contains(nodeId))
+                return first;
+
+            string recheck = DialogueNodeNames.Recheck(nodeId);
+            return nodeExists(recheck) ? recheck : first;
         }
 
         void UpdateRespawn(RespawnArea respawn)
@@ -69,8 +68,8 @@ namespace ProjectT.Interaction
                 return;
             }
 
-            InteractableData record = data;
-            string node = ResolveDialogueNode(context.Investigated);
+            string record = nodeId;
+            string node = ResolveDialogueNode(context.Investigated, context.Dialogue.HasNode);
 
             DialogueResult result = await context.Dialogue.Play(node);
 
@@ -78,5 +77,12 @@ namespace ProjectT.Interaction
             if (result == DialogueResult.Completed)
                 context.Investigated.Add(record);
         }
+
+#if UNITY_EDITOR
+        void OnValidate()
+        {
+            YarnNodeCheck.WarnMissingDeferred(this, nameof(Interactable), nodeId);
+        }
+#endif
     }
 }

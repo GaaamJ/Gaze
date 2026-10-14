@@ -6,10 +6,10 @@ namespace ProjectT.Data.Tests
     public class DataTableTests
     {
         [Test]
-        public void NodeNames_FollowObjectIdRule()
+        public void NodeNames_FollowNodeIdRule()
         {
-            Assert.AreEqual("Obj_TempRespawn", DialogueNodeNames.Obj("TempRespawn"));
-            Assert.AreEqual("Obj_TempRespawn_Recheck", DialogueNodeNames.ObjRecheck("TempRespawn"));
+            Assert.AreEqual("TempRespawn", DialogueNodeNames.First("TempRespawn"));
+            Assert.AreEqual("TempRespawn_Recheck", DialogueNodeNames.Recheck("TempRespawn"));
         }
 
         [Test]
