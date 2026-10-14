@@ -39,6 +39,11 @@ namespace ProjectT.Dialogue
             runner.RemoveCommandHandler(QuitNormallyCommandName);
         }
 
+        public bool HasNode(string nodeName)
+        {
+            return !string.IsNullOrEmpty(nodeName) && runner != null && runner.Dialogue.NodeExists(nodeName);
+        }
+
         public bool RequestCancel()
         {
             if (!isPlaying || cancelRequested || !runner.IsDialogueRunning)
@@ -63,7 +68,7 @@ namespace ProjectT.Dialogue
                 return DialogueResult.Rejected;
             }
 
-            if (string.IsNullOrEmpty(nodeName) || !runner.Dialogue.NodeExists(nodeName))
+            if (!HasNode(nodeName))
             {
                 Debug.LogWarning($"[DialogueService] 노드 '{nodeName}'가 없다.", this);
                 return DialogueResult.Rejected;

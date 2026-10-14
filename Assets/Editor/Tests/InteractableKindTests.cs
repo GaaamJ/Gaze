@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using ProjectT.Core.GameFolder;
 using ProjectT.Data;
+using ProjectT.Puzzle;
 using ProjectT.Save;
 using UnityEditor;
 using UnityEngine;
@@ -15,17 +16,10 @@ namespace ProjectT.Interaction.Tests
 {
     public class InteractableKindTests
     {
-        static readonly ObjectKind[] LinkedKinds =
-        {
-            ObjectKind.Death, ObjectKind.Puzzle, ObjectKind.Respawn,
-            ObjectKind.Clear, ObjectKind.ElevatorDoor, ObjectKind.Corpse
-        };
-
         readonly List<Object> created = new();
         string tempBase;
         GameFolderPaths paths;
         HashSet<string> investigated;
-        ObjectResultHandlers handlers;
 
         [SetUp]
         public void SetUp()
@@ -35,7 +29,6 @@ namespace ProjectT.Interaction.Tests
             SaveManager.Paths = paths;
             SaveManager.Load();
             investigated = new HashSet<string>();
-            handlers = new ObjectResultHandlers();
         }
 
         [TearDown]
@@ -52,36 +45,25 @@ namespace ProjectT.Interaction.Tests
                 Directory.Delete(tempBase, true);
         }
 
-        InteractContext Context() => new InteractContext(null, investigated, handlers);
+        InteractContext Context() => new InteractContext(null, investigated);
 
-        ObjectData NewData(string id, ObjectKind kind, string node = "", string recheck = "", string link = "")
-        {
-            var data = ScriptableObject.CreateInstance<ObjectData>();
-            created.Add(data);
-            var so = new SerializedObject(data);
-            so.FindProperty("id").stringValue = id;
-            so.FindProperty("kind").intValue = (int)kind;
-            so.FindProperty("dialogueNode").stringValue = node;
-            so.FindProperty("recheckDialogueNode").stringValue = recheck;
-            so.FindProperty("link").stringValue = link;
-            so.ApplyModifiedPropertiesWithoutUndo();
-            return data;
-        }
+        static bool AllExist(string node) => true;
+        static bool NoneExist(string node) => false;
 
-        Interactable NewInteractable(ObjectData data)
+        DialogueInteractable NewInteractable(string nodeId = "")
         {
-            var go = new GameObject($"Interactable_{data.Id}");
+            var go = new GameObject("DialogueInteractable");
             created.Add(go);
-            var interactable = go.AddComponent<Interactable>();
+            var interactable = go.AddComponent<DialogueInteractable>();
             var so = new SerializedObject(interactable);
-            so.FindProperty("data").objectReferenceValue = data;
+            so.FindProperty("dialogueNodeId").stringValue = nodeId;
             so.ApplyModifiedPropertiesWithoutUndo();
             return interactable;
         }
 
-        Interactable NewRespawn(string areaId)
+        DialogueInteractable NewRespawn(string areaId, string nodeId = "")
         {
-            var interactable = NewInteractable(NewData("Respawn", ObjectKind.Respawn));
+            var interactable = NewInteractable(nodeId);
             var respawn = interactable.gameObject.AddComponent<RespawnArea>();
             if (areaId != null)
             {
@@ -98,73 +80,94 @@ namespace ProjectT.Interaction.Tests
             return interactable;
         }
 
-        [TestCaseSource(nameof(LinkedKinds))]
-        public void LinkedKind_CallsRegisteredHandlerOnce(ObjectKind kind)
-        {
-            var target = NewInteractable(NewData($"Obj_{kind}", kind, link: "L"));
-
-            var calls = new List<(Interactable, ObjectKind)>();
-            foreach (var k in LinkedKinds)
-            {
-                var captured = k;
-                handlers.Register(k, (source, _) => calls.Add((source, captured)));
-            }
-
-            target.Interact(Context());
-
-            Assert.AreEqual(1, calls.Count);
-            Assert.AreSame(target, calls[0].Item1);
-            Assert.AreEqual(kind, calls[0].Item2);
-        }
-
-        [TestCaseSource(nameof(LinkedKinds))]
-        public void LinkedKind_WithoutHandler_LogsKindAndLink(ObjectKind kind)
-        {
-            var target = NewInteractable(NewData($"Obj_{kind}", kind, link: "LinkId"));
-            target.Interact(Context());
-
-            LogAssert.Expect(LogType.Log, $"[Interactable] {kind} 조사: id=Obj_{kind}, link=LinkId");
-            if (kind == ObjectKind.Respawn)
-                LogAssert.Expect(LogType.Warning, new Regex("RespawnArea"));
-            LogAssert.Expect(LogType.Log, new Regex("아직 연결되지 않았"));
-        }
-
         [Test]
-        public void LinkedKind_WithDialogueNodeAndNoHandler_PlaysDialogue()
+        public void WithNodeId_TriesDialogue()
         {
-            var target = NewInteractable(NewData("Corpse", ObjectKind.Corpse, node: "Corpse_Refuse"));
+            var target = NewInteractable("Desk");
 
             target.Interact(Context());
 
-            LogAssert.Expect(LogType.Log, new Regex("Corpse 조사"));
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
+            Assert.IsEmpty(investigated);
         }
 
         [Test]
-        public void Unregister_OtherHandler_KeepsCurrent()
+        public void WithoutNodeId_DoesNothingQuietly()
         {
-            int calls = 0;
-            Action<Interactable, InteractContext> current = (_, _) => calls++;
-            handlers.Register(ObjectKind.Clear, current);
-            handlers.Unregister(ObjectKind.Clear, (_, _) => { });
-            Assert.IsTrue(handlers.TryGet(ObjectKind.Clear, out _));
-
-            handlers.Unregister(ObjectKind.Clear, current);
-            Assert.IsFalse(handlers.TryGet(ObjectKind.Clear, out _));
-        }
-
-        [Test]
-        public void Respawn_SavesAreaIdBeforeHandler_AndLoadRestoresIt()
-        {
-            var target = NewRespawn("UndergroundParking");
-            string savedAtHandler = null;
-            handlers.Register(ObjectKind.Respawn, (_, _) =>
-                savedAtHandler = File.Exists(paths.SaveFile) ? File.ReadAllText(paths.SaveFile) : null);
+            var target = NewInteractable();
 
             target.Interact(Context());
 
-            StringAssert.Contains("\"respawnAreaId\": \"UndergroundParking\"", savedAtHandler);
+            LogAssert.NoUnexpectedReceived();
+            Assert.IsEmpty(investigated);
+        }
+
+        [Test]
+        public void CanInteract_TrueWithoutNodeId()
+        {
+            var target = NewInteractable();
+
+            Assert.IsTrue(target.CanInteract);
+            target.gameObject.SetActive(false);
+            Assert.IsFalse(target.CanInteract);
+        }
+
+        [Test]
+        public void ResolvesFirstThenRecheckNode()
+        {
+            var target = NewInteractable("Desk");
+
+            Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated, AllExist));
+            investigated.Add("Desk");
+            Assert.AreEqual("Desk_Recheck", target.ResolveDialogueNode(investigated, AllExist));
+        }
+
+        [Test]
+        public void RecheckMissing_RepeatsFirstNodeWithoutWarning()
+        {
+            var target = NewInteractable("HintGap");
+            investigated.Add("HintGap");
+
+            Assert.AreEqual("HintGap", target.ResolveDialogueNode(investigated, NoneExist));
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RecheckLookup_AsksForRecheckNodeName()
+        {
+            var target = NewInteractable("Desk");
+            investigated.Add("Desk");
+            var asked = new List<string>();
+
+            target.ResolveDialogueNode(investigated, node => { asked.Add(node); return false; });
+
+            CollectionAssert.AreEqual(new[] { "Desk_Recheck" }, asked);
+        }
+
+        [Test]
+        public void SameNodeId_SharesInvestigatedRecord()
+        {
+            var first = NewInteractable("Symbol");
+            var second = NewInteractable("Symbol");
+            var other = NewInteractable("Other");
+
+            investigated.Add(first.DialogueNodeId);
+
+            Assert.AreEqual("Symbol_Recheck", second.ResolveDialogueNode(investigated, AllExist));
+            Assert.AreEqual("Other", other.ResolveDialogueNode(investigated, AllExist));
+        }
+
+        [Test]
+        public void Respawn_SavesAreaIdBeforeDialogue_AndLoadRestoresIt()
+        {
+            var target = NewRespawn("UndergroundParking", "Respawn");
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장: UndergroundParking"));
+            LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
+
+            target.Interact(Context());
+
             Assert.AreEqual("UndergroundParking", RespawnAreaIds.Current);
+            StringAssert.Contains("\"respawnAreaId\": \"UndergroundParking\"", File.ReadAllText(paths.SaveFile));
 
             SaveManager.Load();
             Assert.AreEqual("UndergroundParking", SaveManager.Data.respawnAreaId);
@@ -183,65 +186,84 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void Respawn_SaveFails_KeepsMemoryValueAndStillRunsResult()
+        public void Respawn_SaveFails_KeepsMemoryValue()
         {
             Directory.CreateDirectory(tempBase);
             File.WriteAllText(paths.Root, "blocks root folder");
             var target = NewRespawn("Temp");
-            bool handled = false;
-            handlers.Register(ObjectKind.Respawn, (_, _) => handled = true);
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
             LogAssert.Expect(LogType.Warning, new Regex("저장에 실패했다"));
             target.Interact(Context());
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
-            Assert.IsTrue(handled);
             Assert.IsFalse(File.Exists(paths.SaveFile));
         }
 
-        [Test]
-        public void Item_OnlyLogs_AndIgnoresHandlers()
+        PasswordSymbol NewSymbol(out SpriteRenderer[] renderers)
         {
-            var target = NewInteractable(NewData("Item", ObjectKind.Item));
-            handlers.Register(ObjectKind.Item, (_, _) => Assert.Fail("아이템은 핸들러를 거치지 않는다."));
+            var go = new GameObject("PasswordSymbol");
+            created.Add(go);
+            renderers = new SpriteRenderer[2];
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var child = new GameObject("Sprite" + i);
+                child.transform.SetParent(go.transform);
+                renderers[i] = child.AddComponent<SpriteRenderer>();
+            }
 
-            target.Interact(Context());
+            var symbol = go.AddComponent<PasswordSymbol>();
+            var so = new SerializedObject(symbol);
+            var list = so.FindProperty("symbolRenderers");
+            list.arraySize = renderers.Length;
+            for (int i = 0; i < renderers.Length; i++)
+                list.GetArrayElementAtIndex(i).objectReferenceValue = renderers[i];
+            so.FindProperty("unlitColor").colorValue = Color.white;
+            so.FindProperty("litColor").colorValue = Color.yellow;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return symbol;
+        }
 
-            LogAssert.Expect(LogType.Log, "[Interactable] 아이템 조사: Item");
+        [Test]
+        public void PasswordSymbol_Interact_RaisesPressedOnce()
+        {
+            var symbol = NewSymbol(out _);
+            var received = new List<PasswordSymbol>();
+            symbol.Pressed += s => received.Add(s);
+
+            symbol.Interact(Context());
+
+            CollectionAssert.AreEqual(new[] { symbol }, received);
             Assert.IsEmpty(investigated);
+            LogAssert.NoUnexpectedReceived();
         }
 
         [Test]
-        public void Basic_IgnoresHandlers_AndTriesDialogue()
+        public void PasswordSymbol_SetLit_ChangesChildSpriteColors()
         {
-            var target = NewInteractable(NewData("Desk", ObjectKind.Basic, "Desk", "Desk_Recheck"));
-            handlers.Register(ObjectKind.Basic, (_, _) => Assert.Fail("기본은 핸들러를 거치지 않는다."));
+            var symbol = NewSymbol(out var renderers);
 
-            target.Interact(Context());
+            symbol.SetLit(true);
+            Assert.IsTrue(symbol.IsLit);
+            foreach (var r in renderers)
+                Assert.AreEqual(Color.yellow, r.color);
 
-            LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
-            Assert.IsEmpty(investigated);
+            symbol.SetLit(false);
+            Assert.IsFalse(symbol.IsLit);
+            foreach (var r in renderers)
+                Assert.AreEqual(Color.white, r.color);
         }
 
         [Test]
-        public void Basic_ResolvesFirstThenRecheckNode()
+        public void DangerousGap_CanInteract_AndLogs()
         {
-            var target = NewInteractable(NewData("Desk", ObjectKind.Basic, "Desk", "Desk_Recheck"));
+            var go = new GameObject("DangerousGap");
+            created.Add(go);
+            var gap = go.AddComponent<DangerousGap>();
 
-            Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated));
-            investigated.Add("Desk");
-            Assert.AreEqual("Desk_Recheck", target.ResolveDialogueNode(investigated));
-        }
-
-        [Test]
-        public void Basic_RecheckEmpty_RepeatsFirstNodeWithWarning()
-        {
-            var target = NewInteractable(NewData("Desk", ObjectKind.Basic, "Desk"));
-            investigated.Add("Desk");
-
-            LogAssert.Expect(LogType.Warning, new Regex("재조사 대사 노드가 비어"));
-            Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated));
+            Assert.IsTrue(gap.CanInteract);
+            LogAssert.Expect(LogType.Log, new Regex(@"\[DangerousGap\]"));
+            gap.Interact(Context());
         }
     }
 }
