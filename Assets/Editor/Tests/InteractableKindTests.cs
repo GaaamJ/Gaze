@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using ProjectT.Core.GameFolder;
 using ProjectT.Data;
+using ProjectT.Puzzle;
 using ProjectT.Save;
 using UnityEditor;
 using UnityEngine;
@@ -197,6 +198,72 @@ namespace ProjectT.Interaction.Tests
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
             Assert.IsFalse(File.Exists(paths.SaveFile));
+        }
+
+        PasswordSymbol NewSymbol(out SpriteRenderer[] renderers)
+        {
+            var go = new GameObject("PasswordSymbol");
+            created.Add(go);
+            renderers = new SpriteRenderer[2];
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                var child = new GameObject("Sprite" + i);
+                child.transform.SetParent(go.transform);
+                renderers[i] = child.AddComponent<SpriteRenderer>();
+            }
+
+            var symbol = go.AddComponent<PasswordSymbol>();
+            var so = new SerializedObject(symbol);
+            var list = so.FindProperty("symbolRenderers");
+            list.arraySize = renderers.Length;
+            for (int i = 0; i < renderers.Length; i++)
+                list.GetArrayElementAtIndex(i).objectReferenceValue = renderers[i];
+            so.FindProperty("unlitColor").colorValue = Color.white;
+            so.FindProperty("litColor").colorValue = Color.yellow;
+            so.ApplyModifiedPropertiesWithoutUndo();
+            return symbol;
+        }
+
+        [Test]
+        public void PasswordSymbol_Interact_RaisesPressedOnce()
+        {
+            var symbol = NewSymbol(out _);
+            var received = new List<PasswordSymbol>();
+            symbol.Pressed += s => received.Add(s);
+
+            symbol.Interact(Context());
+
+            CollectionAssert.AreEqual(new[] { symbol }, received);
+            Assert.IsEmpty(investigated);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void PasswordSymbol_SetLit_ChangesChildSpriteColors()
+        {
+            var symbol = NewSymbol(out var renderers);
+
+            symbol.SetLit(true);
+            Assert.IsTrue(symbol.IsLit);
+            foreach (var r in renderers)
+                Assert.AreEqual(Color.yellow, r.color);
+
+            symbol.SetLit(false);
+            Assert.IsFalse(symbol.IsLit);
+            foreach (var r in renderers)
+                Assert.AreEqual(Color.white, r.color);
+        }
+
+        [Test]
+        public void DangerousGap_CanInteract_AndLogs()
+        {
+            var go = new GameObject("DangerousGap");
+            created.Add(go);
+            var gap = go.AddComponent<DangerousGap>();
+
+            Assert.IsTrue(gap.CanInteract);
+            LogAssert.Expect(LogType.Log, new Regex(@"\[DangerousGap\]"));
+            gap.Interact(Context());
         }
     }
 }
