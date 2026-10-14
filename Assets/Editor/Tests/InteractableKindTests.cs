@@ -49,18 +49,18 @@ namespace ProjectT.Interaction.Tests
         static bool AllExist(string node) => true;
         static bool NoneExist(string node) => false;
 
-        Interactable NewInteractable(string nodeId = "")
+        DialogueInteractable NewInteractable(string nodeId = "")
         {
-            var go = new GameObject("Interactable");
+            var go = new GameObject("DialogueInteractable");
             created.Add(go);
-            var interactable = go.AddComponent<Interactable>();
+            var interactable = go.AddComponent<DialogueInteractable>();
             var so = new SerializedObject(interactable);
-            so.FindProperty("nodeId").stringValue = nodeId;
+            so.FindProperty("dialogueNodeId").stringValue = nodeId;
             so.ApplyModifiedPropertiesWithoutUndo();
             return interactable;
         }
 
-        Interactable NewRespawn(string areaId, string nodeId = "")
+        DialogueInteractable NewRespawn(string areaId, string nodeId = "")
         {
             var interactable = NewInteractable(nodeId);
             var respawn = interactable.gameObject.AddComponent<RespawnArea>();
@@ -112,31 +112,6 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void WithOverride_PassesToOverrideInsteadOfDialogue()
-        {
-            var target = NewInteractable("Desk");
-            var handler = target.gameObject.AddComponent<RecordingOverride>();
-
-            target.Interact(Context());
-
-            Assert.AreEqual(1, handler.Calls);
-            LogAssert.NoUnexpectedReceived();
-        }
-
-        [Test]
-        public void WithOverrideAndRespawn_SavesRespawnFirst()
-        {
-            var target = NewRespawn("Temp");
-            var handler = target.gameObject.AddComponent<RecordingOverride>();
-            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장: Temp"));
-
-            target.Interact(Context());
-
-            Assert.AreEqual(1, handler.Calls);
-            Assert.AreEqual("Temp", handler.RespawnAtCall);
-        }
-
-        [Test]
         public void ResolvesFirstThenRecheckNode()
         {
             var target = NewInteractable("Desk");
@@ -175,7 +150,7 @@ namespace ProjectT.Interaction.Tests
             var second = NewInteractable("Symbol");
             var other = NewInteractable("Other");
 
-            investigated.Add(first.NodeId);
+            investigated.Add(first.DialogueNodeId);
 
             Assert.AreEqual("Symbol_Recheck", second.ResolveDialogueNode(investigated, AllExist));
             Assert.AreEqual("Other", other.ResolveDialogueNode(investigated, AllExist));
@@ -222,18 +197,6 @@ namespace ProjectT.Interaction.Tests
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
             Assert.IsFalse(File.Exists(paths.SaveFile));
-        }
-    }
-
-    public class RecordingOverride : MonoBehaviour, IInteractionOverride
-    {
-        public int Calls { get; private set; }
-        public string RespawnAtCall { get; private set; }
-
-        public void Interact(InteractContext context)
-        {
-            Calls++;
-            RespawnAtCall = RespawnAreaIds.Current;
         }
     }
 }
