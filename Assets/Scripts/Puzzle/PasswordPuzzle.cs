@@ -14,8 +14,8 @@ namespace ProjectT.Puzzle
 
         [SerializeField] SpriteRenderer doorRenderer;
         [SerializeField] Sprite openSprite;
-        [Tooltip("문이 닫혀 있는 동안 길을 막는 콜라이더.")]
-        [SerializeField] Collider2D doorCollider;
+        [Tooltip("퍼즐이 풀리면 켜지는 오브젝트 (예: 문 너머 텔레포트).")]
+        [SerializeField] GameObject[] activateOnOpen = Array.Empty<GameObject>();
 
         public event Action WrongSymbolPressed;
 
@@ -112,8 +112,11 @@ namespace ProjectT.Puzzle
             IsSolved = true;
             if (doorRenderer != null && openSprite != null)
                 doorRenderer.sprite = openSprite;
-            if (doorCollider != null)
-                doorCollider.enabled = false;
+            foreach (GameObject target in activateOnOpen)
+            {
+                if (target != null)
+                    target.SetActive(true);
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ namespace ProjectT.Puzzle.Tests
         PasswordSymbol[] symbols;
         PasswordPuzzle puzzle;
         SpriteRenderer doorRenderer;
-        BoxCollider2D doorCollider;
+        GameObject[] targets;
         Sprite closedSprite;
         Sprite openSprite;
         int wrongCount;
@@ -63,8 +63,19 @@ namespace ProjectT.Puzzle.Tests
             return sprite;
         }
 
-        void Build()
+        GameObject NewInactiveTarget(string name)
         {
+            var go = new GameObject(name);
+            created.Add(go);
+            go.SetActive(false);
+            return go;
+        }
+
+        void Build() => Build(NewInactiveTarget("TeleportA"), NewInactiveTarget("TeleportB"));
+
+        void Build(params GameObject[] activateOnOpen)
+        {
+            targets = activateOnOpen;
             symbols = new PasswordSymbol[5];
             for (int i = 0; i < symbols.Length; i++)
             {
@@ -79,7 +90,6 @@ namespace ProjectT.Puzzle.Tests
             openSprite = NewSprite("Open");
             doorRenderer = door.AddComponent<SpriteRenderer>();
             doorRenderer.sprite = closedSprite;
-            doorCollider = door.AddComponent<BoxCollider2D>();
 
             LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
             puzzle = door.AddComponent<PasswordPuzzle>();
@@ -95,7 +105,10 @@ namespace ProjectT.Puzzle.Tests
             so.FindProperty("puzzleId").stringValue = PuzzleId;
             so.FindProperty("doorRenderer").objectReferenceValue = doorRenderer;
             so.FindProperty("openSprite").objectReferenceValue = openSprite;
-            so.FindProperty("doorCollider").objectReferenceValue = doorCollider;
+            var targetList = so.FindProperty("activateOnOpen");
+            targetList.arraySize = targets.Length;
+            for (int i = 0; i < targets.Length; i++)
+                targetList.GetArrayElementAtIndex(i).objectReferenceValue = targets[i];
             so.ApplyModifiedPropertiesWithoutUndo();
 
             puzzle.WrongSymbolPressed += () => wrongCount++;
@@ -107,7 +120,11 @@ namespace ProjectT.Puzzle.Tests
         {
             Assert.IsFalse(puzzle.IsSolved);
             Assert.AreSame(closedSprite, doorRenderer.sprite);
-            Assert.IsTrue(doorCollider.enabled);
+            foreach (var target in targets)
+            {
+                if (target != null)
+                    Assert.IsFalse(target.activeSelf);
+            }
             CollectionAssert.DoesNotContain(SaveManager.Data.solvedPuzzleIds, PuzzleId);
         }
 
@@ -115,7 +132,11 @@ namespace ProjectT.Puzzle.Tests
         {
             Assert.IsTrue(puzzle.IsSolved);
             Assert.AreSame(openSprite, doorRenderer.sprite);
-            Assert.IsFalse(doorCollider.enabled);
+            foreach (var target in targets)
+            {
+                if (target != null)
+                    Assert.IsTrue(target.activeSelf);
+            }
             CollectionAssert.Contains(SaveManager.Data.solvedPuzzleIds, PuzzleId);
         }
 
@@ -247,6 +268,41 @@ namespace ProjectT.Puzzle.Tests
             puzzle.RestoreFromSave();
 
             AssertClosed();
+        }
+
+        [Test]
+        public void NullEntryInActivateList_IsSkipped()
+        {
+            Build(NewInactiveTarget("TeleportA"), null, NewInactiveTarget("TeleportB"));
+
+            Press(1);
+            Press(4);
+
+            AssertOpened();
+            Assert.IsTrue(targets[0].activeSelf);
+            Assert.IsTrue(targets[2].activeSelf);
+        }
+
+        [Test]
+        public void EmptyActivateList_StillOpens()
+        {
+            Build(Array.Empty<GameObject>());
+
+            Press(1);
+            Press(4);
+
+            AssertOpened();
+        }
+
+        [Test]
+        public void StartWithSavedId_EmptyActivateList_StartsOpened()
+        {
+            SaveManager.Data.solvedPuzzleIds.Add(PuzzleId);
+            Build(Array.Empty<GameObject>());
+
+            puzzle.RestoreFromSave();
+
+            AssertOpened();
         }
     }
 }
