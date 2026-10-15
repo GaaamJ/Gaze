@@ -25,6 +25,19 @@ namespace ProjectT.UI
             SetAlpha(0f);
         }
 
+        // 만든 페이더는 씬 루트에 두어 다음 전환·다른 컴포넌트가 FindAnyObjectByType으로 다시 쓰고, 씬과 함께 정리되게 한다.
+        public static ScreenFader FindOrCreate(ScreenFader prefab, Object context, bool warnIfMissing = true)
+        {
+            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
+            if (fader != null)
+                return fader;
+            if (prefab != null)
+                return Instantiate(prefab);
+            if (warnIfMissing)
+                Debug.LogWarning($"[ScreenFader] '{(context != null ? context.name : "")}': 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 진행한다.", context);
+            return null;
+        }
+
         public IEnumerator FadeOut() => FadeTo(1f);
         public IEnumerator FadeIn() => FadeTo(0f);
 

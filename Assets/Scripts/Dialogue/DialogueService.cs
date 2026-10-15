@@ -17,7 +17,8 @@ namespace ProjectT.Dialogue
         bool nodeCompleted;
         bool cancelRequested;
 
-        public bool IsPlaying => isPlaying;
+        // runner.Stop() 직후에도 Play의 정리가 끝나기 전까지는 다음 Play가 거부되므로 둘 다 본다.
+        public bool IsIdle => !isPlaying && (runner == null || !runner.IsDialogueRunning);
 
         public event Action QuitNormallyRequested;
 
@@ -39,6 +40,11 @@ namespace ProjectT.Dialogue
             runner.RemoveCommandHandler(QuitNormallyCommandName);
         }
 
+        public bool HasNode(string nodeName)
+        {
+            return !string.IsNullOrEmpty(nodeName) && runner != null && runner.Dialogue.NodeExists(nodeName);
+        }
+
         public bool RequestCancel()
         {
             if (!isPlaying || cancelRequested || !runner.IsDialogueRunning)
@@ -46,6 +52,18 @@ namespace ProjectT.Dialogue
 
             cancelRequested = true;
             runner.Stop().Forget();
+            return true;
+        }
+
+        public async YarnTask<bool> WaitUntilIdle(float timeoutSeconds)
+        {
+            float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+            while (!IsIdle)
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                    return false;
+                await YarnTask.Yield();
+            }
             return true;
         }
 
@@ -57,13 +75,13 @@ namespace ProjectT.Dialogue
                 return DialogueResult.Rejected;
             }
 
-            if (isPlaying || runner.IsDialogueRunning)
+            if (!IsIdle)
             {
                 Debug.LogWarning($"[DialogueService] 대화 중이라 '{nodeName}' 재생을 거부했다.", this);
                 return DialogueResult.Rejected;
             }
 
-            if (string.IsNullOrEmpty(nodeName) || !runner.Dialogue.NodeExists(nodeName))
+            if (!HasNode(nodeName))
             {
                 Debug.LogWarning($"[DialogueService] 노드 '{nodeName}'가 없다.", this);
                 return DialogueResult.Rejected;

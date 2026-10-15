@@ -1,27 +1,151 @@
-title: Temp_Respawn
+// 본문에 문장이 하나도 없는 노드는 Yarn 컴파일에서 빠지므로 대사 작성 전 노드에는 <<stop>>을 둔다.
+
+title: TempRespawn
 ---
-라리스: 쉴랭
+// 대사 작성 전
+<<stop>>
 ===
 
-title: Temp_Respawn_Recheck
+title: TempRespawn_Recheck
 ---
-라리스: 힘들다이~
+// 대사 작성 전
+<<stop>>
 ===
 
-title: Temp_Interactable
+title: ParkingLotRespawn
 ---
-라리스: 우왕
+// 대사 작성 전
+<<stop>>
 ===
 
-title: Temp_Interactable_Recheck
+title: ParkingLotRespawn_Recheck
 ---
-라리스: 웩 보기싫어
+// 대사 작성 전
+<<stop>>
 ===
 
-title: Test_RespawnQuit
+title: HintGapA
 ---
-라리스: 여기서 그만둘까?
--> 게임 끄기
-    <<QuitNormally>>
--> 계속
+// 대사 작성 전
+<<stop>>
+===
+
+title: HintGapA_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: HintGapB
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: HintGapB_Recheck
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: PasswordDoor_Open
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling001
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling002
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_FallingDeath_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling001_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling002_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DeathObject_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_DangerousGap_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_PasswordWrong
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_PasswordWrong_Sign
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_CloseWindow
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: DeathObject_Corpse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: FallingDeath_Corpse
+---
+// 대사 작성 전
+<<stop>>
 ===

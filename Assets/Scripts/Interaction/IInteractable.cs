@@ -8,13 +8,11 @@ namespace ProjectT.Interaction
     {
         public readonly DialogueService Dialogue;
         public readonly HashSet<string> Investigated;
-        public readonly ObjectResultHandlers Handlers;
 
-        public InteractContext(DialogueService dialogue, HashSet<string> investigated, ObjectResultHandlers handlers)
+        public InteractContext(DialogueService dialogue, HashSet<string> investigated)
         {
             Dialogue = dialogue;
             Investigated = investigated;
-            Handlers = handlers;
         }
     }
 

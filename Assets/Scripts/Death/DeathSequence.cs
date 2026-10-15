@@ -1,115 +1,200 @@
-// 무엇: 사망의 입구 하나. 사망을 시작하면 입력을 잠그고(InputLockReason.Death) 화면을 검게 덮은 뒤 Started를 올린다.
-//       잠금과 검은 화면은 씬을 다시 불러와도 End()까지 남는다.
-// 어떻게 쓰나:
-//   사망을 일으키는 쪽  → DeathSequence.Begin(deathData);
-//   사망 연출(#52)      → DeathSequence.Started += data => { 사망 대사·게임 오버 ... ; DeathSequence.End(); };
-// 주의:
-//   - 사망 대사·컷씬·게임 오버는 여기서 하지 않는다. Started를 받은 쪽이 만든다.
-//   - 대화 중에 Begin하면 대화를 끊고, 대화가 끝난 뒤에 Started를 올린다(사망이 이긴다). 그래서 Started 안에서 바로 대화를 재생할 수 있다.
-//   - 검은 화면은 sortingOrder 200이라 ScreenFader(100)와 대화창(0) 위를 덮는다.
 using System;
+using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Yarn.Unity;
-using ProjectT.Data;
+using ProjectT.Area;
 using ProjectT.Dialogue;
+using ProjectT.Save;
 using ProjectT.Session;
+using ProjectT.UI;
 using Object = UnityEngine.Object;
 
 namespace ProjectT.Death
 {
     public static class DeathSequence
     {
-        const int ScreenSortingOrder = 200;
+        const float DialogueStopTimeout = 2f;
+        const float TeleportTimeout = 3f;
 
-        static int run;
+        public static bool IsActive { get; private set; }
 
-        public static bool IsActive => InputLock.KeepDeathLock;
+        // 리로드된 씬의 DeathSceneEntry가 Awake에서 읽고 비운다.
+        public static bool ReloadedAfterDeath { get; private set; }
 
-        public static event Action<DeathData> Started;
+        // 에디트 모드 테스트에서는 씬을 불러올 수 없어 바꿔 끼운다.
+        internal static Action ReloadScene = ReloadActiveScene;
 
-        internal static GameObject BlackScreen { get; private set; }
-
-        public static void Begin(DeathData data)
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        internal static void ResetState()
         {
+            IsActive = false;
+            ReloadedAfterDeath = false;
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        public static void Begin(string deathNodeId)
+        {
+            if (string.IsNullOrWhiteSpace(deathNodeId))
+            {
+                Debug.LogWarning("[DeathSequence] 사망 노드 이름이 비어 있어 사망시키지 않았다.");
+                return;
+            }
+
             if (IsActive)
                 return;
-            if (data == null)
+
+            DeathSceneEntry scene = Object.FindAnyObjectByType<DeathSceneEntry>();
+            if (scene == null)
             {
-                Debug.LogError("[DeathSequence] DeathData가 비어 있어 사망을 시작하지 않았다.");
+                Debug.LogError($"[DeathSequence] 씬에 DeathSceneEntry가 없어 사망 '{deathNodeId}'를 처리하지 못했다.");
                 return;
             }
 
-            InputLock.KeepDeathLock = true;
-            foreach (InputLock inputLock in Object.FindObjectsByType<InputLock>(FindObjectsSortMode.None))
+            IsActive = true;
+            InputLock inputLock = scene.InputLock;
+            if (inputLock != null)
                 inputLock.Lock(InputLockReason.Death);
-            BlackScreen = CreateScreen();
 
-            DialogueService dialogue = Object.FindAnyObjectByType<DialogueService>();
-            if (dialogue != null && dialogue.IsPlaying)
+            Debug.Log($"[DeathSequence] 사망 시작: {deathNodeId}", scene);
+            Run(scene, inputLock, deathNodeId).Forget();
+        }
+
+        static async YarnTask Run(DeathSceneEntry scene, InputLock inputLock, string deathNodeId)
+        {
+            bool reloading = false;
+            ScreenFader fader = null;
+            try
             {
-                dialogue.RequestCancel();
-                StartAfterDialogue(dialogue, data, ++run).Forget();
+                DialogueService dialogue = scene.Dialogue;
+                if (dialogue != null)
+                {
+                    dialogue.RequestCancel();
+                    if (!await dialogue.WaitUntilIdle(DialogueStopTimeout))
+                        Debug.LogWarning("[DeathSequence] 진행 중인 대사가 제때 끝나지 않았다. 사망 노드가 거부될 수 있다.");
+                }
+
+                await WaitForTeleports();
+
+                SaveProgress(deathNodeId);
+
+                if (dialogue != null)
+                {
+                    DialogueResult result = await dialogue.Play(deathNodeId);
+                    if (result == DialogueResult.Rejected)
+                        Debug.LogWarning($"[DeathSequence] 사망 노드 '{deathNodeId}'를 재생하지 못했다. 그대로 리로드한다.");
+                }
+                else
+                {
+                    Debug.LogWarning($"[DeathSequence] DialogueService가 없어 사망 노드 '{deathNodeId}' 없이 리로드한다.");
+                }
+
+                fader = scene != null ? scene.FindOrCreateFader() : null;
+                if (fader != null)
+                {
+                    IEnumerator fadeOut = fader.FadeOut();
+                    while (fadeOut.MoveNext())
+                        await YarnTask.Yield();
+                }
+
+                reloading = true;
+                ReloadedAfterDeath = true;
+                SceneManager.sceneLoaded += OnSceneLoaded;
+                ReloadScene();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                reloading = false;
+            }
+            finally
+            {
+                // 리로드에 들어가면 옛 씬 오브젝트는 건드리지 않는다. 잠금은 옛 씬과 함께 사라진다.
+                if (!reloading)
+                    Abort(inputLock, fader);
+            }
+        }
+
+        static void Abort(InputLock inputLock, ScreenFader fader)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            ReloadedAfterDeath = false;
+            IsActive = false;
+            if (inputLock != null)
+                inputLock.Unlock(InputLockReason.Death);
+            if (fader != null)
+                fader.SetAlpha(0f);
+        }
+
+        // 리스폰 위치·퍼즐 클리어는 조사·풀이 시점에 이미 저장된다.
+        // 사망 대사 도중 게임을 꺼도 시체가 남도록 대사보다 먼저 기록한다.
+        // TODO(#52 2b): 메타픽션 사망 대기 저장을 여기서 연결한다.
+        static void SaveProgress(string deathNodeId)
+        {
+            DeathRecords.Add(deathNodeId);
+        }
+
+        static async YarnTask WaitForTeleports()
+        {
+            Teleport[] teleports = Object.FindObjectsByType<Teleport>(FindObjectsSortMode.None);
+            float deadline = Time.realtimeSinceStartup + TeleportTimeout;
+            while (AnyTransitioning(teleports))
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                {
+                    Debug.LogWarning("[DeathSequence] 텔레포트 전환이 제때 끝나지 않았다. 그대로 진행한다.");
+                    return;
+                }
+                await YarnTask.Yield();
+            }
+        }
+
+        static bool AnyTransitioning(Teleport[] teleports)
+        {
+            foreach (Teleport teleport in teleports)
+            {
+                if (teleport != null && teleport.IsTransitioning)
+                    return true;
+            }
+            return false;
+        }
+
+        internal static bool ConsumeReload()
+        {
+            if (!ReloadedAfterDeath)
+                return false;
+            ReloadedAfterDeath = false;
+            return true;
+        }
+
+        internal static void CompleteReload()
+        {
+            IsActive = false;
+        }
+
+        // DeathSceneEntry가 없는 씬으로 리로드되면 사망 상태가 영구히 남지 않게 여기서 푼다.
+        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            if (!ReloadedAfterDeath)
+                return;
+            Debug.LogWarning($"[DeathSequence] 리로드된 씬 '{scene.name}'에 DeathSceneEntry가 없어 사망 상태만 푼다.");
+            ReloadedAfterDeath = false;
+            IsActive = false;
+        }
+
+        static void ReloadActiveScene()
+        {
+            Scene scene = SceneManager.GetActiveScene();
+#if UNITY_EDITOR
+            // 빌드 설정에 없는 씬은 에디터에서도 SceneManager.LoadScene으로 불러올 수 없다.
+            if (scene.buildIndex < 0)
+            {
+                UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(scene.path, new LoadSceneParameters(LoadSceneMode.Single));
                 return;
             }
-            Started?.Invoke(data);
-        }
-
-        public static void End()
-        {
-            if (!IsActive)
-                return;
-
-            run++;
-            InputLock.KeepDeathLock = false;
-            foreach (InputLock inputLock in Object.FindObjectsByType<InputLock>(FindObjectsSortMode.None))
-                inputLock.Unlock(InputLockReason.Death);
-            if (BlackScreen != null)
-                DestroyScreen(BlackScreen);
-            BlackScreen = null;
-        }
-
-        static async YarnTask StartAfterDialogue(DialogueService dialogue, DeathData data, int startedRun)
-        {
-            while (dialogue != null && dialogue.IsPlaying)
-                await YarnTask.Yield();
-            // 기다리는 사이 End()가 불렸거나 사망이 다시 시작됐으면 이 사망의 Started는 버린다.
-            if (startedRun == run)
-                Started?.Invoke(data);
-        }
-
-        static GameObject CreateScreen()
-        {
-            var go = new GameObject("DeathScreen", typeof(Canvas), typeof(Image));
-            var canvas = go.GetComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvas.sortingOrder = ScreenSortingOrder;
-            go.GetComponent<Image>().color = Color.black;
-
-            // DontDestroyOnLoad는 플레이 모드에서만 쓸 수 있다. 에디트 모드(테스트)에서는 열린 씬에 저장되지 않게만 한다.
-            if (Application.isPlaying)
-                Object.DontDestroyOnLoad(go);
-            else
-                go.hideFlags = HideFlags.DontSave;
-            return go;
-        }
-
-        static void DestroyScreen(GameObject screen)
-        {
-            if (Application.isPlaying)
-                Object.Destroy(screen);
-            else
-                Object.DestroyImmediate(screen);
-        }
-
-        // 도메인 리로드를 끈 플레이 모드에서도 실행마다 사망 상태를 비운다.
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void ResetOnPlay()
-        {
-            InputLock.KeepDeathLock = false;
-            Started = null;
-            BlackScreen = null;
-            run++;
+#endif
+            SceneManager.LoadScene(scene.buildIndex);
         }
     }
 }
