@@ -168,6 +168,22 @@ namespace ProjectT.Death.Tests
         }
 
         [UnityTest]
+        public IEnumerator Play_OnFinished_CalledOnceAfterUnlock()
+        {
+            var source = new GameObject("Hole");
+            AddReaction(source, "A", 1);
+            int finished = 0;
+            bool lockedAtFinish = true;
+
+            Assert.IsTrue(DeathRefusal.Play(source, "Node_A", () => { finished++; lockedAtFinish = inputLock.IsLocked; }));
+            Assert.IsFalse(DeathRefusal.Play(source, "Node_B", () => finished += 100));
+            yield return WaitUntilDone();
+
+            Assert.AreEqual(1, finished);
+            Assert.IsFalse(lockedAtFinish);
+        }
+
+        [UnityTest]
         public IEnumerator Play_WithoutReactions_PlaysDialogueOnly()
         {
             var source = new GameObject("Corpse");

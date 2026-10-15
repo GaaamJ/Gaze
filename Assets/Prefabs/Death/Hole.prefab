@@ -167,6 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathRefusalZone
   refusalNodeId: 
+  retryDelay: 0.7
 --- !u!114 &2032487211226357398
 MonoBehaviour:
   m_ObjectHideFlags: 0

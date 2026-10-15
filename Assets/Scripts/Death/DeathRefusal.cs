@@ -24,7 +24,8 @@ namespace ProjectT.Death
             activeScene = null;
         }
 
-        public static bool Play(GameObject source, string refusalNodeId)
+        // onFinished는 시작된 경우에만, 잠금이 풀린 뒤 한 번 불린다.
+        public static bool Play(GameObject source, string refusalNodeId, Action onFinished = null)
         {
             if (IsActive || DeathSequence.IsActive || source == null)
                 return false;
@@ -48,12 +49,12 @@ namespace ProjectT.Death
 
             IRefusalReaction[] reactions = source.GetComponents<IRefusalReaction>();
             Debug.Log($"[DeathRefusal] 거부 시작: {refusalNodeId} ({source.name})", source);
-            Run(scene, inputLock, dialogue, scene.Laris, reactions, refusalNodeId).Forget();
+            Run(scene, inputLock, dialogue, scene.Laris, reactions, refusalNodeId, onFinished).Forget();
             return true;
         }
 
         static async YarnTask Run(DeathSceneEntry scene, InputLock inputLock, DialogueService dialogue,
-            PlayerMovement laris, IRefusalReaction[] reactions, string refusalNodeId)
+            PlayerMovement laris, IRefusalReaction[] reactions, string refusalNodeId, Action onFinished)
         {
             try
             {
@@ -88,6 +89,19 @@ namespace ProjectT.Death
                     inputLock.Unlock(InputLockReason.Refusal);
                 if (ReferenceEquals(activeScene, scene))
                     activeScene = null;
+                Finish(onFinished);
+            }
+        }
+
+        static void Finish(Action onFinished)
+        {
+            try
+            {
+                onFinished?.Invoke();
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
             }
         }
 
