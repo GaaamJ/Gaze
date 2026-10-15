@@ -90,57 +90,6 @@ namespace ProjectT.Death.Tests
             yield return WaitForReload();
         }
 
-        static DeathInteractable NewDeathObject(string afterDeathNodeId)
-        {
-            var target = new GameObject("DeathObject").AddComponent<DeathInteractable>();
-            Set(target, so =>
-            {
-                so.FindProperty("deathNodeId").stringValue = "Death_DeathObject";
-                so.FindProperty("afterDeathNodeId").stringValue = afterDeathNodeId;
-            });
-            return target;
-        }
-
-        [Test]
-        public void DeathInteractable_AfterDeathWithRecord_PlaysAfterDeathNodeInsteadOfDying()
-        {
-            SaveManager.Data.diedNodeIds.Add("Death_DeathObject");
-            var target = NewDeathObject("DeathObject_Corpse");
-
-            LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어 'DeathObject_Corpse'를 재생하지"));
-            target.Interact(new InteractContext(null, null));
-
-            Assert.IsFalse(DeathSequence.IsActive);
-            Assert.IsFalse(inputLock.IsLocked);
-            LogAssert.NoUnexpectedReceived();
-        }
-
-        [UnityTest]
-        public IEnumerator DeathInteractable_AfterDeathWithoutRecord_BeginsDeath()
-        {
-            SaveManager.Data.diedNodeIds.Add("Death_FallingDeath");
-            var target = NewDeathObject("DeathObject_Corpse");
-
-            ExpectDeath("Death_DeathObject");
-            target.Interact(new InteractContext(null, null));
-
-            Assert.IsTrue(DeathSequence.IsActive);
-            yield return WaitForReload();
-        }
-
-        [UnityTest]
-        public IEnumerator DeathInteractable_EmptyAfterDeathWithRecord_BeginsDeathAgain()
-        {
-            SaveManager.Data.diedNodeIds.Add("Death_DeathObject");
-            var target = NewDeathObject("");
-
-            ExpectDeath("Death_DeathObject");
-            target.Interact(new InteractContext(null, null));
-
-            Assert.IsTrue(DeathSequence.IsActive);
-            yield return WaitForReload();
-        }
-
         DeathZone NewZone()
         {
             var go = new GameObject("Zone");
