@@ -217,8 +217,7 @@ namespace ProjectT.Puzzle.Tests
             Build();
             Press(1);
 
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
-            LogAssert.Expect(LogType.Warning, new Regex("wrongDeathNodeId가 비어"));
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
             Press(wrong);
 
             foreach (var symbol in symbols)
@@ -232,8 +231,7 @@ namespace ProjectT.Puzzle.Tests
         {
             Build();
             Press(1);
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
-            LogAssert.Expect(LogType.Warning, new Regex("wrongDeathNodeId가 비어"));
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
             Press(2);
 
             Press(4);

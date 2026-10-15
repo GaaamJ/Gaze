@@ -176,7 +176,6 @@ namespace ProjectT.Interaction.Tests
             Directory.CreateDirectory(tempBase);
             File.WriteAllText(paths.Root, "blocks root folder");
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
-            LogAssert.Expect(LogType.Warning, new Regex("조사 기록 'HintGapA' 저장에 실패했다"));
 
             DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
 
@@ -293,7 +292,6 @@ namespace ProjectT.Interaction.Tests
             target.transform.position = new Vector3(4f, 0f, 0f);
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
-            LogAssert.Expect(LogType.Warning, new Regex("저장에 실패했다"));
             target.Interact(Context());
 
             Assert.AreEqual("Temp", RespawnAreaIds.Current);

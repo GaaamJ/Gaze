@@ -45,8 +45,6 @@ namespace ProjectT.Interaction
             string areaId = respawn.Area != null ? respawn.Area.AreaId : null;
             if (RespawnPoint.Set(position, areaId))
                 Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {position} ({areaId})", this);
-            else
-                Debug.LogWarning($"[DialogueInteractable] 리스폰 지점 {position} 저장에 실패했다. 메모리 값만 갱신됐다.", this);
         }
 
         async YarnTask PlayDialogue(InteractContext context)
@@ -70,8 +68,7 @@ namespace ProjectT.Interaction
         internal static void RecordInvestigated(ICollection<string> investigated, string nodeId)
         {
             investigated.Add(nodeId);
-            if (!InvestigatedNodeIds.Add(nodeId))
-                Debug.LogWarning($"[DialogueInteractable] 조사 기록 '{nodeId}' 저장에 실패했다. 메모리 기록만 남았다.");
+            InvestigatedNodeIds.Add(nodeId);
         }
 
 #if UNITY_EDITOR

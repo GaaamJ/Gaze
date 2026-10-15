@@ -71,13 +71,12 @@ namespace ProjectT.Core.Tests
         }
 
         [Test]
-        public void Add_WhenSaveFails_WarnsAndKeepsInMemory()
+        public void Add_WhenSaveFails_KeepsInMemory()
         {
             Directory.CreateDirectory(_tempBase);
             File.WriteAllText(_paths.Root, "not a folder");
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
-            LogAssert.Expect(LogType.Warning, new Regex(@"\[DeathRecords\] 사망 기록 저장에 실패했다"));
             Assert.IsFalse(DeathRecords.Add("Death_DeathObject"));
 
             Assert.IsTrue(DeathRecords.Has("Death_DeathObject"));

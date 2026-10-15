@@ -75,7 +75,7 @@ namespace ProjectT.Dialogue
                 return DialogueResult.Rejected;
             }
 
-            if (isPlaying || runner.IsDialogueRunning)
+            if (!IsIdle)
             {
                 Debug.LogWarning($"[DialogueService] 대화 중이라 '{nodeName}' 재생을 거부했다.", this);
                 return DialogueResult.Rejected;

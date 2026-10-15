@@ -241,6 +241,21 @@ namespace ProjectT.Death.Tests
             Assert.IsFalse(DeathSequence.IsActive);
         }
 
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void Begin_BlankNodeId_WarnsAndDoesNotDie(string nodeId)
+        {
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+
+            DeathSequence.Begin(nodeId);
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
+            CollectionAssert.IsEmpty(SaveManager.Data.diedNodeIds);
+            Assert.AreEqual(0, reloadCount);
+        }
+
         [Test]
         public void Begin_WithoutEntry_LogsErrorAndStaysInactive()
         {

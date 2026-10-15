@@ -90,13 +90,38 @@ namespace ProjectT.Death.Tests
             yield return WaitForReload();
         }
 
-        DeathZone NewZone()
+        [Test]
+        public void DeathInteractable_BlankNode_WarnsWithoutDying()
+        {
+            var target = new GameObject("Gap").AddComponent<DeathInteractable>();
+
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+            target.Interact(new InteractContext(null, null));
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
+        }
+
+        DeathZone NewZone(string nodeId = "Death_Falling001")
         {
             var go = new GameObject("Zone");
             go.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = go.AddComponent<DeathZone>();
-            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
+            Set(zone, so => so.FindProperty("deathNodeId").stringValue = nodeId);
             return zone;
+        }
+
+        [Test]
+        public void DeathZone_BlankNode_WarnsWithoutDying()
+        {
+            var zone = NewZone("");
+            var body = NewLaris(out _);
+
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+            zone.HandleEntered(body);
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
         }
 
         static Collider2D NewLaris(out Collider2D detectTrigger)
@@ -163,7 +188,6 @@ namespace ProjectT.Death.Tests
             puzzle.WrongSymbolPressed += () => { wrongCount++; litWhenRaised = symbols[0].IsLit; };
 
             puzzle.HandlePressed(symbols[0]);
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
             ExpectDeath("Death_PasswordWrong");
             puzzle.HandlePressed(symbols[2]);
 

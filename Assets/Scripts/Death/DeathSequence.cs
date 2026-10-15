@@ -35,6 +35,12 @@ namespace ProjectT.Death
 
         public static void Begin(string deathNodeId)
         {
+            if (string.IsNullOrWhiteSpace(deathNodeId))
+            {
+                Debug.LogWarning("[DeathSequence] 사망 노드 이름이 비어 있어 사망시키지 않았다.");
+                return;
+            }
+
             if (IsActive)
                 return;
 

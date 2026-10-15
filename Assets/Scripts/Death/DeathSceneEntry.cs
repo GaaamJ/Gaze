@@ -123,16 +123,6 @@ namespace ProjectT.Death
             DeathSequence.CompleteReload();
         }
 
-        // 만든 페이더는 씬 루트에 두어 Teleport도 FindAnyObjectByType으로 같은 것을 쓰게 한다.
-        internal ScreenFader FindOrCreateFader()
-        {
-            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
-            if (fader != null)
-                return fader;
-            if (faderPrefab != null)
-                return Instantiate(faderPrefab);
-            Debug.LogWarning("[DeathSceneEntry] 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 진행한다.", this);
-            return null;
-        }
+        internal ScreenFader FindOrCreateFader() => ScreenFader.FindOrCreate(faderPrefab, this);
     }
 }
