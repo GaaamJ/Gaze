@@ -54,7 +54,13 @@ title: PasswordDoor_Open
 <<stop>>
 ===
 
-title: Death_FallingDeath
+title: Death_Falling001
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling002
 ---
 // 대사 작성 전
 <<stop>>
@@ -121,6 +127,18 @@ title: Death_PasswordWrong_Sign
 ===
 
 title: Death_CloseWindow
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: DeathObject_Corpse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: FallingDeath_Corpse
 ---
 // 대사 작성 전
 <<stop>>

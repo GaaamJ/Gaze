@@ -19,6 +19,9 @@ namespace ProjectT.Dialogue
 
         public bool IsPlaying => isPlaying;
 
+        // runner.Stop() 직후에도 Play의 정리가 끝나기 전까지는 다음 Play가 거부되므로 둘 다 본다.
+        public bool IsIdle => !isPlaying && (runner == null || !runner.IsDialogueRunning);
+
         public event Action QuitNormallyRequested;
 
         void Awake()
@@ -51,6 +54,18 @@ namespace ProjectT.Dialogue
 
             cancelRequested = true;
             runner.Stop().Forget();
+            return true;
+        }
+
+        public async YarnTask<bool> WaitUntilIdle(float timeoutSeconds)
+        {
+            float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+            while (!IsIdle)
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                    return false;
+                await YarnTask.Yield();
+            }
             return true;
         }
 

@@ -42,17 +42,12 @@ namespace ProjectT.Interaction
 
         void UpdateRespawn(RespawnArea respawn)
         {
-            if (respawn.Area == null || string.IsNullOrWhiteSpace(respawn.Area.AreaId))
-            {
-                Debug.LogWarning($"[DialogueInteractable] '{name}': RespawnArea의 지역이 비어 있어 리스폰 지점을 갱신하지 않았다.", this);
-                return;
-            }
-
-            string areaId = respawn.Area.AreaId;
-            if (RespawnAreaIds.Set(areaId))
-                Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {areaId}", this);
+            Vector2 position = respawn.SpawnPosition;
+            string areaId = respawn.Area != null ? respawn.Area.AreaId : null;
+            if (RespawnPoint.Set(position, areaId))
+                Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {position} ({areaId})", this);
             else
-                Debug.LogWarning($"[DialogueInteractable] 리스폰 지점 '{areaId}' 저장에 실패했다. 메모리 값만 갱신됐다.", this);
+                Debug.LogWarning($"[DialogueInteractable] 리스폰 지점 {position} 저장에 실패했다. 메모리 값만 갱신됐다.", this);
         }
 
         async YarnTask PlayDialogue(InteractContext context)
@@ -70,7 +65,14 @@ namespace ProjectT.Interaction
 
             // 대사 중 이 오브젝트가 파괴될 수 있으므로 await 뒤에는 미리 받아 둔 값만 쓴다.
             if (result == DialogueResult.Completed)
-                context.Investigated.Add(record);
+                RecordInvestigated(context.Investigated, record);
+        }
+
+        internal static void RecordInvestigated(ICollection<string> investigated, string nodeId)
+        {
+            investigated.Add(nodeId);
+            if (!InvestigatedNodeIds.Add(nodeId))
+                Debug.LogWarning($"[DialogueInteractable] 조사 기록 '{nodeId}' 저장에 실패했다. 메모리 기록만 남았다.");
         }
 
 #if UNITY_EDITOR

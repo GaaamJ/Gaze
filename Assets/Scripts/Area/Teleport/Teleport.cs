@@ -137,7 +137,7 @@ namespace ProjectT.Area
             return null;
         }
 
-        static void MoveTo(Rigidbody2D body, Vector3 position)
+        internal static void MoveTo(Rigidbody2D body, Vector3 position)
         {
             position.z = body.transform.position.z;
             body.position = position;
