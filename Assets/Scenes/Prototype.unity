@@ -13178,6 +13178,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathInteractable
   deathNodeId: Death_DangerousGap
+  afterDeathNodeId: 
 --- !u!1 &2007013525
 GameObject:
   m_ObjectHideFlags: 0
@@ -13631,6 +13632,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathInteractable
   deathNodeId: Death_DeathObject
+  afterDeathNodeId: DeathObject_Corpse
 --- !u!114 &2110457243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13646,6 +13648,7 @@ MonoBehaviour:
   source: {fileID: 2110457242}
   target: {fileID: 2110457239}
   corpseSprite: {fileID: 5191243800749403340, guid: cca8f2227c8f87146b3b5be23b1b1c88, type: 3}
+  corpseObject: {fileID: 0}
 --- !u!1001 &2132577340
 PrefabInstance:
   m_ObjectHideFlags: 0
