@@ -11647,6 +11647,39 @@ MonoBehaviour:
   activateOnOpen:
   - {fileID: 453309934}
   wrongDeathNodeId: Death_PasswordWrong
+--- !u!1 &1002311733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1002311734}
+  m_Layer: 0
+  m_Name: DeathInteractable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1002311734
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1002311733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2110457240}
+  - {fileID: 1144555582}
+  m_Father: {fileID: 1556776377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1040953798
 GameObject:
   m_ObjectHideFlags: 0
@@ -12035,7 +12068,7 @@ GameObject:
   - component: {fileID: 1144555582}
   - component: {fileID: 1144555583}
   m_Layer: 0
-  m_Name: Aftermath_DeathObject
+  m_Name: DeathAftermathInteractable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12054,7 +12087,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1556776377}
+  m_Father: {fileID: 1002311734}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1144555583
 MonoBehaviour:
@@ -12602,12 +12635,11 @@ Transform:
   m_Children:
   - {fileID: 7951793}
   - {fileID: 1111389133}
-  - {fileID: 2110457240}
+  - {fileID: 1002311734}
   - {fileID: 893714106}
   - {fileID: 420215713}
   - {fileID: 1176768364}
   - {fileID: 1853656031}
-  - {fileID: 1144555582}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1710541729
@@ -13626,7 +13658,7 @@ GameObject:
   - component: {fileID: 2110457241}
   - component: {fileID: 2110457242}
   m_Layer: 9
-  m_Name: GrayScale_DeathInteractable
+  m_Name: BeforeInteractable
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -13704,7 +13736,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1556776377}
+  m_Father: {fileID: 1002311734}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &2110457241
 BoxCollider2D:
