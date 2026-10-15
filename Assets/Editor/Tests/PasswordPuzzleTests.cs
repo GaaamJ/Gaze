@@ -296,5 +296,30 @@ namespace ProjectT.Puzzle.Tests
 
             AssertOpened();
         }
+
+        // 에디터에서는 ApplyModifiedProperties가 OnValidate를 부르므로 Set으로 검사를 일으킨다.
+        [Test]
+        public void OnValidate_AnswerNotInSymbols_Warns()
+        {
+            Build();
+            PasswordSymbol outsider = NewSymbols(1)[0];
+            outsider.name = "Outsider";
+            created.Add(outsider.gameObject);
+
+            LogAssert.Expect(LogType.Warning, new Regex("정답 문양 'Outsider'이 symbols에 없어"));
+            Set(puzzle, so => SetObjects(so.FindProperty("answers"), new[] { symbols[0], outsider }));
+
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void OnValidate_AnswersInSymbols_DoesNotWarn()
+        {
+            Build();
+
+            Set(puzzle, so => SetObjects(so.FindProperty("answers"), new[] { symbols[1], symbols[4] }));
+
+            LogAssert.NoUnexpectedReceived();
+        }
     }
 }
