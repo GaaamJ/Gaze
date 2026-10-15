@@ -93,8 +93,10 @@ namespace ProjectT.Death
                 if (fader != null)
                     fader.SetAlpha(1f);
 
+                // 현재 동작: 검은 화면과 Death 잠금을 한 프레임 유지한 뒤 푼다.
                 yield return null;
 
+                // 현재 동작: 잠금을 페이드 인보다 먼저 풀어 페이드 인 중에도 조작할 수 있다.
                 FinishEntry();
 
                 if (fader != null)

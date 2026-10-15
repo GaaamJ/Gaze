@@ -27,7 +27,7 @@ namespace ProjectT.Death.Tests
         [SetUp]
         public void SetUp()
         {
-            // 오답 문양 테스트가 실수로 퍼즐을 풀어도 실제 세이브를 건드리지 않게 한다.
+            // 퍼즐 저장·사망 기록 경로가 실제 세이브를 건드리지 않게 임시 폴더를 쓴다.
             tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
             SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
             SaveManager.Load();

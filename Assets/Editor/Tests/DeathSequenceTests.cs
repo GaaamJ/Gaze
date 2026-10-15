@@ -143,6 +143,7 @@ namespace ProjectT.Death.Tests
             Assert.IsFalse(DeathSequence.ReloadedAfterDeath);
             Assert.IsTrue(newLock.IsLocked);
 
+            // 에디트 모드에서는 Start 코루틴이 돌지 않아 RunEntry를 직접 넘긴다.
             IEnumerator run = entry.RunEntry();
             Assert.IsTrue(run.MoveNext());
             Assert.AreEqual(1f, fader.Alpha, "리로드 직후 화면이 검게 시작해야 한다.");
