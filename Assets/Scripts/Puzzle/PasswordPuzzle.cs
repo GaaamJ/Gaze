@@ -21,10 +21,10 @@ namespace ProjectT.Puzzle
         [Tooltip("오답 문양을 누르면 재생할 사망 노드 이름 (예: Death_PasswordWrong)")]
         [SerializeField] string wrongDeathNodeId = "";
 
+        // 런타임 구독자는 없고 테스트가 오답 발생을 관찰하는 용도다.
         public event Action WrongSymbolPressed;
 
         public bool IsSolved { get; private set; }
-        public string PuzzleId => puzzleId;
         public string DeathNodeId => wrongDeathNodeId;
 
         void Awake()

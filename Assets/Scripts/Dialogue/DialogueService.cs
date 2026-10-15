@@ -17,8 +17,6 @@ namespace ProjectT.Dialogue
         bool nodeCompleted;
         bool cancelRequested;
 
-        public bool IsPlaying => isPlaying;
-
         // runner.Stop() 직후에도 Play의 정리가 끝나기 전까지는 다음 Play가 거부되므로 둘 다 본다.
         public bool IsIdle => !isPlaying && (runner == null || !runner.IsDialogueRunning);
 

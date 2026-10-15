@@ -22,8 +22,6 @@ namespace ProjectT.Death
         // 에디트 모드 테스트에서는 DialogueRunner가 돌지 않아 바꿔 끼운다.
         internal static Func<string, YarnTask<DialogueResult>> PlayDialogue = PlayWithSceneDialogue;
 
-        public string RefusalNodeId => refusalNodeId;
-
         void OnTriggerEnter2D(Collider2D other)
         {
             HandleEntered(other);

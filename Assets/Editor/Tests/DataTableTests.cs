@@ -8,7 +8,6 @@ namespace ProjectT.Data.Tests
         [Test]
         public void NodeNames_FollowNodeIdRule()
         {
-            Assert.AreEqual("TempRespawn", DialogueNodeNames.First("TempRespawn"));
             Assert.AreEqual("TempRespawn_Recheck", DialogueNodeNames.Recheck("TempRespawn"));
         }
 

@@ -21,6 +21,7 @@ namespace ProjectT.Death
         [Tooltip("사망 기록이 있으면 끌 오브젝트")]
         [SerializeField] GameObject[] deactivate;
 
+        // Awake 외에 테스트·외부에서 다시 불러도 생성물이 겹치지 않게 막는다.
         bool applied;
 
         // 세이브는 GameSession.Begin(BeforeSceneLoad)에서 이미 불러와 있다.
@@ -37,12 +38,7 @@ namespace ProjectT.Death
                 return;
             }
 
-            Apply(DeathRecords.Has(death.DeathNodeId));
-        }
-
-        internal void Apply(bool died)
-        {
-            if (!died || applied)
+            if (applied || !DeathRecords.Has(death.DeathNodeId))
                 return;
             applied = true;
 

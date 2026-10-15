@@ -32,12 +32,11 @@ namespace ProjectT.Interaction
 
         public string ResolveDialogueNode(ICollection<string> investigated, Func<string, bool> nodeExists)
         {
-            string first = DialogueNodeNames.First(dialogueNodeId);
             if (!investigated.Contains(dialogueNodeId))
-                return first;
+                return dialogueNodeId;
 
             string recheck = DialogueNodeNames.Recheck(dialogueNodeId);
-            return nodeExists(recheck) ? recheck : first;
+            return nodeExists(recheck) ? recheck : dialogueNodeId;
         }
 
         void UpdateRespawn(RespawnArea respawn)

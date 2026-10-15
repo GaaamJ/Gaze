@@ -25,7 +25,6 @@ namespace ProjectT.Death
 
         internal InputLock InputLock => inputLock;
         internal DialogueService Dialogue => dialogueService;
-        internal PlayerMovement Laris => laris;
 
         void Awake()
         {
