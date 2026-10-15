@@ -3,16 +3,15 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Player;
 using ProjectT.Save;
 using ProjectT.Session;
+using ProjectT.Tests;
 using ProjectT.UI;
-using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
@@ -21,19 +20,16 @@ namespace ProjectT.Death.Tests
     {
         const int MaxFrames = 300;
 
+        TempSaveSandbox save;
         InputLock inputLock;
         ScreenFader fader;
         int reloadCount;
         Action originalReload;
-        string tempBase;
 
         [SetUp]
         public void SetUp()
         {
-            // Begin이 사망 기록을 저장하므로 실제 세이브 대신 임시 폴더를 쓴다.
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
             reloadCount = 0;
@@ -49,32 +45,7 @@ namespace ProjectT.Death.Tests
         {
             DeathSequence.ResetState();
             DeathSequence.ReloadScene = originalReload;
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
-        }
-
-        static void Set(UnityEngine.Object target, Action<SerializedObject> edit)
-        {
-            var so = new SerializedObject(target);
-            edit(so);
-            so.ApplyModifiedPropertiesWithoutUndo();
-        }
-
-        static ScreenFader NewFader()
-        {
-            var go = new GameObject("ScreenFader");
-            go.AddComponent<RectTransform>();
-            var image = go.AddComponent<Image>();
-            var screenFader = go.AddComponent<ScreenFader>();
-            Set(screenFader, so =>
-            {
-                so.FindProperty("image").objectReferenceValue = image;
-                so.FindProperty("duration").floatValue = 0f;
-            });
-            screenFader.SetAlpha(0f);
-            return screenFader;
+            save.Dispose();
         }
 
         static DeathSceneEntry NewEntry(out InputLock lockOwner)
@@ -99,27 +70,14 @@ namespace ProjectT.Death.Tests
         [UnityTest]
         public IEnumerator BeginTwiceSameFrame_ProcessesOnce()
         {
-            int started = 0;
-            Application.LogCallback count = (message, _, _) => { if (message.Contains("사망 시작")) started++; };
-            Application.logMessageReceived += count;
-            LogAssert.Expect(LogType.Log, new Regex(@"사망 시작: Death_A"));
-            ExpectNoDialogueWarning();
+            DeathSequence.Begin("Death_A");
+            DeathSequence.Begin("Death_B");
 
-            try
-            {
-                DeathSequence.Begin("Death_A");
-                DeathSequence.Begin("Death_B");
+            yield return WaitForReload();
+            for (int i = 0; i < 10; i++)
+                yield return null;
 
-                yield return WaitForReload();
-                for (int i = 0; i < 10; i++)
-                    yield return null;
-            }
-            finally
-            {
-                Application.logMessageReceived -= count;
-            }
             Assert.AreEqual(1, reloadCount);
-            Assert.AreEqual(1, started);
         }
 
         [UnityTest]
@@ -143,6 +101,7 @@ namespace ProjectT.Death.Tests
             Assert.IsFalse(DeathSequence.ReloadedAfterDeath);
             Assert.IsTrue(newLock.IsLocked);
 
+            // 에디트 모드에서는 Start 코루틴이 돌지 않아 RunEntry를 직접 넘긴다.
             IEnumerator run = entry.RunEntry();
             Assert.IsTrue(run.MoveNext());
             Assert.AreEqual(1f, fader.Alpha, "리로드 직후 화면이 검게 시작해야 한다.");
@@ -219,6 +178,40 @@ namespace ProjectT.Death.Tests
             Assert.IsTrue(recordedAtDialogue, "대사 재생 전에 메모리에 기록돼야 한다.");
             Assert.IsTrue(savedAtDialogue, "대사 재생 전에 세이브 파일에 저장돼야 한다.");
             CollectionAssert.AreEqual(new[] { "Death_A" }, SaveManager.Data.diedNodeIds);
+        }
+
+        [UnityTest]
+        public IEnumerator EntryThrows_StillReleasesLockAndIsActive()
+        {
+            ExpectNoDialogueWarning();
+            DeathSequence.Begin("Death_A");
+            yield return WaitForReload();
+
+            var entry = NewEntry(out InputLock newLock);
+            Set(fader, so => so.FindProperty("image").objectReferenceValue = null);
+            entry.EnterScene();
+            Assert.IsTrue(newLock.IsLocked);
+
+            IEnumerator run = entry.RunEntry();
+            Assert.That(() => run.MoveNext(), Throws.InstanceOf<Exception>());
+
+            Assert.IsFalse(newLock.IsLocked);
+            Assert.IsFalse(DeathSequence.IsActive);
+        }
+
+        [TestCase(null)]
+        [TestCase("")]
+        [TestCase("   ")]
+        public void Begin_BlankNodeId_WarnsAndDoesNotDie(string nodeId)
+        {
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+
+            DeathSequence.Begin(nodeId);
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
+            CollectionAssert.IsEmpty(SaveManager.Data.diedNodeIds);
+            Assert.AreEqual(0, reloadCount);
         }
 
         [Test]

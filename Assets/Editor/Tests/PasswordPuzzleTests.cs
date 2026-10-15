@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Save;
-using UnityEditor;
+using ProjectT.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ProjectT.Tests.TestObjects;
 using Object = UnityEngine.Object;
 
 namespace ProjectT.Puzzle.Tests
@@ -17,8 +18,7 @@ namespace ProjectT.Puzzle.Tests
         const string PuzzleId = "PasswordDoor";
 
         readonly List<Object> created = new();
-        string tempBase;
-        GameFolderPaths paths;
+        TempSaveSandbox save;
 
         PasswordSymbol[] symbols;
         PasswordPuzzle puzzle;
@@ -31,10 +31,7 @@ namespace ProjectT.Puzzle.Tests
         [SetUp]
         public void SetUp()
         {
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Paths = paths;
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             wrongCount = 0;
         }
 
@@ -47,10 +44,7 @@ namespace ProjectT.Puzzle.Tests
                     Object.DestroyImmediate(obj);
             }
             created.Clear();
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
+            save.Dispose();
         }
 
         Sprite NewSprite(string name)
@@ -76,13 +70,8 @@ namespace ProjectT.Puzzle.Tests
         void Build(params GameObject[] activateOnOpen)
         {
             targets = activateOnOpen;
-            symbols = new PasswordSymbol[5];
-            for (int i = 0; i < symbols.Length; i++)
-            {
-                var go = new GameObject($"0{i + 1}");
-                created.Add(go);
-                symbols[i] = go.AddComponent<PasswordSymbol>();
-            }
+            symbols = NewSymbols(5);
+            created.AddRange(symbols.Select(s => s.gameObject));
 
             var door = new GameObject("PuzzleDoor");
             created.Add(door);
@@ -91,25 +80,13 @@ namespace ProjectT.Puzzle.Tests
             doorRenderer = door.AddComponent<SpriteRenderer>();
             doorRenderer.sprite = closedSprite;
 
-            LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
-            puzzle = door.AddComponent<PasswordPuzzle>();
-            var so = new SerializedObject(puzzle);
-            var list = so.FindProperty("symbols");
-            list.arraySize = symbols.Length;
-            for (int i = 0; i < symbols.Length; i++)
-                list.GetArrayElementAtIndex(i).objectReferenceValue = symbols[i];
-            var answerList = so.FindProperty("answers");
-            answerList.arraySize = 2;
-            answerList.GetArrayElementAtIndex(0).objectReferenceValue = symbols[0];
-            answerList.GetArrayElementAtIndex(1).objectReferenceValue = symbols[3];
-            so.FindProperty("puzzleId").stringValue = PuzzleId;
-            so.FindProperty("doorRenderer").objectReferenceValue = doorRenderer;
-            so.FindProperty("openSprite").objectReferenceValue = openSprite;
-            var targetList = so.FindProperty("activateOnOpen");
-            targetList.arraySize = targets.Length;
-            for (int i = 0; i < targets.Length; i++)
-                targetList.GetArrayElementAtIndex(i).objectReferenceValue = targets[i];
-            so.ApplyModifiedPropertiesWithoutUndo();
+            puzzle = AddPuzzle(door, symbols, new[] { symbols[0], symbols[3] }, PuzzleId);
+            Set(puzzle, so =>
+            {
+                so.FindProperty("doorRenderer").objectReferenceValue = doorRenderer;
+                so.FindProperty("openSprite").objectReferenceValue = openSprite;
+                SetObjects(so.FindProperty("activateOnOpen"), targets);
+            });
 
             puzzle.WrongSymbolPressed += () => wrongCount++;
         }
@@ -164,7 +141,7 @@ namespace ProjectT.Puzzle.Tests
             Press(4);
 
             AssertOpened();
-            StringAssert.Contains(PuzzleId, File.ReadAllText(paths.SaveFile));
+            StringAssert.Contains(PuzzleId, File.ReadAllText(save.Paths.SaveFile));
             SaveManager.Load();
             CollectionAssert.AreEqual(new[] { PuzzleId }, SaveManager.Data.solvedPuzzleIds);
         }
@@ -192,6 +169,21 @@ namespace ProjectT.Puzzle.Tests
             CollectionAssert.AreEqual(new[] { PuzzleId }, SaveManager.Data.solvedPuzzleIds);
         }
 
+        [Test]
+        public void EmptyPuzzleId_OpensWithoutSaving()
+        {
+            Build();
+            Set(puzzle, so => so.FindProperty("puzzleId").stringValue = "");
+
+            Press(1);
+            Press(4);
+
+            Assert.IsTrue(puzzle.IsSolved);
+            Assert.AreSame(openSprite, doorRenderer.sprite);
+            CollectionAssert.IsEmpty(SaveManager.Data.solvedPuzzleIds);
+            Assert.IsFalse(File.Exists(save.Paths.SaveFile));
+        }
+
         [TestCase(2)]
         [TestCase(3)]
         [TestCase(5)]
@@ -200,8 +192,7 @@ namespace ProjectT.Puzzle.Tests
             Build();
             Press(1);
 
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
-            LogAssert.Expect(LogType.Warning, new Regex("wrongDeathNodeId가 비어"));
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
             Press(wrong);
 
             foreach (var symbol in symbols)
@@ -215,8 +206,7 @@ namespace ProjectT.Puzzle.Tests
         {
             Build();
             Press(1);
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
-            LogAssert.Expect(LogType.Warning, new Regex("wrongDeathNodeId가 비어"));
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
             Press(2);
 
             Press(4);
@@ -305,6 +295,31 @@ namespace ProjectT.Puzzle.Tests
             puzzle.RestoreFromSave();
 
             AssertOpened();
+        }
+
+        // 에디터에서는 ApplyModifiedProperties가 OnValidate를 부르므로 Set으로 검사를 일으킨다.
+        [Test]
+        public void OnValidate_AnswerNotInSymbols_Warns()
+        {
+            Build();
+            PasswordSymbol outsider = NewSymbols(1)[0];
+            outsider.name = "Outsider";
+            created.Add(outsider.gameObject);
+
+            LogAssert.Expect(LogType.Warning, new Regex("정답 문양 'Outsider'이 symbols에 없어"));
+            Set(puzzle, so => SetObjects(so.FindProperty("answers"), new[] { symbols[0], outsider }));
+
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void OnValidate_AnswersInSymbols_DoesNotWarn()
+        {
+            Build();
+
+            Set(puzzle, so => SetObjects(so.FindProperty("answers"), new[] { symbols[1], symbols[4] }));
+
+            LogAssert.NoUnexpectedReceived();
         }
     }
 }

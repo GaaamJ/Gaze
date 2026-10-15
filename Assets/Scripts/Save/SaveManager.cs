@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ProjectT.Core.GameFolder;
@@ -44,6 +45,7 @@ namespace ProjectT.Save
             }
         }
 
+        // 실패 로그는 여기서만 남긴다. 호출자가 바꾼 메모리 값은 그대로 남아 다음 저장 때 함께 기록된다.
         public static bool Save()
         {
             string path = SavePath;
@@ -73,6 +75,16 @@ namespace ProjectT.Save
                 TryDelete(temp);
                 return false;
             }
+        }
+
+        // 공백 id는 무시하고 이미 있는 id는 다시 저장하지 않는다. 할 일이 없으면 저장 성공으로 본다.
+        public static bool AddUnique(List<string> ids, string id)
+        {
+            if (string.IsNullOrWhiteSpace(id) || ids.Contains(id))
+                return true;
+
+            ids.Add(id);
+            return Save();
         }
 
         static void TryDelete(string file)

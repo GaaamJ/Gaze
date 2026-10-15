@@ -121,20 +121,12 @@ namespace ProjectT.Area
             activeFader = null;
         }
 
-        // 만든 페이더는 씬 루트에 두어 다음 전환·다른 텔레포트가 FindAnyObjectByType으로 다시 쓰고, 씬과 함께 정리되게 한다.
         ScreenFader FindOrCreateFader()
         {
-            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
-            if (fader != null)
-                return fader;
-            if (faderPrefab != null)
-                return Instantiate(faderPrefab);
-            if (!warnedNoFader)
-            {
+            ScreenFader fader = ScreenFader.FindOrCreate(faderPrefab, this, !warnedNoFader);
+            if (fader == null)
                 warnedNoFader = true;
-                Debug.LogWarning($"[Teleport] '{name}': 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 옮긴다.", this);
-            }
-            return null;
+            return fader;
         }
 
         internal static void MoveTo(Rigidbody2D body, Vector3 position)

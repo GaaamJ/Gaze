@@ -25,7 +25,6 @@ namespace ProjectT.Death
 
         internal InputLock InputLock => inputLock;
         internal DialogueService Dialogue => dialogueService;
-        internal PlayerMovement Laris => laris;
 
         void Awake()
         {
@@ -86,20 +85,32 @@ namespace ProjectT.Death
             if (!enteringAfterDeath)
                 yield break;
 
-            // 씬에 놓인 페이더의 Awake가 알파를 0으로 되돌리므로 Awake가 아닌 여기서 검게 만든다.
-            ScreenFader fader = FindOrCreateFader();
-            if (fader != null)
-                fader.SetAlpha(1f);
-
-            yield return null;
-
-            FinishEntry();
-
-            if (fader != null)
+            // 반복기 안에서는 yield를 catch로 감쌀 수 없어 finally로 정리만 보장하고, 예외는 Unity 코루틴 실행기가 로그로 남긴다.
+            try
             {
-                IEnumerator fadeIn = fader.FadeIn();
-                while (fadeIn.MoveNext())
-                    yield return fadeIn.Current;
+                // 씬에 놓인 페이더의 Awake가 알파를 0으로 되돌리므로 Awake가 아닌 여기서 검게 만든다.
+                ScreenFader fader = FindOrCreateFader();
+                if (fader != null)
+                    fader.SetAlpha(1f);
+
+                // 현재 동작: 검은 화면과 Death 잠금을 한 프레임 유지한 뒤 푼다.
+                yield return null;
+
+                // 현재 동작: 잠금을 페이드 인보다 먼저 풀어 페이드 인 중에도 조작할 수 있다.
+                FinishEntry();
+
+                if (fader != null)
+                {
+                    IEnumerator fadeIn = fader.FadeIn();
+                    while (fadeIn.MoveNext())
+                        yield return fadeIn.Current;
+                }
+            }
+            finally
+            {
+                // 페이드 인 중 새 사망이 시작됐을 수 있어, 이미 끝낸 진입은 다시 끝내지 않는다.
+                if (enteringAfterDeath)
+                    FinishEntry();
             }
         }
 
@@ -112,16 +123,6 @@ namespace ProjectT.Death
             DeathSequence.CompleteReload();
         }
 
-        // 만든 페이더는 씬 루트에 두어 Teleport도 FindAnyObjectByType으로 같은 것을 쓰게 한다.
-        internal ScreenFader FindOrCreateFader()
-        {
-            ScreenFader fader = FindAnyObjectByType<ScreenFader>();
-            if (fader != null)
-                return fader;
-            if (faderPrefab != null)
-                return Instantiate(faderPrefab);
-            Debug.LogWarning("[DeathSceneEntry] 씬에 ScreenFader가 없고 'faderPrefab'도 비어 있어 페이드 없이 진행한다.", this);
-            return null;
-        }
+        internal ScreenFader FindOrCreateFader() => ScreenFader.FindOrCreate(faderPrefab, this);
     }
 }

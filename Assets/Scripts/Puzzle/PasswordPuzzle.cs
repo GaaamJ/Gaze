@@ -21,10 +21,10 @@ namespace ProjectT.Puzzle
         [Tooltip("오답 문양을 누르면 재생할 사망 노드 이름 (예: Death_PasswordWrong)")]
         [SerializeField] string wrongDeathNodeId = "";
 
+        // 런타임 구독자는 없고 테스트가 오답 발생을 관찰하는 용도다.
         public event Action WrongSymbolPressed;
 
         public bool IsSolved { get; private set; }
-        public string PuzzleId => puzzleId;
         public string DeathNodeId => wrongDeathNodeId;
 
         void Awake()
@@ -32,32 +32,36 @@ namespace ProjectT.Puzzle
             RestoreFromSave();
         }
 
-        void OnEnable()
-        {
-            foreach (PasswordSymbol symbol in symbols)
-            {
-                if (symbol != null)
-                    symbol.Pressed += HandlePressed;
-            }
-        }
+        void OnEnable() => SetSubscribed(true);
 
-        void OnDisable()
+        void OnDisable() => SetSubscribed(false);
+
+        void SetSubscribed(bool subscribed)
         {
             foreach (PasswordSymbol symbol in symbols)
             {
-                if (symbol != null)
+                if (symbol == null)
+                    continue;
+                if (subscribed)
+                    symbol.Pressed += HandlePressed;
+                else
                     symbol.Pressed -= HandlePressed;
             }
         }
 
+#if UNITY_EDITOR
         void OnValidate()
         {
             if (string.IsNullOrEmpty(puzzleId))
                 Debug.LogWarning($"[PasswordPuzzle] puzzleId가 비어 있다: {name}", this);
-#if UNITY_EDITOR
             YarnNodeCheck.WarnMissingDeferred(this, nameof(PasswordPuzzle), wrongDeathNodeId);
-#endif
+            foreach (PasswordSymbol answer in answers)
+            {
+                if (answer != null && Array.IndexOf(symbols, answer) < 0)
+                    Debug.LogWarning($"[PasswordPuzzle] '{name}': 정답 문양 '{answer.name}'이 symbols에 없어 눌러도 반응하지 않아 퍼즐이 풀리지 않는다.", this);
+            }
         }
+#endif
 
         internal void RestoreFromSave()
         {
@@ -79,23 +83,24 @@ namespace ProjectT.Puzzle
 
             if (Array.IndexOf(answers, symbol) < 0)
             {
-                foreach (PasswordSymbol other in symbols)
-                {
-                    if (other != null)
-                        other.SetLit(false);
-                }
-                WrongSymbolPressed?.Invoke();
-                Debug.Log($"[PasswordPuzzle] 오답 문양: 사망 '{wrongDeathNodeId}'", this);
-                if (string.IsNullOrWhiteSpace(wrongDeathNodeId))
-                    Debug.LogWarning($"[PasswordPuzzle] '{name}': wrongDeathNodeId가 비어 있어 사망시키지 않았다.", this);
-                else
-                    DeathSequence.Begin(wrongDeathNodeId);
+                OnWrongSymbol();
                 return;
             }
 
             symbol.SetLit(!symbol.IsLit);
             if (AllAnswersLit())
                 Solve();
+        }
+
+        void OnWrongSymbol()
+        {
+            foreach (PasswordSymbol other in symbols)
+            {
+                if (other != null)
+                    other.SetLit(false);
+            }
+            WrongSymbolPressed?.Invoke();
+            DeathSequence.Begin(wrongDeathNodeId);
         }
 
         bool AllAnswersLit()
@@ -112,10 +117,7 @@ namespace ProjectT.Puzzle
 
         void Solve()
         {
-            if (!SaveManager.Data.solvedPuzzleIds.Contains(puzzleId))
-                SaveManager.Data.solvedPuzzleIds.Add(puzzleId);
-            if (!SaveManager.Save())
-                Debug.LogWarning($"[PasswordPuzzle] 퍼즐 해결 저장에 실패했다: {puzzleId}", this);
+            SaveManager.AddUnique(SaveManager.Data.solvedPuzzleIds, puzzleId);
             ApplyOpened();
         }
 

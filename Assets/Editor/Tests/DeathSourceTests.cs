@@ -1,36 +1,29 @@
 using System;
 using System.Collections;
-using System.IO;
-using ProjectT.Core.GameFolder;
-using ProjectT.Save;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using ProjectT.Interaction;
-using ProjectT.Player;
-using ProjectT.Puzzle;
 using ProjectT.Session;
-using UnityEditor;
+using ProjectT.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
-    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 각 트리거가 입구를 부르는지만 본다.
-    public class DeathTriggerTests
+    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathInteractable·PasswordPuzzle이 입구를 부르는지만 본다.
+    public class DeathSourceTests
     {
+        TempSaveSandbox save;
         InputLock inputLock;
         Action originalReload;
         int reloadCount;
-        string tempBase;
 
         [SetUp]
         public void SetUp()
         {
-            // 오답 문양 테스트가 실수로 퍼즐을 풀어도 실제 세이브를 건드리지 않게 한다.
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
             originalReload = DeathSequence.ReloadScene;
@@ -47,17 +40,7 @@ namespace ProjectT.Death.Tests
         {
             DeathSequence.ResetState();
             DeathSequence.ReloadScene = originalReload;
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
-        }
-
-        static void Set(UnityEngine.Object target, Action<SerializedObject> edit)
-        {
-            var so = new SerializedObject(target);
-            edit(so);
-            so.ApplyModifiedPropertiesWithoutUndo();
+            save.Dispose();
         }
 
         static void ExpectDeath(string node)
@@ -90,23 +73,38 @@ namespace ProjectT.Death.Tests
             yield return WaitForReload();
         }
 
-        DeathZone NewZone()
+        [Test]
+        public void DeathInteractable_BlankNode_WarnsWithoutDying()
+        {
+            var target = new GameObject("Gap").AddComponent<DeathInteractable>();
+
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+            target.Interact(new InteractContext(null, null));
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
+        }
+
+        static DeathZone NewZone(string nodeId = "Death_Falling001")
         {
             var go = new GameObject("Zone");
             go.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = go.AddComponent<DeathZone>();
-            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
+            Set(zone, so => so.FindProperty("deathNodeId").stringValue = nodeId);
             return zone;
         }
 
-        static Collider2D NewLaris(out Collider2D detectTrigger)
+        [Test]
+        public void DeathZone_BlankNode_WarnsWithoutDying()
         {
-            var go = new GameObject("Laris");
-            go.AddComponent<PlayerMovement>();
-            var body = go.AddComponent<BoxCollider2D>();
-            detectTrigger = go.AddComponent<CircleCollider2D>();
-            detectTrigger.isTrigger = true;
-            return body;
+            var zone = NewZone("");
+            var body = NewLaris(out _);
+
+            LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
+            zone.HandleEntered(body);
+
+            Assert.IsFalse(DeathSequence.IsActive);
+            Assert.IsFalse(inputLock.IsLocked);
         }
 
         [UnityTest]
@@ -139,31 +137,13 @@ namespace ProjectT.Death.Tests
         [UnityTest]
         public IEnumerator PasswordPuzzle_WrongSymbol_BeginsDeathAfterClearing()
         {
-            var symbols = new PasswordSymbol[3];
-            for (int i = 0; i < symbols.Length; i++)
-                symbols[i] = new GameObject($"0{i + 1}").AddComponent<PasswordSymbol>();
-
-            LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
-            var puzzle = new GameObject("PuzzleDoor").AddComponent<PasswordPuzzle>();
-            Set(puzzle, so =>
-            {
-                var list = so.FindProperty("symbols");
-                list.arraySize = symbols.Length;
-                for (int i = 0; i < symbols.Length; i++)
-                    list.GetArrayElementAtIndex(i).objectReferenceValue = symbols[i];
-                var answers = so.FindProperty("answers");
-                answers.arraySize = 2;
-                answers.GetArrayElementAtIndex(0).objectReferenceValue = symbols[0];
-                answers.GetArrayElementAtIndex(1).objectReferenceValue = symbols[1];
-                so.FindProperty("puzzleId").stringValue = "PasswordDoor";
-                so.FindProperty("wrongDeathNodeId").stringValue = "Death_PasswordWrong";
-            });
+            var symbols = NewSymbols(3);
+            var puzzle = AddPuzzle(new GameObject("PuzzleDoor"), symbols, new[] { symbols[0], symbols[1] }, "PasswordDoor", "Death_PasswordWrong");
             int wrongCount = 0;
             bool litWhenRaised = true;
             puzzle.WrongSymbolPressed += () => { wrongCount++; litWhenRaised = symbols[0].IsLit; };
 
             puzzle.HandlePressed(symbols[0]);
-            LogAssert.Expect(LogType.Log, new Regex(@"\[PasswordPuzzle\] 오답 문양"));
             ExpectDeath("Death_PasswordWrong");
             puzzle.HandlePressed(symbols[2]);
 
