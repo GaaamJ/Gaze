@@ -52,6 +52,9 @@ namespace ProjectT.Save
 
         public List<string> investigatedNodeIds = new List<string>();
 
+        // 사망 노드 이름이 사망의 키다. 같은 노드로 여러 번 죽어도 한 번만 남는다.
+        public List<string> diedNodeIds = new List<string>();
+
         public string elevatorAreaId = "";
 
         public string elevatorFileId = "";

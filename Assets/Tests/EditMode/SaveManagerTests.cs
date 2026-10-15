@@ -45,6 +45,8 @@ namespace ProjectT.Core.Tests
             d.respawnPosition = new Vector2(3.25f, -7.5f);
             d.investigatedNodeIds.Add("HintGapA");
             d.investigatedNodeIds.Add("TempRespawn");
+            d.diedNodeIds.Add("Death_DeathObject");
+            d.diedNodeIds.Add("Death_FallingDeath");
             d.elevatorAreaId = "Temp";
             d.elevatorFileId = "b3c1e2d4-0000-4000-8000-000000000002";
             d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000001");
@@ -112,6 +114,7 @@ namespace ProjectT.Core.Tests
             Assert.AreEqual(e.hasRespawnPosition, d.hasRespawnPosition);
             Assert.AreEqual(e.respawnPosition, d.respawnPosition);
             CollectionAssert.AreEqual(e.investigatedNodeIds, d.investigatedNodeIds);
+            CollectionAssert.AreEqual(e.diedNodeIds, d.diedNodeIds);
             Assert.AreEqual(e.elevatorAreaId, d.elevatorAreaId);
             Assert.AreEqual(e.elevatorFileId, d.elevatorFileId);
             CollectionAssert.AreEqual(e.elevatorFileIdHistory, d.elevatorFileIdHistory);
@@ -193,7 +196,7 @@ namespace ProjectT.Core.Tests
         }
 
         [Test]
-        public void Load_OldSaveWithoutNewFields_HasNoRespawnPositionAndNoInvestigated()
+        public void Load_OldSaveWithoutNewFields_HasNoRespawnPositionInvestigatedOrDied()
         {
             Directory.CreateDirectory(_paths.Root);
             File.WriteAllText(_paths.SaveFile,
@@ -208,6 +211,8 @@ namespace ProjectT.Core.Tests
             Assert.AreEqual(Vector2.zero, d.respawnPosition);
             Assert.IsNotNull(d.investigatedNodeIds);
             CollectionAssert.IsEmpty(d.investigatedNodeIds);
+            Assert.IsNotNull(d.diedNodeIds);
+            CollectionAssert.IsEmpty(d.diedNodeIds);
             CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
             Assert.AreEqual("Temp", d.respawnAreaId);
         }
@@ -221,6 +226,7 @@ namespace ProjectT.Core.Tests
             Assert.AreEqual("", d.respawnAreaId);
             Assert.IsFalse(d.hasRespawnPosition);
             CollectionAssert.IsEmpty(d.investigatedNodeIds);
+            CollectionAssert.IsEmpty(d.diedNodeIds);
             Assert.AreEqual("", d.elevatorAreaId);
             Assert.AreEqual("", d.elevatorFileId);
             CollectionAssert.IsEmpty(d.elevatorFileIdHistory);
