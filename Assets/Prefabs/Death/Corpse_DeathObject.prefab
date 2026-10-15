@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 7271676389729130230}
   - component: {fileID: 1870001599390817577}
   - component: {fileID: 3475813213656625316}
-  - component: {fileID: 4921884566327174426}
+  - component: {fileID: 5252417344359180464}
+  - component: {fileID: 2176641735252084499}
   m_Layer: 9
   m_Name: Corpse_DeathObject
   m_TagString: Untagged
@@ -139,7 +140,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.375, y: 1.875}
   m_EdgeRadius: 0
---- !u!114 &4921884566327174426
+--- !u!114 &5252417344359180464
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -148,7 +149,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 7361024822199607268}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
+  m_Script: {fileID: 11500000, guid: f49d49d96bb678149a3272ed99788fcb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.DialogueInteractable
-  dialogueNodeId: DeathObject_Corpse
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathRefusalInteractable
+  refusalNodeId: Death_DeathObject_Refuse
+--- !u!114 &2176641735252084499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7361024822199607268}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5daf94d08a5cf614199f497141e1a239, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.PushBackReaction
+  distance: 1
+  duration: 0.3
