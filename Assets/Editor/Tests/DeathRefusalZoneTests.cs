@@ -4,16 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Dialogue;
-using ProjectT.Player;
 using ProjectT.Save;
 using ProjectT.Session;
-using UnityEditor;
+using ProjectT.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Yarn.Unity;
+using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
@@ -22,7 +21,7 @@ namespace ProjectT.Death.Tests
     {
         const string Node = "Death_Falling001_Refuse";
 
-        string tempBase;
+        TempSaveSandbox save;
         Func<string, YarnTask<DialogueResult>> originalPlayDialogue;
         List<string> played;
         DialogueResult result;
@@ -32,9 +31,7 @@ namespace ProjectT.Death.Tests
         [SetUp]
         public void SetUp()
         {
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            GameSession.Begin();
+            save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
 
@@ -51,10 +48,7 @@ namespace ProjectT.Death.Tests
         {
             DeathRefusalZone.PlayDialogue = originalPlayDialogue;
             DeathSequence.ResetState();
-            SaveManager.Paths = null;
-            GameSession.Begin();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
+            save.Dispose();
         }
 
         // DialogueService.Play처럼 재생하는 동안만 Dialogue 잠금을 건다.
@@ -92,20 +86,8 @@ namespace ProjectT.Death.Tests
             var go = new GameObject("Hole");
             go.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = go.AddComponent<DeathRefusalZone>();
-            var so = new SerializedObject(zone);
-            so.FindProperty("refusalNodeId").stringValue = nodeId;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            Set(zone, so => so.FindProperty("refusalNodeId").stringValue = nodeId);
             return zone;
-        }
-
-        static Collider2D NewLaris(out Collider2D detectTrigger)
-        {
-            var go = new GameObject("LarisBody");
-            go.AddComponent<PlayerMovement>();
-            var body = go.AddComponent<BoxCollider2D>();
-            detectTrigger = go.AddComponent<CircleCollider2D>();
-            detectTrigger.isTrigger = true;
-            return body;
         }
 
         static bool SavedOnDisk(string nodeId)

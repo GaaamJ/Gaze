@@ -10,7 +10,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
+using static ProjectT.Tests.TestObjects;
 using Object = UnityEngine.Object;
 
 namespace ProjectT.Area.Tests
@@ -57,21 +57,6 @@ namespace ProjectT.Area.Tests
             return go.AddComponent<TeleportEnd>();
         }
 
-        ScreenFader NewFader()
-        {
-            var go = new GameObject("ScreenFader");
-            go.AddComponent<RectTransform>();
-            var image = go.AddComponent<Image>();
-            var fader = go.AddComponent<ScreenFader>();
-            Set(fader, so =>
-            {
-                so.FindProperty("image").objectReferenceValue = image;
-                so.FindProperty("duration").floatValue = 0f;
-            });
-            fader.SetAlpha(0f);
-            return fader;
-        }
-
         const string FaderPrefabPath = "Assets/TeleportTestsFader.prefab";
 
         // 실제 ScreenFader.prefab은 페이드 시간이 있어 에디트 모드에서 끝나지 않으므로 시간 0인 임시 프리팹을 만든다.
@@ -87,13 +72,6 @@ namespace ProjectT.Area.Tests
         public void TearDown()
         {
             AssetDatabase.DeleteAsset(FaderPrefabPath);
-        }
-
-        static void Set(Object target, Action<SerializedObject> edit)
-        {
-            var so = new SerializedObject(target);
-            edit(so);
-            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         // 첫 MoveNext는 페이드 아웃과 이동을 끝내고 물리 단계 대기에서 멈춘다.

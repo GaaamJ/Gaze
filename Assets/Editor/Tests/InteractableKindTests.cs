@@ -1,15 +1,15 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Data;
 using ProjectT.Puzzle;
 using ProjectT.Save;
-using UnityEditor;
+using ProjectT.Session;
+using ProjectT.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ProjectT.Tests.TestObjects;
 using Object = UnityEngine.Object;
 
 namespace ProjectT.Interaction.Tests
@@ -17,17 +17,13 @@ namespace ProjectT.Interaction.Tests
     public class InteractableKindTests
     {
         readonly List<Object> created = new();
-        string tempBase;
-        GameFolderPaths paths;
+        TempSaveSandbox save;
         HashSet<string> investigated;
 
         [SetUp]
         public void SetUp()
         {
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Paths = paths;
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             investigated = new HashSet<string>();
         }
 
@@ -40,11 +36,7 @@ namespace ProjectT.Interaction.Tests
                     Object.DestroyImmediate(obj);
             }
             created.Clear();
-            SaveManager.Paths = null;
-            // 세션 테스트가 남긴 GameSession.Investigated까지 되돌리려고 Load 대신 Begin을 부른다(Begin이 Load를 포함한다).
-            ProjectT.Session.GameSession.Begin();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
+            save.Dispose();
         }
 
         InteractContext Context() => new InteractContext(null, investigated);
@@ -57,9 +49,7 @@ namespace ProjectT.Interaction.Tests
             var go = new GameObject("DialogueInteractable");
             created.Add(go);
             var interactable = go.AddComponent<DialogueInteractable>();
-            var so = new SerializedObject(interactable);
-            so.FindProperty("dialogueNodeId").stringValue = nodeId;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            Set(interactable, so => so.FindProperty("dialogueNodeId").stringValue = nodeId);
             return interactable;
         }
 
@@ -71,13 +61,8 @@ namespace ProjectT.Interaction.Tests
             {
                 var area = ScriptableObject.CreateInstance<AreaData>();
                 created.Add(area);
-                var areaSo = new SerializedObject(area);
-                areaSo.FindProperty("areaId").stringValue = areaId;
-                areaSo.ApplyModifiedPropertiesWithoutUndo();
-
-                var so = new SerializedObject(respawn);
-                so.FindProperty("area").objectReferenceValue = area;
-                so.ApplyModifiedPropertiesWithoutUndo();
+                Set(area, so => so.FindProperty("areaId").stringValue = areaId);
+                Set(respawn, so => so.FindProperty("area").objectReferenceValue = area);
             }
             return interactable;
         }
@@ -173,8 +158,8 @@ namespace ProjectT.Interaction.Tests
         [Test]
         public void RecordInvestigated_SaveFails_KeepsMemoryRecord()
         {
-            Directory.CreateDirectory(tempBase);
-            File.WriteAllText(paths.Root, "blocks root folder");
+            Directory.CreateDirectory(save.Base);
+            File.WriteAllText(save.Paths.Root, "blocks root folder");
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
 
             DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
@@ -190,11 +175,11 @@ namespace ProjectT.Interaction.Tests
             Assert.IsTrue(SaveManager.Save());
             SaveManager.Data.investigatedNodeIds.Clear();
 
-            ProjectT.Session.GameSession.Begin();
+            GameSession.Begin();
 
             var target = NewInteractable("HintGapA");
-            Assert.IsTrue(ProjectT.Session.GameSession.Investigated.Contains("HintGapA"));
-            Assert.AreEqual("HintGapA_Recheck", target.ResolveDialogueNode(ProjectT.Session.GameSession.Investigated, AllExist));
+            Assert.IsTrue(GameSession.Investigated.Contains("HintGapA"));
+            Assert.AreEqual("HintGapA_Recheck", target.ResolveDialogueNode(GameSession.Investigated, AllExist));
         }
 
         [Test]
@@ -252,9 +237,7 @@ namespace ProjectT.Interaction.Tests
             var point = new GameObject("SpawnPoint");
             created.Add(point);
             point.transform.position = new Vector3(-3f, 7f, 0f);
-            var so = new SerializedObject(target.GetComponent<RespawnArea>());
-            so.FindProperty("spawnPoint").objectReferenceValue = point.transform;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            Set(target.GetComponent<RespawnArea>(), so => so.FindProperty("spawnPoint").objectReferenceValue = point.transform);
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
             target.Interact(Context());
@@ -286,8 +269,8 @@ namespace ProjectT.Interaction.Tests
         [Test]
         public void Respawn_SaveFails_KeepsMemoryValue()
         {
-            Directory.CreateDirectory(tempBase);
-            File.WriteAllText(paths.Root, "blocks root folder");
+            Directory.CreateDirectory(save.Base);
+            File.WriteAllText(save.Paths.Root, "blocks root folder");
             var target = NewRespawn("Temp");
             target.transform.position = new Vector3(4f, 0f, 0f);
 
@@ -297,7 +280,7 @@ namespace ProjectT.Interaction.Tests
             Assert.AreEqual("Temp", RespawnAreaIds.Current);
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(4f, 0f), SaveManager.Data.respawnPosition);
-            Assert.IsFalse(File.Exists(paths.SaveFile));
+            Assert.IsFalse(File.Exists(save.Paths.SaveFile));
         }
 
         PasswordSymbol NewSymbol(out SpriteRenderer[] renderers)
@@ -313,14 +296,13 @@ namespace ProjectT.Interaction.Tests
             }
 
             var symbol = go.AddComponent<PasswordSymbol>();
-            var so = new SerializedObject(symbol);
-            var list = so.FindProperty("symbolRenderers");
-            list.arraySize = renderers.Length;
-            for (int i = 0; i < renderers.Length; i++)
-                list.GetArrayElementAtIndex(i).objectReferenceValue = renderers[i];
-            so.FindProperty("unlitColor").colorValue = Color.white;
-            so.FindProperty("litColor").colorValue = Color.yellow;
-            so.ApplyModifiedPropertiesWithoutUndo();
+            SpriteRenderer[] captured = renderers;
+            Set(symbol, so =>
+            {
+                SetObjects(so.FindProperty("symbolRenderers"), captured);
+                so.FindProperty("unlitColor").colorValue = Color.white;
+                so.FindProperty("litColor").colorValue = Color.yellow;
+            });
             return symbol;
         }
 

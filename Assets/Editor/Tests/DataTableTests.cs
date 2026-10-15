@@ -6,7 +6,7 @@ namespace ProjectT.Data.Tests
     public class DataTableTests
     {
         [Test]
-        public void NodeNames_FollowNodeIdRule()
+        public void Recheck_AppendsRecheckSuffixToNodeName()
         {
             Assert.AreEqual("TempRespawn_Recheck", DialogueNodeNames.Recheck("TempRespawn"));
         }

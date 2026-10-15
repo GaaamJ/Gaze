@@ -11,34 +11,27 @@ namespace ProjectT.Core.Tests
     {
         const string SampleId = "b3c1e2d4-0000-4000-8000-000000000001";
 
-        string _tempBase;
-        GameFolderPaths _paths;
+        TempSaveSandbox _save;
         string _file;
 
         [SetUp]
         public void SetUp()
         {
-            _tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            _paths = new GameFolderPaths(Path.Combine(_tempBase, GameFolderPaths.RootFolderName));
-            GameFolderStructure.EnsureStructure(_paths, new[] { "Temp", "UndergroundParking" });
-            _file = _paths.ElevatorFilePath("Temp");
-            SaveManager.Paths = _paths;
-            SaveManager.Load();
+            _save = new TempSaveSandbox();
+            GameFolderStructure.EnsureStructure(_save.Paths, new[] { "Temp", "UndergroundParking" });
+            _file = _save.Paths.ElevatorFilePath("Temp");
         }
 
         [TearDown]
         public void TearDown()
         {
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(_tempBase))
-                Directory.Delete(_tempBase, true);
+            _save.Dispose();
         }
 
         [Test]
         public void ElevatorFilePath_IsInsideFloorFolder()
         {
-            Assert.AreEqual(Path.Combine(_paths.Root, "Areas", "Temp", "elevator.ev"), _file);
+            Assert.AreEqual(Path.Combine(_save.Paths.Root, "Areas", "Temp", "elevator.ev"), _file);
         }
 
         [Test]
@@ -70,7 +63,7 @@ namespace ProjectT.Core.Tests
         [Test]
         public void Write_WhenFolderMissing_ReturnsFalse()
         {
-            Assert.IsFalse(ElevatorFile.Write(Path.Combine(_paths.Areas, "Nowhere", "elevator.ev"), SampleId));
+            Assert.IsFalse(ElevatorFile.Write(Path.Combine(_save.Paths.Areas, "Nowhere", "elevator.ev"), SampleId));
         }
 
         [Test]
@@ -143,7 +136,7 @@ namespace ProjectT.Core.Tests
 
             Assert.AreEqual(id, SaveManager.Data.elevatorFileId);
             CollectionAssert.AreEqual(new[] { id }, SaveManager.Data.elevatorFileIdHistory);
-            StringAssert.Contains(id, File.ReadAllText(_paths.SaveFile));
+            StringAssert.Contains(id, File.ReadAllText(_save.Paths.SaveFile));
         }
 
         [Test]
@@ -194,8 +187,8 @@ namespace ProjectT.Core.Tests
             ElevatorFileIds.Issue(out _);
             ElevatorFileIds.WriteCurrent(_file);
 
-            StringAssert.StartsWith(_tempBase, SaveManager.SavePath);
-            StringAssert.StartsWith(_tempBase, _file);
+            StringAssert.StartsWith(_save.Base, SaveManager.SavePath);
+            StringAssert.StartsWith(_save.Base, _file);
             Assert.AreEqual(saveExisted, File.Exists(realSave));
             Assert.AreEqual(elevatorExisted, File.Exists(realElevator));
             if (saveExisted) Assert.AreEqual(saveBefore, File.GetLastWriteTimeUtc(realSave));

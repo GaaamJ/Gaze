@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Save;
-using UnityEditor;
+using ProjectT.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ProjectT.Tests.TestObjects;
 using Object = UnityEngine.Object;
 
 namespace ProjectT.Puzzle.Tests
@@ -17,8 +18,7 @@ namespace ProjectT.Puzzle.Tests
         const string PuzzleId = "PasswordDoor";
 
         readonly List<Object> created = new();
-        string tempBase;
-        GameFolderPaths paths;
+        TempSaveSandbox save;
 
         PasswordSymbol[] symbols;
         PasswordPuzzle puzzle;
@@ -31,10 +31,7 @@ namespace ProjectT.Puzzle.Tests
         [SetUp]
         public void SetUp()
         {
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Paths = paths;
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             wrongCount = 0;
         }
 
@@ -47,10 +44,7 @@ namespace ProjectT.Puzzle.Tests
                     Object.DestroyImmediate(obj);
             }
             created.Clear();
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
+            save.Dispose();
         }
 
         Sprite NewSprite(string name)
@@ -76,13 +70,8 @@ namespace ProjectT.Puzzle.Tests
         void Build(params GameObject[] activateOnOpen)
         {
             targets = activateOnOpen;
-            symbols = new PasswordSymbol[5];
-            for (int i = 0; i < symbols.Length; i++)
-            {
-                var go = new GameObject($"0{i + 1}");
-                created.Add(go);
-                symbols[i] = go.AddComponent<PasswordSymbol>();
-            }
+            symbols = NewSymbols(5);
+            created.AddRange(symbols.Select(s => s.gameObject));
 
             var door = new GameObject("PuzzleDoor");
             created.Add(door);
@@ -91,25 +80,13 @@ namespace ProjectT.Puzzle.Tests
             doorRenderer = door.AddComponent<SpriteRenderer>();
             doorRenderer.sprite = closedSprite;
 
-            LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
-            puzzle = door.AddComponent<PasswordPuzzle>();
-            var so = new SerializedObject(puzzle);
-            var list = so.FindProperty("symbols");
-            list.arraySize = symbols.Length;
-            for (int i = 0; i < symbols.Length; i++)
-                list.GetArrayElementAtIndex(i).objectReferenceValue = symbols[i];
-            var answerList = so.FindProperty("answers");
-            answerList.arraySize = 2;
-            answerList.GetArrayElementAtIndex(0).objectReferenceValue = symbols[0];
-            answerList.GetArrayElementAtIndex(1).objectReferenceValue = symbols[3];
-            so.FindProperty("puzzleId").stringValue = PuzzleId;
-            so.FindProperty("doorRenderer").objectReferenceValue = doorRenderer;
-            so.FindProperty("openSprite").objectReferenceValue = openSprite;
-            var targetList = so.FindProperty("activateOnOpen");
-            targetList.arraySize = targets.Length;
-            for (int i = 0; i < targets.Length; i++)
-                targetList.GetArrayElementAtIndex(i).objectReferenceValue = targets[i];
-            so.ApplyModifiedPropertiesWithoutUndo();
+            puzzle = AddPuzzle(door, symbols, new[] { symbols[0], symbols[3] }, PuzzleId);
+            Set(puzzle, so =>
+            {
+                so.FindProperty("doorRenderer").objectReferenceValue = doorRenderer;
+                so.FindProperty("openSprite").objectReferenceValue = openSprite;
+                SetObjects(so.FindProperty("activateOnOpen"), targets);
+            });
 
             puzzle.WrongSymbolPressed += () => wrongCount++;
         }
@@ -164,7 +141,7 @@ namespace ProjectT.Puzzle.Tests
             Press(4);
 
             AssertOpened();
-            StringAssert.Contains(PuzzleId, File.ReadAllText(paths.SaveFile));
+            StringAssert.Contains(PuzzleId, File.ReadAllText(save.Paths.SaveFile));
             SaveManager.Load();
             CollectionAssert.AreEqual(new[] { PuzzleId }, SaveManager.Data.solvedPuzzleIds);
         }
@@ -196,9 +173,7 @@ namespace ProjectT.Puzzle.Tests
         public void EmptyPuzzleId_OpensWithoutSaving()
         {
             Build();
-            var so = new SerializedObject(puzzle);
-            so.FindProperty("puzzleId").stringValue = "";
-            so.ApplyModifiedPropertiesWithoutUndo();
+            Set(puzzle, so => so.FindProperty("puzzleId").stringValue = "");
 
             Press(1);
             Press(4);
@@ -206,7 +181,7 @@ namespace ProjectT.Puzzle.Tests
             Assert.IsTrue(puzzle.IsSolved);
             Assert.AreSame(openSprite, doorRenderer.sprite);
             CollectionAssert.IsEmpty(SaveManager.Data.solvedPuzzleIds);
-            Assert.IsFalse(File.Exists(paths.SaveFile));
+            Assert.IsFalse(File.Exists(save.Paths.SaveFile));
         }
 
         [TestCase(2)]

@@ -1,16 +1,14 @@
-using System;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
 using ProjectT.Puzzle;
 using ProjectT.Save;
 using ProjectT.Session;
-using UnityEditor;
+using ProjectT.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
+using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
@@ -20,35 +18,22 @@ namespace ProjectT.Death.Tests
         const string NodeId = "Death_DeathObject";
         const string PrefabName = "CorpseTemplate";
 
-        string tempBase;
+        TempSaveSandbox save;
         GameObject prefab;
 
         [SetUp]
         public void SetUp()
         {
-            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
-            SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
-            SaveManager.Load();
+            save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             prefab = new GameObject(PrefabName);
-            prefab.transform.position = new Vector3(-100f, -100f, 0f);
         }
 
         [TearDown]
         public void TearDown()
         {
-            SaveManager.Paths = null;
-            SaveManager.Load();
-            if (Directory.Exists(tempBase))
-                Directory.Delete(tempBase, true);
-        }
-
-        static void Set(UnityEngine.Object target, Action<SerializedObject> edit)
-        {
-            var so = new SerializedObject(target);
-            edit(so);
-            so.ApplyModifiedPropertiesWithoutUndo();
+            save.Dispose();
         }
 
         static DeathInteractable NewDeathObject(string nodeId = NodeId)
@@ -251,13 +236,7 @@ namespace ProjectT.Death.Tests
             zoneGo.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = zoneGo.AddComponent<DeathZone>();
             Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
-            LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
-            var puzzle = new GameObject("Puzzle").AddComponent<PasswordPuzzle>();
-            Set(puzzle, so =>
-            {
-                so.FindProperty("puzzleId").stringValue = "PasswordDoor";
-                so.FindProperty("wrongDeathNodeId").stringValue = "Death_PasswordWrong";
-            });
+            var puzzle = AddPuzzle(new GameObject("Puzzle"), new PasswordSymbol[0], new PasswordSymbol[0], "PasswordDoor", "Death_PasswordWrong");
 
             var zoneTarget = new GameObject("ZoneTarget");
             var puzzleTarget = new GameObject("PuzzleTarget");
