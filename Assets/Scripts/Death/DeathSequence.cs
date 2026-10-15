@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using Yarn.Unity;
 using ProjectT.Area;
 using ProjectT.Dialogue;
+using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.UI;
 using Object = UnityEngine.Object;
@@ -69,7 +70,7 @@ namespace ProjectT.Death
 
                 await WaitForTeleports();
 
-                SaveProgress();
+                SaveProgress(deathNodeId);
 
                 if (dialogue != null)
                 {
@@ -120,9 +121,11 @@ namespace ProjectT.Death
         }
 
         // 리스폰 위치·퍼즐 클리어는 조사·풀이 시점에 이미 저장된다.
+        // 사망 대사 도중 게임을 꺼도 시체가 남도록 대사보다 먼저 기록한다.
         // TODO(#52 2b): 메타픽션 사망 대기 저장을 여기서 연결한다.
-        static void SaveProgress()
+        static void SaveProgress(string deathNodeId)
         {
+            DeathRecords.Add(deathNodeId);
         }
 
         static async YarnTask WaitForTeleports()

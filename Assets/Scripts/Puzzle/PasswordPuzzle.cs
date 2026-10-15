@@ -6,7 +6,7 @@ using ProjectT.Save;
 
 namespace ProjectT.Puzzle
 {
-    public class PasswordPuzzle : MonoBehaviour
+    public class PasswordPuzzle : MonoBehaviour, IDeathSource
     {
         [SerializeField] PasswordSymbol[] symbols = Array.Empty<PasswordSymbol>();
         [Tooltip("symbols 안에 있는 정답 문양.")]
@@ -25,6 +25,7 @@ namespace ProjectT.Puzzle
 
         public bool IsSolved { get; private set; }
         public string PuzzleId => puzzleId;
+        public string DeathNodeId => wrongDeathNodeId;
 
         void Awake()
         {

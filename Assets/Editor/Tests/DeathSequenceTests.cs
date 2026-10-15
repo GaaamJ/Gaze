@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using ProjectT.Core.GameFolder;
 using ProjectT.Player;
 using ProjectT.Save;
 using ProjectT.Session;
@@ -23,10 +25,15 @@ namespace ProjectT.Death.Tests
         ScreenFader fader;
         int reloadCount;
         Action originalReload;
+        string tempBase;
 
         [SetUp]
         public void SetUp()
         {
+            // Begin이 사망 기록을 저장하므로 실제 세이브 대신 임시 폴더를 쓴다.
+            tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
+            SaveManager.Paths = new GameFolderPaths(Path.Combine(tempBase, GameFolderPaths.RootFolderName));
+            SaveManager.Load();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
             reloadCount = 0;
@@ -42,6 +49,10 @@ namespace ProjectT.Death.Tests
         {
             DeathSequence.ResetState();
             DeathSequence.ReloadScene = originalReload;
+            SaveManager.Paths = null;
+            SaveManager.Load();
+            if (Directory.Exists(tempBase))
+                Directory.Delete(tempBase, true);
         }
 
         static void Set(UnityEngine.Object target, Action<SerializedObject> edit)
@@ -176,6 +187,38 @@ namespace ProjectT.Death.Tests
             Assert.IsFalse(DeathSequence.ReloadedAfterDeath);
             Assert.IsFalse(inputLock.IsLocked);
             Assert.AreEqual(0f, fader.Alpha);
+        }
+
+        // DialogueService가 없을 때의 경고는 대사 재생 자리에서 나므로, 그 순간 이미 기록·저장돼 있어야 한다.
+        [UnityTest]
+        public IEnumerator Begin_RecordsDeathBeforeDialogue()
+        {
+            bool recordedAtDialogue = false;
+            bool savedAtDialogue = false;
+            Application.LogCallback probe = (message, _, _) =>
+            {
+                if (!message.Contains("DialogueService가 없어"))
+                    return;
+                recordedAtDialogue = DeathRecords.Has("Death_A");
+                savedAtDialogue = File.Exists(SaveManager.SavePath) && File.ReadAllText(SaveManager.SavePath).Contains("\"Death_A\"");
+            };
+            Application.logMessageReceived += probe;
+            ExpectNoDialogueWarning();
+
+            try
+            {
+                Assert.IsFalse(DeathRecords.Has("Death_A"));
+                DeathSequence.Begin("Death_A");
+                yield return WaitForReload();
+            }
+            finally
+            {
+                Application.logMessageReceived -= probe;
+            }
+
+            Assert.IsTrue(recordedAtDialogue, "대사 재생 전에 메모리에 기록돼야 한다.");
+            Assert.IsTrue(savedAtDialogue, "대사 재생 전에 세이브 파일에 저장돼야 한다.");
+            CollectionAssert.AreEqual(new[] { "Death_A" }, SaveManager.Data.diedNodeIds);
         }
 
         [Test]

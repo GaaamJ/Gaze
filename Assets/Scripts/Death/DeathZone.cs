@@ -5,7 +5,7 @@ using ProjectT.Player;
 namespace ProjectT.Death
 {
     [RequireComponent(typeof(Collider2D))]
-    public class DeathZone : MonoBehaviour
+    public class DeathZone : MonoBehaviour, IDeathSource
     {
         [Tooltip("라리스가 들어오면 재생할 사망 노드 이름 (예: Death_FallingDeath)")]
         [SerializeField] string deathNodeId;

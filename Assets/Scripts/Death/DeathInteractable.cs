@@ -4,7 +4,7 @@ using ProjectT.Interaction;
 
 namespace ProjectT.Death
 {
-    public class DeathInteractable : Interactable
+    public class DeathInteractable : Interactable, IDeathSource
     {
         [Tooltip("조사하면 재생할 사망 노드 이름 (예: Death_DangerousGap)")]
         [SerializeField] string deathNodeId;
