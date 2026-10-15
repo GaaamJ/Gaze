@@ -72,7 +72,13 @@ title: Death_FallingDeath_Sign
 <<stop>>
 ===
 
-title: Death_FallingDeath_Refuse
+title: Death_Falling001_Refuse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: Death_Falling002_Refuse
 ---
 // 대사 작성 전
 <<stop>>

@@ -8670,7 +8670,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathAftermath
   source: {fileID: 863144095}
   spawns:
-  - prefab: {fileID: 8308404901694469938, guid: c63c4cb04cb6cef488a95a664e290161, type: 3}
+  - prefab: {fileID: 2598594991836271209, guid: 9c616306e57e4044eb4fcab907945a08, type: 3}
     point: {fileID: 863144094}
   - prefab: {fileID: 5011679062384483848, guid: 751984e7cfcebf04dba186239ef3a64a, type: 3}
     point: {fileID: 687528326}
@@ -12287,7 +12287,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathAftermath
   source: {fileID: 829347868}
   spawns:
-  - prefab: {fileID: 8308404901694469938, guid: c63c4cb04cb6cef488a95a664e290161, type: 3}
+  - prefab: {fileID: 4939071574986062436, guid: e978767e19911a642895087edaa71cb0, type: 3}
     point: {fileID: 829347866}
   - prefab: {fileID: 5011679062384483848, guid: 751984e7cfcebf04dba186239ef3a64a, type: 3}
     point: {fileID: 913917842}
