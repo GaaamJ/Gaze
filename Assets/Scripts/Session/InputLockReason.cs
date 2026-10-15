@@ -5,6 +5,5 @@ namespace ProjectT.Session
         Dialogue,
         Teleport,
         Death,
-        Refusal,
     }
 }

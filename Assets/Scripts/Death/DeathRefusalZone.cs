@@ -1,23 +1,26 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Yarn.Unity;
 using ProjectT.Data;
+using ProjectT.Dialogue;
+using ProjectT.Interaction;
 using ProjectT.Player;
+using ProjectT.Session;
 
 namespace ProjectT.Death
 {
+    // 라리스를 막는 것은 같은 프리팹의 콜라이더가 하고, 이 영역은 처음 다가올 때 거부 대사만 한 번 재생한다.
     [RequireComponent(typeof(Collider2D))]
     public class DeathRefusalZone : MonoBehaviour
     {
-        [Tooltip("라리스가 들어오면 재생할 거부 노드 이름 (예: Death_Falling001_Refuse)")]
+        [Tooltip("처음 들어오면 한 번 재생할 거부 노드 이름 (예: Death_Falling001_Refuse). 끝까지 보면 조사 기록에 남아 다시 재생하지 않는다.")]
         [SerializeField] string refusalNodeId;
-        [Tooltip("거부가 끝난 뒤(잠금이 풀린 시점부터) 다시 들어와도 재생하지 않는 시간(초). 0이면 나갔다 들어오는 즉시 다시 재생한다.")]
-        [SerializeField] float retryDelay = 0.7f;
 
-        bool larisInside;
-        float retryAt = float.NegativeInfinity;
+        bool playing;
 
-        // 에디트 모드 테스트에서 시간을 바꿔 끼운다.
-        internal Func<float> Clock = () => Time.realtimeSinceStartup;
+        // 에디트 모드 테스트에서는 DialogueRunner가 돌지 않아 바꿔 끼운다.
+        internal static Func<string, YarnTask<DialogueResult>> PlayDialogue = PlayWithSceneDialogue;
 
         public string RefusalNodeId => refusalNodeId;
 
@@ -26,48 +29,55 @@ namespace ProjectT.Death
             HandleEntered(other);
         }
 
-        void OnTriggerExit2D(Collider2D other)
-        {
-            HandleExited(other);
-        }
-
-        // 꺼진 동안에는 나가는 이벤트가 오지 않으므로 다시 켜질 때 새로 들어온 것으로 본다.
-        void OnDisable()
-        {
-            larisInside = false;
-        }
-
         internal void HandleEntered(Collider2D other)
         {
-            if (!PlayerMovement.TryFrom(other, out _) || larisInside)
+            if (!PlayerMovement.TryFrom(other, out _) || playing || DeathSequence.IsActive)
                 return;
-            // 대기 중에 들어온 것도 들어온 것으로 기록해, 대기가 끝나도 나갔다 들어와야 재생되게 한다.
-            larisInside = true;
-            if (Clock() < retryAt)
+
+            HashSet<string> investigated = GameSession.Investigated;
+            if (string.IsNullOrWhiteSpace(refusalNodeId) || investigated == null || investigated.Contains(refusalNodeId))
                 return;
-            DeathRefusal.Play(gameObject, refusalNodeId, OnRefusalFinished);
+
+            // await 없이 시작해야 DialogueService.Play가 같은 콜백 안에서 입력 잠금을 건다.
+            Refuse(refusalNodeId, investigated).Forget();
         }
 
-        internal void HandleExited(Collider2D other)
+        async YarnTask Refuse(string nodeId, HashSet<string> investigated)
         {
-            if (PlayerMovement.TryFrom(other, out _))
-                larisInside = false;
+            playing = true;
+            try
+            {
+                DialogueResult result = await PlayDialogue(nodeId);
+                if (result == DialogueResult.Completed)
+                    DialogueInteractable.RecordInvestigated(investigated, nodeId);
+                else if (result == DialogueResult.Rejected)
+                    Debug.LogWarning($"[DeathRefusalZone] 거부 노드 '{nodeId}'를 재생하지 못했다.");
+            }
+            finally
+            {
+                playing = false;
+            }
         }
 
-        void OnRefusalFinished()
+        static async YarnTask<DialogueResult> PlayWithSceneDialogue(string nodeId)
         {
-            if (this == null)
-                return;
-            retryAt = Clock() + Mathf.Max(0f, retryDelay);
+            DialogueService dialogue = FindAnyObjectByType<DialogueService>();
+            if (dialogue == null)
+            {
+                Debug.LogWarning($"[DeathRefusalZone] 씬에 DialogueService가 없어 '{nodeId}'를 재생하지 못했다.");
+                return DialogueResult.Rejected;
+            }
+            // 다른 대화 중이면 DialogueService가 경고와 함께 거부하므로 미리 조용히 넘긴다.
+            if (!dialogue.IsIdle)
+                return DialogueResult.Interrupted;
+            return await dialogue.Play(nodeId);
         }
 
 #if UNITY_EDITOR
         void OnValidate()
         {
             if (TryGetComponent(out Collider2D zone) && !zone.isTrigger)
-                Debug.LogWarning($"[DeathRefusalZone] '{name}': 콜라이더가 Trigger가 아니라 라리스가 들어갈 수 없다.", this);
-            if (retryDelay < 0f)
-                Debug.LogWarning($"[DeathRefusalZone] '{name}': retryDelay가 음수라 0으로 본다.", this);
+                Debug.LogWarning($"[DeathRefusalZone] '{name}': 콜라이더가 Trigger가 아니라 라리스가 들어갈 수 없다. 막는 콜라이더는 자식에 둔다.", this);
             YarnNodeCheck.WarnMissingDeferred(this, nameof(DeathRefusalZone), refusalNodeId);
         }
 #endif
