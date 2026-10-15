@@ -41,7 +41,7 @@ namespace ProjectT.Core.Tests
             d.investigatedNodeIds.Add("HintGapA");
             d.investigatedNodeIds.Add("TempRespawn");
             d.diedNodeIds.Add("Death_DeathObject");
-            d.diedNodeIds.Add("Death_FallingDeath");
+            d.diedNodeIds.Add("Death_Falling001");
             d.elevatorAreaId = "Temp";
             d.elevatorFileId = "b3c1e2d4-0000-4000-8000-000000000002";
             d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000001");

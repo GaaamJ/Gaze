@@ -40,7 +40,7 @@ namespace ProjectT.Core.Tests
             Assert.IsTrue(DeathRecords.Add("Death_DeathObject"));
 
             Assert.IsTrue(DeathRecords.Has("Death_DeathObject"));
-            Assert.IsFalse(DeathRecords.Has("Death_FallingDeath"));
+            Assert.IsFalse(DeathRecords.Has("Death_Falling001"));
             SaveManager.Load();
             CollectionAssert.AreEqual(new[] { "Death_DeathObject" }, SaveManager.Data.diedNodeIds);
         }
@@ -50,11 +50,11 @@ namespace ProjectT.Core.Tests
         {
             Assert.IsTrue(DeathRecords.Add("Death_DeathObject"));
             Assert.IsTrue(DeathRecords.Add("Death_DeathObject"));
-            Assert.IsTrue(DeathRecords.Add("Death_FallingDeath"));
+            Assert.IsTrue(DeathRecords.Add("Death_Falling001"));
 
-            CollectionAssert.AreEqual(new[] { "Death_DeathObject", "Death_FallingDeath" }, SaveManager.Data.diedNodeIds);
+            CollectionAssert.AreEqual(new[] { "Death_DeathObject", "Death_Falling001" }, SaveManager.Data.diedNodeIds);
             SaveManager.Load();
-            CollectionAssert.AreEqual(new[] { "Death_DeathObject", "Death_FallingDeath" }, SaveManager.Data.diedNodeIds);
+            CollectionAssert.AreEqual(new[] { "Death_DeathObject", "Death_Falling001" }, SaveManager.Data.diedNodeIds);
         }
 
         [Test]

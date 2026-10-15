@@ -95,7 +95,7 @@ namespace ProjectT.Death.Tests
             var go = new GameObject("Zone");
             go.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = go.AddComponent<DeathZone>();
-            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_FallingDeath");
+            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
             return zone;
         }
 
@@ -115,7 +115,7 @@ namespace ProjectT.Death.Tests
             var zone = NewZone();
             var body = NewLaris(out _);
 
-            ExpectDeath("Death_FallingDeath");
+            ExpectDeath("Death_Falling001");
             zone.HandleEntered(body);
 
             Assert.IsTrue(DeathSequence.IsActive);

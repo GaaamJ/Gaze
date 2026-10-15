@@ -158,7 +158,7 @@ namespace ProjectT.Death.Tests
         [Test]
         public void WithoutRecord_DoesNothing()
         {
-            SaveManager.Data.diedNodeIds.Add("Death_FallingDeath");
+            SaveManager.Data.diedNodeIds.Add("Death_Falling001");
             var source = NewDeathObject();
             var aftermath = NewAftermath(source, Vector3.zero, new[] { (prefab, (Transform)null) }, new[] { source.gameObject });
 
@@ -249,7 +249,7 @@ namespace ProjectT.Death.Tests
             var zoneGo = new GameObject("Zone");
             zoneGo.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = zoneGo.AddComponent<DeathZone>();
-            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_FallingDeath");
+            Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
             var puzzle = new GameObject("Puzzle").AddComponent<PasswordPuzzle>();
             Set(puzzle, so => so.FindProperty("wrongDeathNodeId").stringValue = "Death_PasswordWrong");
 
