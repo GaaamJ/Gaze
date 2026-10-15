@@ -13,35 +13,10 @@ namespace ProjectT.Save
         DeathPendingRetrigger = 3
     }
 
-    public enum CorpseKind
-    {
-        World = 0,
-        File = 1
-    }
-
-    [Serializable]
-    public class DeathRecord
-    {
-        public string deathId;
-        public int count;
-    }
-
-    [Serializable]
-    public class CorpseRecord
-    {
-        public string id;
-        public Vector3 position;
-        public string areaId;
-        public CorpseKind kind;
-        public string fileName;
-    }
-
     [Serializable]
     public class SaveData
     {
         public List<string> solvedPuzzleIds = new List<string>();
-        public List<DeathRecord> deathRecords = new List<DeathRecord>();
-        public List<CorpseRecord> corpses = new List<CorpseRecord>();
 
         // 비어 있으면 시작 지점
         public string respawnAreaId = "";
