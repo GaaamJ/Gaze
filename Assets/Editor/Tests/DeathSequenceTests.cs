@@ -221,6 +221,25 @@ namespace ProjectT.Death.Tests
             CollectionAssert.AreEqual(new[] { "Death_A" }, SaveManager.Data.diedNodeIds);
         }
 
+        [UnityTest]
+        public IEnumerator EntryThrows_StillReleasesLockAndIsActive()
+        {
+            ExpectNoDialogueWarning();
+            DeathSequence.Begin("Death_A");
+            yield return WaitForReload();
+
+            var entry = NewEntry(out InputLock newLock);
+            Set(fader, so => so.FindProperty("image").objectReferenceValue = null);
+            entry.EnterScene();
+            Assert.IsTrue(newLock.IsLocked);
+
+            IEnumerator run = entry.RunEntry();
+            Assert.That(() => run.MoveNext(), Throws.InstanceOf<Exception>());
+
+            Assert.IsFalse(newLock.IsLocked);
+            Assert.IsFalse(DeathSequence.IsActive);
+        }
+
         [Test]
         public void Begin_WithoutEntry_LogsErrorAndStaysInactive()
         {

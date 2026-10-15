@@ -245,21 +245,28 @@ namespace ProjectT.Death.Tests
         [Test]
         public void DeathZoneAndPasswordPuzzle_AreAcceptedAsSource()
         {
+            SaveManager.Data.diedNodeIds.Add("Death_Falling001");
             SaveManager.Data.diedNodeIds.Add("Death_PasswordWrong");
             var zoneGo = new GameObject("Zone");
             zoneGo.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = zoneGo.AddComponent<DeathZone>();
             Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
+            LogAssert.Expect(LogType.Warning, new Regex("puzzleId가 비어 있다"));
             var puzzle = new GameObject("Puzzle").AddComponent<PasswordPuzzle>();
-            Set(puzzle, so => so.FindProperty("wrongDeathNodeId").stringValue = "Death_PasswordWrong");
+            Set(puzzle, so =>
+            {
+                so.FindProperty("puzzleId").stringValue = "PasswordDoor";
+                so.FindProperty("wrongDeathNodeId").stringValue = "Death_PasswordWrong";
+            });
 
             var zoneTarget = new GameObject("ZoneTarget");
             var puzzleTarget = new GameObject("PuzzleTarget");
             NewAftermath(zone, Vector3.zero, new (GameObject, Transform)[0], new[] { zoneTarget }).Apply();
             NewAftermath(puzzle, Vector3.zero, new (GameObject, Transform)[0], new[] { puzzleTarget }).Apply();
 
-            Assert.IsTrue(zoneTarget.activeSelf);
+            Assert.IsFalse(zoneTarget.activeSelf);
             Assert.IsFalse(puzzleTarget.activeSelf);
+            LogAssert.NoUnexpectedReceived();
         }
     }
 }

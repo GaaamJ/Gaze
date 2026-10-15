@@ -192,6 +192,23 @@ namespace ProjectT.Puzzle.Tests
             CollectionAssert.AreEqual(new[] { PuzzleId }, SaveManager.Data.solvedPuzzleIds);
         }
 
+        [Test]
+        public void EmptyPuzzleId_OpensWithoutSaving()
+        {
+            Build();
+            var so = new SerializedObject(puzzle);
+            so.FindProperty("puzzleId").stringValue = "";
+            so.ApplyModifiedPropertiesWithoutUndo();
+
+            Press(1);
+            Press(4);
+
+            Assert.IsTrue(puzzle.IsSolved);
+            Assert.AreSame(openSprite, doorRenderer.sprite);
+            CollectionAssert.IsEmpty(SaveManager.Data.solvedPuzzleIds);
+            Assert.IsFalse(File.Exists(paths.SaveFile));
+        }
+
         [TestCase(2)]
         [TestCase(3)]
         [TestCase(5)]

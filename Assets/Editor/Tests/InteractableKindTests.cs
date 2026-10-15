@@ -41,6 +41,8 @@ namespace ProjectT.Interaction.Tests
             }
             created.Clear();
             SaveManager.Paths = null;
+            // 세션 테스트가 남긴 GameSession.Investigated까지 되돌리려고 Load 대신 Begin을 부른다(Begin이 Load를 포함한다).
+            ProjectT.Session.GameSession.Begin();
             if (Directory.Exists(tempBase))
                 Directory.Delete(tempBase, true);
         }
@@ -228,8 +230,9 @@ namespace ProjectT.Interaction.Tests
         }
 
         [Test]
-        public void Respawn_WithoutArea_SavesPositionOnly()
+        public void Respawn_WithoutArea_SavesPositionAndClearsArea()
         {
+            SaveManager.Data.respawnAreaId = "Temp";
             var target = NewRespawn(null);
             target.transform.position = new Vector3(1f, 1f, 0f);
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));

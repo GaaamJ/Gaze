@@ -19,8 +19,7 @@ namespace ProjectT.Save
             SaveData data = SaveManager.Data;
             data.respawnPosition = position;
             data.hasRespawnPosition = true;
-            if (!string.IsNullOrWhiteSpace(areaId))
-                data.respawnAreaId = areaId;
+            data.respawnAreaId = areaId ?? "";
             return SaveManager.Save();
         }
     }

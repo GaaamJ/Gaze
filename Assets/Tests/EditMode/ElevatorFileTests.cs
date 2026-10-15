@@ -30,6 +30,7 @@ namespace ProjectT.Core.Tests
         public void TearDown()
         {
             SaveManager.Paths = null;
+            SaveManager.Load();
             if (Directory.Exists(_tempBase))
                 Directory.Delete(_tempBase, true);
         }

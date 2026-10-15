@@ -86,20 +86,30 @@ namespace ProjectT.Death
             if (!enteringAfterDeath)
                 yield break;
 
-            // 씬에 놓인 페이더의 Awake가 알파를 0으로 되돌리므로 Awake가 아닌 여기서 검게 만든다.
-            ScreenFader fader = FindOrCreateFader();
-            if (fader != null)
-                fader.SetAlpha(1f);
-
-            yield return null;
-
-            FinishEntry();
-
-            if (fader != null)
+            // 반복기 안에서는 yield를 catch로 감쌀 수 없어 finally로 정리만 보장하고, 예외는 Unity 코루틴 실행기가 로그로 남긴다.
+            try
             {
-                IEnumerator fadeIn = fader.FadeIn();
-                while (fadeIn.MoveNext())
-                    yield return fadeIn.Current;
+                // 씬에 놓인 페이더의 Awake가 알파를 0으로 되돌리므로 Awake가 아닌 여기서 검게 만든다.
+                ScreenFader fader = FindOrCreateFader();
+                if (fader != null)
+                    fader.SetAlpha(1f);
+
+                yield return null;
+
+                FinishEntry();
+
+                if (fader != null)
+                {
+                    IEnumerator fadeIn = fader.FadeIn();
+                    while (fadeIn.MoveNext())
+                        yield return fadeIn.Current;
+                }
+            }
+            finally
+            {
+                // 페이드 인 중 새 사망이 시작됐을 수 있어, 이미 끝낸 진입은 다시 끝내지 않는다.
+                if (enteringAfterDeath)
+                    FinishEntry();
             }
         }
 

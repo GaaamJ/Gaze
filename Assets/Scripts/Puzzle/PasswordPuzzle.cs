@@ -56,6 +56,11 @@ namespace ProjectT.Puzzle
                 Debug.LogWarning($"[PasswordPuzzle] puzzleId가 비어 있다: {name}", this);
 #if UNITY_EDITOR
             YarnNodeCheck.WarnMissingDeferred(this, nameof(PasswordPuzzle), wrongDeathNodeId);
+            foreach (PasswordSymbol answer in answers)
+            {
+                if (answer != null && Array.IndexOf(symbols, answer) < 0)
+                    Debug.LogWarning($"[PasswordPuzzle] '{name}': 정답 문양 '{answer.name}'이 symbols에 없어 눌러도 반응하지 않아 퍼즐이 풀리지 않는다.", this);
+            }
 #endif
         }
 
@@ -112,10 +117,13 @@ namespace ProjectT.Puzzle
 
         void Solve()
         {
-            if (!SaveManager.Data.solvedPuzzleIds.Contains(puzzleId))
-                SaveManager.Data.solvedPuzzleIds.Add(puzzleId);
-            if (!SaveManager.Save())
-                Debug.LogWarning($"[PasswordPuzzle] 퍼즐 해결 저장에 실패했다: {puzzleId}", this);
+            if (!string.IsNullOrEmpty(puzzleId))
+            {
+                if (!SaveManager.Data.solvedPuzzleIds.Contains(puzzleId))
+                    SaveManager.Data.solvedPuzzleIds.Add(puzzleId);
+                if (!SaveManager.Save())
+                    Debug.LogWarning($"[PasswordPuzzle] 퍼즐 해결 저장에 실패했다: {puzzleId}", this);
+            }
             ApplyOpened();
         }
 
