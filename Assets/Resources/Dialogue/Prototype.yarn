@@ -125,3 +125,15 @@ title: Death_CloseWindow
 // 대사 작성 전
 <<stop>>
 ===
+
+title: DeathObject_Corpse
+---
+// 대사 작성 전
+<<stop>>
+===
+
+title: FallingDeath_Corpse
+---
+// 대사 작성 전
+<<stop>>
+===

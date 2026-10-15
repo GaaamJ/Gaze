@@ -149,6 +149,60 @@ namespace ProjectT.Death.Tests
             Assert.AreSame(aliveSprite, renderer.sprite);
         }
 
+        static CorpseOnDeath NewFieldCorpse(MonoBehaviour source, out GameObject corpseObject)
+        {
+            corpseObject = new GameObject("FieldCorpse");
+            corpseObject.SetActive(false);
+            var corpse = new GameObject("CorpseOnDeath").AddComponent<CorpseOnDeath>();
+            GameObject captured = corpseObject;
+            Set(corpse, so =>
+            {
+                so.FindProperty("source").objectReferenceValue = source;
+                so.FindProperty("corpseObject").objectReferenceValue = captured;
+            });
+            return corpse;
+        }
+
+        [Test]
+        public void Field_WithRecord_ActivatesCorpseObject()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var corpse = NewFieldCorpse(NewDeathInteractable(NodeId), out GameObject corpseObject);
+
+            corpse.Apply();
+
+            Assert.IsTrue(corpseObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void Field_WithoutRecord_KeepsCorpseObjectInactive()
+        {
+            SaveManager.Data.diedNodeIds.Add("Death_DangerousGap");
+            var corpse = NewFieldCorpse(NewDeathInteractable(NodeId), out GameObject corpseObject);
+
+            corpse.Apply();
+
+            Assert.IsFalse(corpseObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void SwapAndField_WithRecord_AppliesBoth()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var corpse = NewCorpse(NewDeathInteractable(NodeId), out SpriteRenderer renderer);
+            var corpseObject = new GameObject("FieldCorpse");
+            corpseObject.SetActive(false);
+            Set(corpse, so => so.FindProperty("corpseObject").objectReferenceValue = corpseObject);
+
+            corpse.Apply();
+
+            Assert.AreSame(corpseSprite, renderer.sprite);
+            Assert.IsTrue(corpseObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
         [Test]
         public void CorpseSpriteEmpty_WarnsAndKeepsSprite()
         {
