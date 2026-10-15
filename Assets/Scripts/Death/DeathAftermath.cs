@@ -46,8 +46,9 @@ namespace ProjectT.Death
                 return;
             applied = true;
 
-            if (spawns != null)
+            if (spawns != null && spawns.Length > 0)
             {
+                WarnIfParentScaled();
                 foreach (Spawn spawn in spawns)
                     Place(spawn);
             }
@@ -75,7 +76,14 @@ namespace ProjectT.Death
             }
 
             Transform at = spawn.point != null ? spawn.point : transform;
-            Instantiate(spawn.prefab, at.position, at.rotation);
+            Instantiate(spawn.prefab, at.position, at.rotation, transform.parent);
+        }
+
+        void WarnIfParentScaled()
+        {
+            Transform parent = transform.parent;
+            if (parent != null && parent.lossyScale != Vector3.one)
+                Debug.LogWarning($"[DeathAftermath] '{name}': 부모 '{parent.name}'의 스케일이 {parent.lossyScale}라 생성물 크기가 프리팹과 달라진다.", this);
         }
 
 #if UNITY_EDITOR

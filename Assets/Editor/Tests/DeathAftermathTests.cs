@@ -58,9 +58,10 @@ namespace ProjectT.Death.Tests
             return source;
         }
 
-        static DeathAftermath NewAftermath(MonoBehaviour source, Vector3 position, (GameObject prefab, Transform point)[] spawns, GameObject[] deactivate)
+        static DeathAftermath NewAftermath(MonoBehaviour source, Vector3 position, (GameObject prefab, Transform point)[] spawns, GameObject[] deactivate, Transform parent = null)
         {
             var go = new GameObject("Aftermath");
+            go.transform.SetParent(parent, false);
             go.transform.position = position;
             var aftermath = go.AddComponent<DeathAftermath>();
             Set(aftermath, so =>
@@ -98,22 +99,60 @@ namespace ProjectT.Death.Tests
         }
 
         [Test]
-        public void WithRecord_SpawnsAtPointAndDeactivates()
+        public void WithRecord_SpawnsUnderOwnParentAtPointAndDeactivates()
         {
             SaveManager.Data.diedNodeIds.Add(NodeId);
             var source = NewDeathObject();
+            var parent = new GameObject("Group").transform;
+            parent.position = new Vector3(10f, 20f, 0f);
             Transform point = NewPoint(new Vector3(30f, -5f, 0f), 90f);
-            var aftermath = NewAftermath(source, new Vector3(1f, 2f, 0f), new[] { (prefab, point) }, new[] { source.gameObject });
+            var aftermath = NewAftermath(source, new Vector3(1f, 2f, 0f), new[] { (prefab, point) }, new[] { source.gameObject }, parent);
 
             aftermath.Apply();
 
             GameObject[] clones = Clones();
             Assert.AreEqual(1, clones.Length);
+            Assert.AreSame(parent, clones[0].transform.parent);
             Assert.AreEqual(point.position, clones[0].transform.position);
             Assert.AreEqual(point.rotation.eulerAngles.z, clones[0].transform.rotation.eulerAngles.z, 0.01f);
-            Assert.IsNull(clones[0].transform.parent);
             Assert.IsFalse(source.gameObject.activeSelf);
             LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void AtRoot_SpawnsAtRoot()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var source = NewDeathObject();
+            Transform point = NewPoint(new Vector3(30f, -5f, 0f), 0f);
+            var aftermath = NewAftermath(source, Vector3.zero, new[] { (prefab, point) }, new GameObject[0]);
+
+            aftermath.Apply();
+
+            GameObject[] clones = Clones();
+            Assert.AreEqual(1, clones.Length);
+            Assert.IsNull(clones[0].transform.parent);
+            Assert.AreEqual(point.position, clones[0].transform.position);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void ParentScaled_WarnsAndStillSpawnsUnderParent()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var source = NewDeathObject();
+            var parent = new GameObject("ScaledGroup").transform;
+            parent.localScale = new Vector3(2f, 1f, 1f);
+            Transform point = NewPoint(new Vector3(6f, 4f, 0f), 0f);
+            var aftermath = NewAftermath(source, Vector3.zero, new[] { (prefab, point) }, new GameObject[0], parent);
+
+            LogAssert.Expect(LogType.Warning, new Regex(@"\[DeathAftermath\].*스케일"));
+            aftermath.Apply();
+
+            GameObject[] clones = Clones();
+            Assert.AreEqual(1, clones.Length);
+            Assert.AreSame(parent, clones[0].transform.parent);
+            Assert.That(Vector3.Distance(point.position, clones[0].transform.position), Is.LessThan(0.001f));
         }
 
         [Test]
