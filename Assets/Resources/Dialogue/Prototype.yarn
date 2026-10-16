@@ -134,7 +134,10 @@ title: Death_PasswordWrong_Sign
 
 title: Death_CloseWindow
 ---
-// 대사 작성 전
+// 임시 대사 (작성자가 교체)
+...갑자기 전부 꺼져 버렸어.
+분명히 그때 죽었어. 기억나.
+네가 창을 닫았지?
 <<stop>>
 ===
 

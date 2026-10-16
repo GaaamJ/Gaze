@@ -40,7 +40,7 @@ namespace ProjectT.Core.Tests
             d.elevatorFileId = "b3c1e2d4-0000-4000-8000-000000000002";
             d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000001");
             d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000002");
-            d.exitState = ExitState.DeathPendingRetrigger;
+            d.exitState = ExitState.DeathPending;
         }
 
         [Test]

@@ -31,7 +31,7 @@ namespace ProjectT.Death.Tests
             DeathSequence.ReloadScene = () => reloadCount++;
 
             inputLock = new GameObject("LockOwner").AddComponent<InputLock>();
-            var entry = new GameObject("DeathSceneEntry").AddComponent<DeathSceneEntry>();
+            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
             Set(entry, so => so.FindProperty("inputLock").objectReferenceValue = inputLock);
         }
 

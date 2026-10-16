@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
+using Yarn.Unity;
 using ProjectT.Area;
 using ProjectT.Dialogue;
 using ProjectT.Player;
@@ -11,7 +13,7 @@ using ProjectT.UI;
 namespace ProjectT.Death
 {
     // DeathSequence가 FindAnyObjectByType으로 찾으므로 씬에 하나만 둔다.
-    public class DeathSceneEntry : MonoBehaviour
+    public class SceneEntry : MonoBehaviour
     {
         [SerializeField] InputLock inputLock;
         [SerializeField] DialogueService dialogueService;
@@ -20,20 +22,25 @@ namespace ProjectT.Death
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
 
+        // 에디트 모드 테스트에서는 DialogueRunner가 돌지 않아 바꿔 끼운다.
+        internal static Func<DialogueService, string, YarnTask<DialogueResult>> PlayDialogue = (dialogue, node) => dialogue.Play(node);
+
         bool enteringAfterDeath;
+        bool enteringAfterWindowClose;
         bool holdingLock;
 
         internal InputLock InputLock => inputLock;
         internal DialogueService Dialogue => dialogueService;
+        internal bool EnteringAfterWindowClose => enteringAfterWindowClose;
 
         void Awake()
         {
             if (inputLock == null)
-                Debug.LogError("[DeathSceneEntry] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
             if (dialogueService == null)
-                Debug.LogError("[DeathSceneEntry] 'dialogueService' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'dialogueService' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
             if (laris == null)
-                Debug.LogError("[DeathSceneEntry] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
 
             EnterScene();
             RestoreRespawn(SaveManager.Data);
@@ -41,14 +48,31 @@ namespace ProjectT.Death
 
         IEnumerator Start()
         {
+            if (enteringAfterWindowClose)
+            {
+                RunWindowCloseEntry().Forget();
+                yield break;
+            }
+
             IEnumerator entry = RunEntry();
             while (entry.MoveNext())
                 yield return entry.Current;
         }
 
+        void OnEnable()
+        {
+            if (dialogueService != null)
+                dialogueService.QuitNormallyRequested += NormalQuit.Request;
+        }
+
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금과 사망 상태를 되돌린다.
         void OnDisable()
         {
+            if (dialogueService != null)
+                dialogueService.QuitNormallyRequested -= NormalQuit.Request;
+
+            if (enteringAfterWindowClose)
+                FinishWindowCloseEntry();
             if (!enteringAfterDeath)
                 return;
             StopAllCoroutines();
@@ -58,15 +82,61 @@ namespace ProjectT.Death
         // 다른 컴포넌트의 Update보다 먼저 잠가야 리로드 첫 프레임에 방향키가 먹지 않는다.
         internal void EnterScene()
         {
-            if (!DeathSequence.ConsumeReload())
+            if (DeathSequence.ConsumeReload())
+                enteringAfterDeath = true;
+            else if (GameSession.ConsumePendingDeath())
+                enteringAfterWindowClose = true;
+            else
                 return;
 
-            enteringAfterDeath = true;
             if (inputLock != null)
             {
                 inputLock.Lock(InputLockReason.Death);
                 holdingLock = true;
             }
+        }
+
+        // 창 닫기 사망은 발동 때 기록·시체 파일을 이미 저장했으므로 여기서는 사망 대사만 재생한다.
+        internal async YarnTask RunWindowCloseEntry()
+        {
+            if (!enteringAfterWindowClose)
+                return;
+
+            try
+            {
+                // LineAdvancer는 자기 Start에서 runner 프레젠터 목록에 끼어드는데 Start 순서는 정해져 있지 않다. 같은 프레임에 시작하면 Z 진행 입력이 이 대화에 연결되지 않는다.
+                await YarnTask.Yield();
+                if (!enteringAfterWindowClose)
+                    return;
+
+                const string node = ExitRecorder.WindowCloseDeathNodeId;
+                if (dialogueService == null)
+                {
+                    Debug.LogWarning($"[SceneEntry] DialogueService가 없어 창 닫기 사망 노드 '{node}' 없이 재개한다.", this);
+                }
+                else if (await PlayDialogue(dialogueService, node) == DialogueResult.Rejected)
+                {
+                    Debug.LogWarning($"[SceneEntry] 창 닫기 사망 노드 '{node}'를 재생하지 못했다. 그대로 재개한다.", this);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            finally
+            {
+                FinishWindowCloseEntry();
+            }
+        }
+
+        void FinishWindowCloseEntry()
+        {
+            if (!enteringAfterWindowClose)
+                return;
+            if (holdingLock && inputLock != null)
+                inputLock.Unlock(InputLockReason.Death);
+            holdingLock = false;
+            enteringAfterWindowClose = false;
         }
 
         // 사망 리로드뿐 아니라 첫 시작에도 복원한다. 잠금 해제·페이드 인보다 먼저여야 이동이 보이지 않는다.
@@ -77,7 +147,7 @@ namespace ProjectT.Death
 
             Teleport.MoveTo(laris.GetComponent<Rigidbody2D>(), position);
             CinemachineCore.ResetCameraState();
-            Debug.Log($"[DeathSceneEntry] 리스폰 위치로 시작: {position}", this);
+            Debug.Log($"[SceneEntry] 리스폰 위치로 시작: {position}", this);
         }
 
         internal IEnumerator RunEntry()
