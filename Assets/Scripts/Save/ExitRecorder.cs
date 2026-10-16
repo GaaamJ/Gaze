@@ -53,5 +53,21 @@ namespace ProjectT.Save
             SaveManager.Save();
             return true;
         }
+
+        // 읽은 값은 바로 None으로 저장해 다음 실행에서 다시 처리하지 않는다.
+        public static ExitState TakeLastExitState()
+        {
+            SaveData data = SaveManager.Data;
+            ExitState state = Normalize(data.exitState);
+            if (data.exitState != ExitState.None)
+            {
+                data.exitState = ExitState.None;
+                SaveManager.Save();
+            }
+            return state;
+        }
+
+        static ExitState Normalize(ExitState state) =>
+            state == ExitState.Normal || state == ExitState.DeathPending ? state : ExitState.None;
     }
 }

@@ -18,14 +18,14 @@ namespace ProjectT.Tests
             Base = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
             Paths = new GameFolderPaths(Path.Combine(Base, GameFolderPaths.RootFolderName));
             SaveManager.Paths = Paths;
-            GameSession.Begin();
+            GameSession.Reload();
         }
 
         public void Dispose()
         {
             SaveManager.Paths = null;
-            // SaveManager.Data와 GameSession.Investigated를 실제 세이브 기준으로 되돌린다(Begin이 Load를 포함한다).
-            GameSession.Begin();
+            // 실제 세이브 기준으로 되돌리되 Begin을 부르지 않는다. Begin은 실제 세이브의 종료 상태를 None으로 덮어쓴다.
+            GameSession.Reload();
             if (Directory.Exists(Base))
                 Directory.Delete(Base, true);
         }
