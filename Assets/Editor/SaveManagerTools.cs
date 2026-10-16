@@ -75,6 +75,19 @@ public static class SaveManagerTools
             info.Attributes &= ~FileAttributes.ReadOnly;
     }
 
+    const string SimulateWindowCloseMenu = "Tools/창 닫기 시뮬레이션";
+
+    [MenuItem(SimulateWindowCloseMenu, true)]
+    static bool ValidateSimulateWindowClose() => EditorApplication.isPlaying;
+
+    // 에디터에서는 빌드 종료 훅을 걸지 않으므로 평소 플레이 중지는 창 닫기가 아니다. 이 메뉴만 창 닫기로 본다.
+    [MenuItem(SimulateWindowCloseMenu, false, 1)]
+    static void SimulateWindowClose()
+    {
+        ExitRecorder.RecordWindowClose();
+        EditorApplication.isPlaying = false;
+    }
+
     [MenuItem("Tools/Save/Open Save Folder")]
     static void OpenSaveFolder()
     {
