@@ -104,6 +104,11 @@ namespace ProjectT.Death
 
             try
             {
+                // LineAdvancer는 자기 Start에서 runner 프레젠터 목록에 끼어드는데 Start 순서는 정해져 있지 않다. 같은 프레임에 시작하면 Z 진행 입력이 이 대화에 연결되지 않는다.
+                await YarnTask.Yield();
+                if (!enteringAfterWindowClose)
+                    return;
+
                 const string node = ExitRecorder.WindowCloseDeathNodeId;
                 if (dialogueService == null)
                 {

@@ -157,7 +157,7 @@ namespace ProjectT.Death.Tests
         }
 
         [UnityTest]
-        public IEnumerator PendingDeath_PlaysNodeImmediatelyWithoutFade_ThenUnlocks()
+        public IEnumerator PendingDeath_PlaysNodeNextFrameWithoutFade_ThenUnlocks()
         {
             WriteExitState(2);
             GameSession.Begin();
@@ -168,8 +168,9 @@ namespace ProjectT.Death.Tests
             Assert.IsTrue(entry.EnteringAfterWindowClose);
 
             entry.RunWindowCloseEntry().Forget();
+            yield return Frames(() => pending != null);
 
-            CollectionAssert.AreEqual(new[] { Node }, played, "프레임을 기다리지 않고 바로 대사를 재생한다.");
+            CollectionAssert.AreEqual(new[] { Node }, played);
             Assert.AreEqual(0f, alphaAtPlay[0], "화면을 검게 만들지 않는다.");
             Assert.IsTrue(lockedAtPlay[0]);
             Assert.AreEqual(0f, fader.Alpha);
@@ -217,8 +218,51 @@ namespace ProjectT.Death.Tests
             CollectionAssert.IsEmpty(played);
         }
 
-        [Test]
-        public void PendingDeath_WithoutFaderInScene_DoesNotCreateFader()
+        [UnityTest]
+        public IEnumerator PendingDeath_DoesNotPlayInSameFrame_KeepsDeathLockWhileWaiting()
+        {
+            WriteExitState(2);
+            GameSession.Begin();
+            var entry = NewEntry();
+
+            entry.EnterScene();
+            entry.RunWindowCloseEntry().Forget();
+
+            CollectionAssert.IsEmpty(played, "Yarn 프레젠터가 준비되도록 같은 프레임에는 재생하지 않는다.");
+            Assert.IsTrue(inputLock.IsLocked, "기다리는 동안에도 Death 잠금을 유지한다.");
+            Assert.AreEqual(0f, fader.Alpha);
+
+            yield return Frames(() => pending != null);
+
+            CollectionAssert.AreEqual(new[] { Node }, played);
+            Assert.IsTrue(lockedAtPlay[0]);
+            pending.SetResult();
+            yield return Frames(() => !inputLock.IsLocked);
+            Assert.IsFalse(inputLock.IsLocked);
+        }
+
+        [UnityTest]
+        public IEnumerator PendingDeath_EntryDisabledWhileWaiting_UnlocksWithoutPlaying()
+        {
+            WriteExitState(2);
+            GameSession.Begin();
+            var entry = NewEntry();
+
+            entry.EnterScene();
+            entry.RunWindowCloseEntry().Forget();
+            // 에디트 모드에서는 SetActive(false)가 OnDisable을 부르지 않는다.
+            typeof(SceneEntry).GetMethod("OnDisable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(entry, null);
+
+            Assert.IsFalse(inputLock.IsLocked);
+            Assert.IsFalse(entry.EnteringAfterWindowClose);
+            yield return null;
+            yield return null;
+            Assert.IsFalse(inputLock.IsLocked);
+            CollectionAssert.IsEmpty(played, "기다리는 사이 꺼진 진입은 대사를 재생하지 않는다.");
+        }
+
+        [UnityTest]
+        public IEnumerator PendingDeath_WithoutFaderInScene_DoesNotCreateFader()
         {
             fader.gameObject.SetActive(false);
             WriteExitState(2);
@@ -228,6 +272,7 @@ namespace ProjectT.Death.Tests
 
             entry.EnterScene();
             entry.RunWindowCloseEntry().Forget();
+            yield return Frames(() => pending != null);
 
             CollectionAssert.AreEqual(new[] { Node }, played);
             Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<ScreenFader>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
