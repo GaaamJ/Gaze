@@ -104,15 +104,6 @@ namespace ProjectT.Death
 
             try
             {
-                ScreenFader fader = FindOrCreateFader();
-                if (fader != null)
-                {
-                    fader.SetAlpha(1f);
-                    IEnumerator fadeIn = fader.FadeIn();
-                    while (fadeIn.MoveNext())
-                        await YarnTask.Yield();
-                }
-
                 const string node = ExitRecorder.WindowCloseDeathNodeId;
                 if (dialogueService == null)
                 {

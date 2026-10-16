@@ -157,7 +157,7 @@ namespace ProjectT.Death.Tests
         }
 
         [UnityTest]
-        public IEnumerator PendingDeath_FadesInThenPlaysNodeOnly_ThenUnlocks()
+        public IEnumerator PendingDeath_PlaysNodeImmediatelyWithoutFade_ThenUnlocks()
         {
             WriteExitState(2);
             GameSession.Begin();
@@ -168,11 +168,11 @@ namespace ProjectT.Death.Tests
             Assert.IsTrue(entry.EnteringAfterWindowClose);
 
             entry.RunWindowCloseEntry().Forget();
-            yield return Frames(() => pending != null);
 
-            CollectionAssert.AreEqual(new[] { Node }, played);
-            Assert.AreEqual(0f, alphaAtPlay[0], "페이드 인이 끝난 뒤 대사를 재생한다.");
+            CollectionAssert.AreEqual(new[] { Node }, played, "프레임을 기다리지 않고 바로 대사를 재생한다.");
+            Assert.AreEqual(0f, alphaAtPlay[0], "화면을 검게 만들지 않는다.");
             Assert.IsTrue(lockedAtPlay[0]);
+            Assert.AreEqual(0f, fader.Alpha);
             Assert.IsFalse(DeathSequence.IsActive, "즉시 사망 흐름을 타지 않는다.");
 
             pending.SetResult();
@@ -215,6 +215,23 @@ namespace ProjectT.Death.Tests
 
             Assert.IsFalse(inputLock.IsLocked);
             CollectionAssert.IsEmpty(played);
+        }
+
+        [Test]
+        public void PendingDeath_WithoutFaderInScene_DoesNotCreateFader()
+        {
+            fader.gameObject.SetActive(false);
+            WriteExitState(2);
+            GameSession.Begin();
+            var entry = NewEntry();
+            Set(entry, so => so.FindProperty("faderPrefab").objectReferenceValue = fader);
+
+            entry.EnterScene();
+            entry.RunWindowCloseEntry().Forget();
+
+            CollectionAssert.AreEqual(new[] { Node }, played);
+            Assert.AreEqual(1, UnityEngine.Object.FindObjectsByType<ScreenFader>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length);
+            pending.SetResult();
         }
 
         [UnityTest]
