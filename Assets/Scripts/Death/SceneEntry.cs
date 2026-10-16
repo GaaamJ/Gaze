@@ -11,7 +11,7 @@ using ProjectT.UI;
 namespace ProjectT.Death
 {
     // DeathSequence가 FindAnyObjectByType으로 찾으므로 씬에 하나만 둔다.
-    public class DeathSceneEntry : MonoBehaviour
+    public class SceneEntry : MonoBehaviour
     {
         [SerializeField] InputLock inputLock;
         [SerializeField] DialogueService dialogueService;
@@ -29,11 +29,11 @@ namespace ProjectT.Death
         void Awake()
         {
             if (inputLock == null)
-                Debug.LogError("[DeathSceneEntry] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
             if (dialogueService == null)
-                Debug.LogError("[DeathSceneEntry] 'dialogueService' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'dialogueService' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
             if (laris == null)
-                Debug.LogError("[DeathSceneEntry] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[SceneEntry] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
 
             EnterScene();
             RestoreRespawn(SaveManager.Data);
@@ -77,7 +77,7 @@ namespace ProjectT.Death
 
             Teleport.MoveTo(laris.GetComponent<Rigidbody2D>(), position);
             CinemachineCore.ResetCameraState();
-            Debug.Log($"[DeathSceneEntry] 리스폰 위치로 시작: {position}", this);
+            Debug.Log($"[SceneEntry] 리스폰 위치로 시작: {position}", this);
         }
 
         internal IEnumerator RunEntry()

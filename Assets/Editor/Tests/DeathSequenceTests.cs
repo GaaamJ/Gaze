@@ -48,10 +48,10 @@ namespace ProjectT.Death.Tests
             save.Dispose();
         }
 
-        static DeathSceneEntry NewEntry(out InputLock lockOwner)
+        static SceneEntry NewEntry(out InputLock lockOwner)
         {
             lockOwner = new GameObject("Laris").AddComponent<InputLock>();
-            var entry = new GameObject("DeathSceneEntry").AddComponent<DeathSceneEntry>();
+            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
             InputLock captured = lockOwner;
             Set(entry, so => so.FindProperty("inputLock").objectReferenceValue = captured);
             return entry;
@@ -218,14 +218,14 @@ namespace ProjectT.Death.Tests
         public void Begin_WithoutEntry_LogsErrorAndStaysInactive()
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            LogAssert.Expect(LogType.Error, new Regex("DeathSceneEntry가 없어"));
+            LogAssert.Expect(LogType.Error, new Regex("SceneEntry가 없어"));
 
             DeathSequence.Begin("Death_A");
 
             Assert.IsFalse(DeathSequence.IsActive);
         }
 
-        static DeathSceneEntry NewEntryWithLaris(Vector3 start, out PlayerMovement laris)
+        static SceneEntry NewEntryWithLaris(Vector3 start, out PlayerMovement laris)
         {
             var entry = NewEntry(out InputLock _);
             laris = new GameObject("LarisBody").AddComponent<PlayerMovement>();

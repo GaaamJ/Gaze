@@ -8988,7 +8988,7 @@ GameObject:
   - component: {fileID: 327527552}
   - component: {fileID: 327527551}
   m_Layer: 0
-  m_Name: DeathSceneEntry
+  m_Name: SceneEntry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
