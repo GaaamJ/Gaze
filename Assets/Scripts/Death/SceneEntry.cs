@@ -59,9 +59,18 @@ namespace ProjectT.Death
                 yield return entry.Current;
         }
 
+        void OnEnable()
+        {
+            if (dialogueService != null)
+                dialogueService.QuitNormallyRequested += NormalQuit.Request;
+        }
+
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금과 사망 상태를 되돌린다.
         void OnDisable()
         {
+            if (dialogueService != null)
+                dialogueService.QuitNormallyRequested -= NormalQuit.Request;
+
             if (enteringAfterWindowClose)
                 FinishWindowCloseEntry();
             if (!enteringAfterDeath)
