@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
+using Yarn.Unity;
 using ProjectT.Area;
 using ProjectT.Dialogue;
 using ProjectT.Player;
@@ -20,11 +22,16 @@ namespace ProjectT.Death
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
 
+        // 에디트 모드 테스트에서는 DialogueRunner가 돌지 않아 바꿔 끼운다.
+        internal static Func<DialogueService, string, YarnTask<DialogueResult>> PlayDialogue = (dialogue, node) => dialogue.Play(node);
+
         bool enteringAfterDeath;
+        bool enteringAfterWindowClose;
         bool holdingLock;
 
         internal InputLock InputLock => inputLock;
         internal DialogueService Dialogue => dialogueService;
+        internal bool EnteringAfterWindowClose => enteringAfterWindowClose;
 
         void Awake()
         {
@@ -41,6 +48,12 @@ namespace ProjectT.Death
 
         IEnumerator Start()
         {
+            if (enteringAfterWindowClose)
+            {
+                RunWindowCloseEntry().Forget();
+                yield break;
+            }
+
             IEnumerator entry = RunEntry();
             while (entry.MoveNext())
                 yield return entry.Current;
@@ -49,6 +62,8 @@ namespace ProjectT.Death
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금과 사망 상태를 되돌린다.
         void OnDisable()
         {
+            if (enteringAfterWindowClose)
+                FinishWindowCloseEntry();
             if (!enteringAfterDeath)
                 return;
             StopAllCoroutines();
@@ -58,15 +73,65 @@ namespace ProjectT.Death
         // 다른 컴포넌트의 Update보다 먼저 잠가야 리로드 첫 프레임에 방향키가 먹지 않는다.
         internal void EnterScene()
         {
-            if (!DeathSequence.ConsumeReload())
+            if (DeathSequence.ConsumeReload())
+                enteringAfterDeath = true;
+            else if (GameSession.ConsumePendingDeath())
+                enteringAfterWindowClose = true;
+            else
                 return;
 
-            enteringAfterDeath = true;
             if (inputLock != null)
             {
                 inputLock.Lock(InputLockReason.Death);
                 holdingLock = true;
             }
+        }
+
+        // 창 닫기 사망은 발동 때 기록·시체 파일을 이미 저장했으므로 여기서는 사망 대사만 재생한다.
+        internal async YarnTask RunWindowCloseEntry()
+        {
+            if (!enteringAfterWindowClose)
+                return;
+
+            try
+            {
+                ScreenFader fader = FindOrCreateFader();
+                if (fader != null)
+                {
+                    fader.SetAlpha(1f);
+                    IEnumerator fadeIn = fader.FadeIn();
+                    while (fadeIn.MoveNext())
+                        await YarnTask.Yield();
+                }
+
+                const string node = ExitRecorder.WindowCloseDeathNodeId;
+                if (dialogueService == null)
+                {
+                    Debug.LogWarning($"[SceneEntry] DialogueService가 없어 창 닫기 사망 노드 '{node}' 없이 재개한다.", this);
+                }
+                else if (await PlayDialogue(dialogueService, node) == DialogueResult.Rejected)
+                {
+                    Debug.LogWarning($"[SceneEntry] 창 닫기 사망 노드 '{node}'를 재생하지 못했다. 그대로 재개한다.", this);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+            }
+            finally
+            {
+                FinishWindowCloseEntry();
+            }
+        }
+
+        void FinishWindowCloseEntry()
+        {
+            if (!enteringAfterWindowClose)
+                return;
+            if (holdingLock && inputLock != null)
+                inputLock.Unlock(InputLockReason.Death);
+            holdingLock = false;
+            enteringAfterWindowClose = false;
         }
 
         // 사망 리로드뿐 아니라 첫 시작에도 복원한다. 잠금 해제·페이드 인보다 먼저여야 이동이 보이지 않는다.
