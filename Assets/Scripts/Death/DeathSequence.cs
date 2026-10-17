@@ -19,7 +19,7 @@ namespace ProjectT.Death
 
         public static bool IsActive { get; private set; }
 
-        // 리로드된 씬의 DeathSceneEntry가 Awake에서 읽고 비운다.
+        // 리로드된 씬의 SceneEntry가 Awake에서 읽고 비운다.
         public static bool ReloadedAfterDeath { get; private set; }
 
         // 에디트 모드 테스트에서는 씬을 불러올 수 없어 바꿔 끼운다.
@@ -44,10 +44,10 @@ namespace ProjectT.Death
             if (IsActive)
                 return;
 
-            DeathSceneEntry scene = Object.FindAnyObjectByType<DeathSceneEntry>();
+            SceneEntry scene = Object.FindAnyObjectByType<SceneEntry>();
             if (scene == null)
             {
-                Debug.LogError($"[DeathSequence] 씬에 DeathSceneEntry가 없어 사망 '{deathNodeId}'를 처리하지 못했다.");
+                Debug.LogError($"[DeathSequence] 씬에 SceneEntry가 없어 사망 '{deathNodeId}'를 처리하지 못했다.");
                 return;
             }
 
@@ -60,7 +60,7 @@ namespace ProjectT.Death
             Run(scene, inputLock, deathNodeId).Forget();
         }
 
-        static async YarnTask Run(DeathSceneEntry scene, InputLock inputLock, string deathNodeId)
+        static async YarnTask Run(SceneEntry scene, InputLock inputLock, string deathNodeId)
         {
             bool reloading = false;
             ScreenFader fader = null;
@@ -128,7 +128,6 @@ namespace ProjectT.Death
 
         // 리스폰 위치·퍼즐 클리어는 조사·풀이 시점에 이미 저장된다.
         // 사망 대사 도중 게임을 꺼도 시체가 남도록 대사보다 먼저 기록한다.
-        // TODO(#52 2b): 메타픽션 사망 대기 저장을 여기서 연결한다.
         static void SaveProgress(string deathNodeId)
         {
             DeathRecords.Add(deathNodeId);
@@ -172,13 +171,13 @@ namespace ProjectT.Death
             IsActive = false;
         }
 
-        // DeathSceneEntry가 없는 씬으로 리로드되면 사망 상태가 영구히 남지 않게 여기서 푼다.
+        // SceneEntry가 없는 씬으로 리로드되면 사망 상태가 영구히 남지 않게 여기서 푼다.
         static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
             if (!ReloadedAfterDeath)
                 return;
-            Debug.LogWarning($"[DeathSequence] 리로드된 씬 '{scene.name}'에 DeathSceneEntry가 없어 사망 상태만 푼다.");
+            Debug.LogWarning($"[DeathSequence] 리로드된 씬 '{scene.name}'에 SceneEntry가 없어 사망 상태만 푼다.");
             ReloadedAfterDeath = false;
             IsActive = false;
         }
