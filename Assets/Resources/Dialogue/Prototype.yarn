@@ -24,36 +24,6 @@ title: ParkingLotRespawn_Recheck
 <<stop>>
 ===
 
-title: HintGapA
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: HintGapA_Recheck
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: HintGapB
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: HintGapB_Recheck
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: PasswordDoor_Open
----
-// 대사 작성 전
-<<stop>>
-===
-
 title: Death_Falling001
 ---
 // 대사 작성 전
@@ -97,36 +67,6 @@ title: Death_DeathObject_Sign
 ===
 
 title: Death_DeathObject_Refuse
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: Death_DangerousGap
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: Death_DangerousGap_Sign
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: Death_DangerousGap_Refuse
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: Death_PasswordWrong
----
-// 대사 작성 전
-<<stop>>
-===
-
-title: Death_PasswordWrong_Sign
 ---
 // 대사 작성 전
 <<stop>>

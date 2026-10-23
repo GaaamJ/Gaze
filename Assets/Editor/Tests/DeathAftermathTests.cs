@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Puzzle;
 using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.Tests;
@@ -228,23 +227,18 @@ namespace ProjectT.Death.Tests
         }
 
         [Test]
-        public void DeathZoneAndPasswordPuzzle_AreAcceptedAsSource()
+        public void DeathZone_IsAcceptedAsSource()
         {
             SaveManager.Data.diedNodeIds.Add("Death_Falling001");
-            SaveManager.Data.diedNodeIds.Add("Death_PasswordWrong");
             var zoneGo = new GameObject("Zone");
             zoneGo.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = zoneGo.AddComponent<DeathZone>();
             Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
-            var puzzle = AddPuzzle(new GameObject("Puzzle"), new PasswordSymbol[0], new PasswordSymbol[0], "PasswordDoor", "Death_PasswordWrong");
 
             var zoneTarget = new GameObject("ZoneTarget");
-            var puzzleTarget = new GameObject("PuzzleTarget");
             NewAftermath(zone, Vector3.zero, new (GameObject, Transform)[0], new[] { zoneTarget }).Apply();
-            NewAftermath(puzzle, Vector3.zero, new (GameObject, Transform)[0], new[] { puzzleTarget }).Apply();
 
             Assert.IsFalse(zoneTarget.activeSelf);
-            Assert.IsFalse(puzzleTarget.activeSelf);
             LogAssert.NoUnexpectedReceived();
         }
     }

@@ -15,7 +15,7 @@ namespace ProjectT.Death
             public Transform point;
         }
 
-        [Tooltip("IDeathSource를 구현한 트리거 컴포넌트 (DeathInteractable, DeathZone, PasswordPuzzle)")]
+        [Tooltip("IDeathSource를 구현한 트리거 컴포넌트 (DeathInteractable, DeathZone)")]
         [SerializeField] MonoBehaviour source;
         [SerializeField] Spawn[] spawns;
         [Tooltip("사망 기록이 있으면 끌 오브젝트")]

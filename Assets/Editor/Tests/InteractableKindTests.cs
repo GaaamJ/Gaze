@@ -3,7 +3,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using ProjectT.Data;
-using ProjectT.Puzzle;
 using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.Tests;
@@ -281,59 +280,6 @@ namespace ProjectT.Interaction.Tests
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(4f, 0f), SaveManager.Data.respawnPosition);
             Assert.IsFalse(File.Exists(save.Paths.SaveFile));
-        }
-
-        PasswordSymbol NewSymbol(out SpriteRenderer[] renderers)
-        {
-            var go = new GameObject("PasswordSymbol");
-            created.Add(go);
-            renderers = new SpriteRenderer[2];
-            for (int i = 0; i < renderers.Length; i++)
-            {
-                var child = new GameObject("Sprite" + i);
-                child.transform.SetParent(go.transform);
-                renderers[i] = child.AddComponent<SpriteRenderer>();
-            }
-
-            var symbol = go.AddComponent<PasswordSymbol>();
-            SpriteRenderer[] captured = renderers;
-            Set(symbol, so =>
-            {
-                SetObjects(so.FindProperty("symbolRenderers"), captured);
-                so.FindProperty("unlitColor").colorValue = Color.white;
-                so.FindProperty("litColor").colorValue = Color.yellow;
-            });
-            return symbol;
-        }
-
-        [Test]
-        public void PasswordSymbol_Interact_RaisesPressedOnce()
-        {
-            var symbol = NewSymbol(out _);
-            var received = new List<PasswordSymbol>();
-            symbol.Pressed += s => received.Add(s);
-
-            symbol.Interact(Context());
-
-            CollectionAssert.AreEqual(new[] { symbol }, received);
-            Assert.IsEmpty(investigated);
-            LogAssert.NoUnexpectedReceived();
-        }
-
-        [Test]
-        public void PasswordSymbol_SetLit_ChangesChildSpriteColors()
-        {
-            var symbol = NewSymbol(out var renderers);
-
-            symbol.SetLit(true);
-            Assert.IsTrue(symbol.IsLit);
-            foreach (var r in renderers)
-                Assert.AreEqual(Color.yellow, r.color);
-
-            symbol.SetLit(false);
-            Assert.IsFalse(symbol.IsLit);
-            foreach (var r in renderers)
-                Assert.AreEqual(Color.white, r.color);
         }
     }
 }
