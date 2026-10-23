@@ -1,7 +1,0 @@
-﻿<Solution>
-  <Project Path="ProjectT.Save.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
-  <Project Path="ProjectT.Core.Tests.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
-  <Project Path="ProjectT.Core.csproj" />
-</Solution>
