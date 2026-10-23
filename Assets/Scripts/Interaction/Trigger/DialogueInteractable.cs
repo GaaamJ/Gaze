@@ -20,7 +20,7 @@ namespace ProjectT.Interaction
         public override void Interact(InteractContext context)
         {
             // 대사 중 '게임 끄기'로 종료해도 갱신된 지점이 남도록 대사보다 먼저 저장한다.
-            if (TryGetComponent(out RespawnArea respawn))
+            if (TryGetComponent(out Respawn respawn))
                 UpdateRespawn(respawn);
 
             if (string.IsNullOrWhiteSpace(dialogueNodeId))
@@ -39,7 +39,7 @@ namespace ProjectT.Interaction
             return nodeExists(recheck) ? recheck : dialogueNodeId;
         }
 
-        void UpdateRespawn(RespawnArea respawn)
+        void UpdateRespawn(Respawn respawn)
         {
             Vector2 position = respawn.SpawnPosition;
             string roomName = gameObject.scene.name;

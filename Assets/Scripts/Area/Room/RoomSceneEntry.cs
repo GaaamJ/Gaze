@@ -4,8 +4,8 @@ using ProjectT.Death;
 
 namespace ProjectT.Area
 {
-    // Core 오브젝트를 인스펙터로 참조하지 않는다. RoomLoader가 Room 씬을 불러온 뒤 찾아 부른다.
-    public class RoomEntry : MonoBehaviour
+    // Core 오브젝트를 인스펙터로 참조하지 않는다. SceneLoader가 Scene 씬을 불러온 뒤 찾아 부른다.
+    public class RoomSceneEntry : MonoBehaviour
     {
         internal void Enter()
         {

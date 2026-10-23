@@ -17,7 +17,7 @@ namespace ProjectT.Session
     {
         [SerializeField] InputLock inputLock;
         [SerializeField] DialogueService dialogueService;
-        [SerializeField] RoomLoader roomLoader;
+        [SerializeField] RoomSceneLoader roomLoader;
         [Tooltip("세이브에 리스폰 위치가 있으면 시작·사망 리로드 때 이 라리스를 옮긴다.")]
         [SerializeField] PlayerMovement laris;
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]

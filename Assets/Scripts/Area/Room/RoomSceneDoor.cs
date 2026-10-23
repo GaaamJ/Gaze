@@ -1,18 +1,20 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 using ProjectT.Player;
 using ProjectT.Session;
 
 namespace ProjectT.Area
 {
-    // 도착 위치는 이 오브젝트의 위치다. Core를 인스펙터로 참조할 수 없어 정적 진입점 RoomTransition.Begin으로 넘긴다.
+    // 도착 위치는 이 오브젝트의 위치다. Core를 인스펙터로 참조할 수 없어 정적 진입점 RoomSceneTransition.Begin으로 넘긴다.
     [RequireComponent(typeof(Collider2D))]
-    public class RoomDoor : MonoBehaviour
+    public class RoomSceneDoor : MonoBehaviour
     {
         [Tooltip("이 문의 id. 다른 Room의 문이 targetDoorId로 가리킨다.")]
         [SerializeField] string doorId;
-        [Tooltip("넘어갈 Room 씬 이름")]
-        [SerializeField] string targetRoom;
-        [Tooltip("넘어간 Room에서 도착할 문의 id")]
+        [Tooltip("넘어갈 Scene 이름")]
+        [FormerlySerializedAs("targetRoom")]
+        [SerializeField] string targetScene;
+        [Tooltip("넘어간 Scene에서 도착할 문의 id")]
         [SerializeField] string targetDoorId;
 
         public string DoorId => doorId;
@@ -40,7 +42,7 @@ namespace ProjectT.Area
             if (inputLock != null && inputLock.IsLocked)
                 return false;
 
-            return RoomTransition.Begin(targetRoom, targetDoorId);
+            return RoomSceneTransition.Begin(targetScene, targetDoorId);
         }
     }
 }

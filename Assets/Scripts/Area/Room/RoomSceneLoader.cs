@@ -9,11 +9,11 @@ using ProjectT.UI;
 
 namespace ProjectT.Area
 {
-    // RoomTransition이 FindAnyObjectByType으로 찾으므로 Core 씬에 하나만 둔다. 어느 Room을 불러올지는 정하지 않는다.
-    public class RoomLoader : MonoBehaviour
+    // Sceneransition이 FindAnyObjectByType으로 찾으므로 Core 씬에 하나만 둔다. 어느 Scene을 불러올지는 정하지 않는다.
+    public class RoomSceneLoader : MonoBehaviour
     {
         [SerializeField] InputLock inputLock;
-        [Tooltip("RoomDoor로 넘어갈 때 도착 문으로 옮길 라리스")]
+        [Tooltip("SceneTransitionDoor로 넘어갈 때 도착 문으로 옮길 라리스")]
         [SerializeField] PlayerMovement laris;
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
@@ -27,9 +27,9 @@ namespace ProjectT.Area
         void Awake()
         {
             if (inputLock == null)
-                Debug.LogError("[RoomLoader] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[RoomSceneLoader] 'inputLock' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
             if (laris == null)
-                Debug.LogError("[RoomLoader] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
+                Debug.LogError("[RoomSceneLoader] 'laris' 참조가 비어 있다. 씬에서 연결해야 한다.", this);
         }
 
         // Unity는 멈춘 코루틴의 finally를 실행하지 않으므로 여기서도 잠금을 되돌린다.
@@ -46,7 +46,7 @@ namespace ProjectT.Area
             AsyncOperation load = SceneManager.LoadSceneAsync(name, LoadSceneMode.Additive);
             if (load == null)
             {
-                Debug.LogError($"[RoomLoader] Room 씬 '{name}'을 불러오지 못했다. 빌드 설정을 확인해야 한다.", this);
+                Debug.LogError($"[RoomSceneLoader] Room 씬 '{name}'을 불러오지 못했다. 빌드 설정을 확인해야 한다.", this);
                 yield break;
             }
             while (!load.isDone)
@@ -60,9 +60,9 @@ namespace ProjectT.Area
         {
             if (!room.IsValid() || !room.isLoaded)
                 return;
-            RoomEntry entry = FindRoomEntry(room);
+            var entry = FindRoomEntry(room);
             if (entry == null)
-                Debug.LogWarning($"[RoomLoader] Room 씬 '{room.name}'에 RoomEntry가 없다.", this);
+                Debug.LogWarning($"[RoomSceneLoader] Room 씬 '{room.name}'에 RoomSceneEntry가 없다.", this);
             else
                 entry.Enter();
         }
@@ -76,11 +76,11 @@ namespace ProjectT.Area
                 yield return null;
         }
 
-        static RoomEntry FindRoomEntry(Scene scene)
+        static RoomSceneEntry FindRoomEntry(Scene scene)
         {
             foreach (GameObject root in scene.GetRootGameObjects())
             {
-                RoomEntry entry = root.GetComponentInChildren<RoomEntry>(true);
+                RoomSceneEntry entry = root.GetComponentInChildren<RoomSceneEntry>(true);
                 if (entry != null)
                     return entry;
             }
@@ -94,7 +94,7 @@ namespace ProjectT.Area
                 return false;
             if (string.IsNullOrWhiteSpace(targetRoom) || !Application.CanStreamedLevelBeLoaded(targetRoom))
             {
-                Debug.LogError($"[RoomLoader] Room 씬 '{targetRoom}'이 빌드 설정에 없어 넘어가지 못했다.", this);
+                Debug.LogError($"[RoomSceneLoader] Room 씬 '{targetRoom}'이 빌드 설정에 없어 넘어가지 못했다.", this);
                 return false;
             }
 
@@ -128,11 +128,11 @@ namespace ProjectT.Area
                 while (load.MoveNext())
                     yield return load.Current;
 
-                RoomDoor door = FindDoor(room, targetDoorId);
+                var door = FindDoor(room, targetDoorId);
                 Rigidbody2D body = laris != null ? laris.GetComponent<Rigidbody2D>() : null;
                 if (door == null)
                 {
-                    Debug.LogError($"[RoomLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 RoomDoor가 없어 라리스를 옮기지 못했다.", this);
+                    Debug.LogError($"[RoomSceneLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 RoomSceneDoor가 없어 라리스를 옮기지 못했다.", this);
                 }
                 else if (body != null)
                 {
@@ -187,13 +187,13 @@ namespace ProjectT.Area
             moveFader = null;
         }
 
-        static RoomDoor FindDoor(Scene scene, string doorId)
+        static RoomSceneDoor FindDoor(Scene scene, string doorId)
         {
             if (!scene.IsValid() || !scene.isLoaded)
                 return null;
             foreach (GameObject root in scene.GetRootGameObjects())
             {
-                foreach (RoomDoor door in root.GetComponentsInChildren<RoomDoor>(true))
+                foreach (RoomSceneDoor door in root.GetComponentsInChildren<RoomSceneDoor>(true))
                 {
                     if (door.DoorId == doorId)
                         return door;

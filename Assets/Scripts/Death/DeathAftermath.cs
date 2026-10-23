@@ -24,7 +24,7 @@ namespace ProjectT.Death
         // 다시 불러도 생성물이 겹치지 않게 막는다.
         bool applied;
 
-        // Awake에서 부르지 않는다. RoomEntry.Enter()가 CoreEntry의 리셋·리스폰 뒤에 부른다.
+        // Awake에서 부르지 않는다. RoomSceneEntry.Enter()가 CoreEntry의 리셋·리스폰 뒤에 부른다.
         internal void Apply()
         {
             if (!(source is IDeathSource death))

@@ -54,7 +54,7 @@ namespace ProjectT.Interaction.Tests
         DialogueInteractable NewRespawn(string nodeId = "")
         {
             var interactable = NewInteractable(nodeId);
-            interactable.gameObject.AddComponent<RespawnArea>();
+            interactable.gameObject.AddComponent<Respawn>();
             return interactable;
         }
 
@@ -212,7 +212,7 @@ namespace ProjectT.Interaction.Tests
             var point = new GameObject("SpawnPoint");
             created.Add(point);
             point.transform.position = new Vector3(-3f, 7f, 0f);
-            Set(target.GetComponent<RespawnArea>(), so => so.FindProperty("spawnPoint").objectReferenceValue = point.transform);
+            Set(target.GetComponent<Respawn>(), so => so.FindProperty("spawnPoint").objectReferenceValue = point.transform);
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
             target.Interact(Context());

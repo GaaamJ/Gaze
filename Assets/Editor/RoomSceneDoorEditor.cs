@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using ProjectT.Area;
 
-[CustomEditor(typeof(RoomDoor))]
+[CustomEditor(typeof(RoomSceneDoor))]
 [CanEditMultipleObjects]
-class RoomDoorEditor : Editor
+class RoomSceneDoorEditor : Editor
 {
     static readonly Regex BlockHeader = new Regex(@"^--- !u!", RegexOptions.Multiline);
     static readonly Regex ScriptGuid = new Regex(@"m_Script: \{fileID: 11500000, guid: ([0-9a-f]{32})");
@@ -26,16 +26,16 @@ class RoomDoorEditor : Editor
     }
 
     static readonly Dictionary<string, FileScan> cache = new Dictionary<string, FileScan>();
-    static string roomDoorGuid;
+    static string doorScriptGuid;
 
     SerializedProperty doorId;
-    SerializedProperty targetRoom;
+    SerializedProperty targetScene;
     SerializedProperty targetDoorId;
 
     void OnEnable()
     {
         doorId = serializedObject.FindProperty("doorId");
-        targetRoom = serializedObject.FindProperty("targetRoom");
+        targetScene = serializedObject.FindProperty("targetScene");
         targetDoorId = serializedObject.FindProperty("targetDoorId");
     }
 
@@ -44,25 +44,25 @@ class RoomDoorEditor : Editor
         serializedObject.Update();
 
         using (new EditorGUI.DisabledScope(true))
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((RoomDoor)target), typeof(MonoScript), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((RoomSceneDoor)target), typeof(MonoScript), false);
 
         EditorGUILayout.PropertyField(doorId);
-        string scenePath = DrawTargetRoom();
+        string scenePath = DrawTargetScene();
         EditorGUILayout.PropertyField(targetDoorId);
 
-        if (!targetRoom.hasMultipleDifferentValues && !targetDoorId.hasMultipleDifferentValues)
+        if (!targetScene.hasMultipleDifferentValues && !targetDoorId.hasMultipleDifferentValues)
             DrawDoorWarning(scenePath);
 
         serializedObject.ApplyModifiedProperties();
     }
 
-    string DrawTargetRoom()
+    string DrawTargetScene()
     {
         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).ToArray();
         var names = new List<string> { "(없음)" };
         names.AddRange(scenes.Select(s => Path.GetFileNameWithoutExtension(s.path)));
 
-        string current = targetRoom.stringValue;
+        string current = targetScene.stringValue;
         int index = string.IsNullOrEmpty(current) ? 0 : names.IndexOf(current, 1);
         bool missing = index < 0;
         if (missing)
@@ -71,14 +71,14 @@ class RoomDoorEditor : Editor
             index = names.Count - 1;
         }
 
-        EditorGUI.showMixedValue = targetRoom.hasMultipleDifferentValues;
+        EditorGUI.showMixedValue = targetScene.hasMultipleDifferentValues;
         EditorGUI.BeginChangeCheck();
-        int picked = EditorGUILayout.Popup(new GUIContent(targetRoom.displayName, targetRoom.tooltip), index, names.ToArray());
+        int picked = EditorGUILayout.Popup(new GUIContent(targetScene.displayName, targetScene.tooltip), index, names.ToArray());
         if (EditorGUI.EndChangeCheck() && !(missing && picked == names.Count - 1))
-            targetRoom.stringValue = picked == 0 ? "" : names[picked];
+            targetScene.stringValue = picked == 0 ? "" : names[picked];
         EditorGUI.showMixedValue = false;
 
-        if (targetRoom.hasMultipleDifferentValues)
+        if (targetScene.hasMultipleDifferentValues)
             return null;
         if (missing)
         {
@@ -95,7 +95,7 @@ class RoomDoorEditor : Editor
         string id = targetDoorId.stringValue;
         if (FindDoorIds(scenePath).Contains(id))
             return;
-        EditorGUILayout.HelpBox($"Room '{Path.GetFileNameWithoutExtension(scenePath)}'에 doorId가 '{id}'인 RoomDoor가 없다.", MessageType.Warning);
+        EditorGUILayout.HelpBox($"Room '{Path.GetFileNameWithoutExtension(scenePath)}'에 doorId가 '{id}'인 RoomSceneDoor가 없다.", MessageType.Warning);
     }
 
     static HashSet<string> FindDoorIds(string scenePath)
@@ -106,27 +106,27 @@ class RoomDoorEditor : Editor
         {
             var ids = new HashSet<string>();
             foreach (GameObject root in open.GetRootGameObjects())
-                foreach (RoomDoor door in root.GetComponentsInChildren<RoomDoor>(true))
+                foreach (RoomSceneDoor door in root.GetComponentsInChildren<RoomSceneDoor>(true))
                     ids.Add(door.DoorId ?? "");
             return ids;
         }
 
         var found = new HashSet<string>();
-        CollectDoorIds(scenePath, RoomDoorScriptGuid(), new HashSet<string>(), found);
+        CollectDoorIds(scenePath, DoorScriptGuid(), new HashSet<string>(), found);
         return found;
     }
 
-    static string RoomDoorScriptGuid()
+    static string DoorScriptGuid()
     {
-        if (roomDoorGuid != null)
-            return roomDoorGuid;
-        foreach (string guid in AssetDatabase.FindAssets("t:MonoScript RoomDoor"))
+        if (doorScriptGuid != null)
+            return doorScriptGuid;
+        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(RoomSceneDoor)}"))
         {
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guid));
-            if (script != null && script.GetClass() == typeof(RoomDoor))
-                return roomDoorGuid = guid;
+            if (script != null && script.GetClass() == typeof(RoomSceneDoor))
+                return doorScriptGuid = guid;
         }
-        return roomDoorGuid = "";
+        return doorScriptGuid = "";
     }
 
     // 씬을 열지 않고 텍스트 직렬화된 파일을 읽는다. 프리팹 인스턴스는 원본 프리팹까지 따라가 기본값과 덮어쓴 값을 모두 후보로 본다.

@@ -244,10 +244,10 @@ namespace ProjectT.Death.Tests
         }
 
         [Test]
-        public void RoomEntryEnter_AppliesInactiveAftermathsInOwnSceneOnly()
+        public void RoomSceneEntryEnter_AppliesInactiveAftermathsInOwnSceneOnly()
         {
             SaveManager.Data.diedNodeIds.Add(NodeId);
-            var entry = new GameObject("RoomEntry").AddComponent<RoomEntry>();
+            var entry = new GameObject("RoomSceneEntry").AddComponent<RoomSceneEntry>();
 
             var source = NewDeathObject();
             var group = new GameObject("InactiveGroup");
@@ -270,10 +270,10 @@ namespace ProjectT.Death.Tests
         }
 
         [Test]
-        public void RoomEntryEnteredTwice_SpawnsOnce()
+        public void RoomSceneEntryEnteredTwice_SpawnsOnce()
         {
             SaveManager.Data.diedNodeIds.Add(NodeId);
-            var entry = new GameObject("RoomEntry").AddComponent<RoomEntry>();
+            var entry = new GameObject("RoomSceneEntry").AddComponent<RoomSceneEntry>();
             NewAftermath(NewDeathObject(), Vector3.zero, new[] { (prefab, (Transform)null) }, new GameObject[0]);
 
             entry.Enter();
