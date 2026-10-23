@@ -24,7 +24,7 @@ namespace ProjectT.Death.Tests
         InputLock inputLock;
         ScreenFader fader;
         int reloadCount;
-        Action<CoreEntry> originalReload;
+        Action<CoreEntry> originalRestart;
 
         [SetUp]
         public void SetUp()
@@ -33,8 +33,8 @@ namespace ProjectT.Death.Tests
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
             reloadCount = 0;
-            originalReload = DeathSequence.ReloadScene;
-            DeathSequence.ReloadScene = _ => reloadCount++;
+            originalRestart = DeathSequence.Restart;
+            DeathSequence.Restart = _ => reloadCount++;
 
             fader = NewFader();
             NewEntry(out inputLock);
@@ -44,7 +44,7 @@ namespace ProjectT.Death.Tests
         public void TearDown()
         {
             DeathSequence.ResetState();
-            DeathSequence.ReloadScene = originalReload;
+            DeathSequence.Restart = originalRestart;
             save.Dispose();
         }
 
@@ -91,14 +91,12 @@ namespace ProjectT.Death.Tests
 
             yield return WaitForReload();
             Assert.IsTrue(DeathSequence.IsActive);
-            Assert.IsTrue(DeathSequence.ReloadedAfterDeath);
             Assert.AreEqual(1f, fader.Alpha);
 
             // Room 리로드 뒤 진입 흉내: 새 라리스·진입점을 만든다.
             var entry = NewEntry(out InputLock newLock);
             fader.SetAlpha(0f);
-            entry.EnterScene();
-            Assert.IsFalse(DeathSequence.ReloadedAfterDeath);
+            entry.EnterScene(afterDeath: true);
             Assert.IsTrue(newLock.IsLocked);
 
             // 에디트 모드에서는 Start 코루틴이 돌지 않아 RunEntry를 직접 넘긴다.
@@ -123,7 +121,7 @@ namespace ProjectT.Death.Tests
             yield return WaitForReload();
 
             var entry = NewEntry(out InputLock newLock);
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: true);
             IEnumerator run = entry.RunEntry();
             while (run.MoveNext()) { }
 
@@ -134,7 +132,7 @@ namespace ProjectT.Death.Tests
         [UnityTest]
         public IEnumerator ReloadThrows_ReleasesLockAndGuard()
         {
-            DeathSequence.ReloadScene = _ => throw new InvalidOperationException("reload failed");
+            DeathSequence.Restart = _ => throw new InvalidOperationException("reload failed");
             ExpectNoDialogueWarning();
             LogAssert.Expect(LogType.Exception, new Regex("reload failed"));
 
@@ -143,7 +141,6 @@ namespace ProjectT.Death.Tests
                 yield return null;
 
             Assert.IsFalse(DeathSequence.IsActive);
-            Assert.IsFalse(DeathSequence.ReloadedAfterDeath);
             Assert.IsFalse(inputLock.IsLocked);
             Assert.AreEqual(0f, fader.Alpha);
         }
@@ -189,7 +186,7 @@ namespace ProjectT.Death.Tests
 
             var entry = NewEntry(out InputLock newLock);
             Set(fader, so => so.FindProperty("image").objectReferenceValue = null);
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: true);
             Assert.IsTrue(newLock.IsLocked);
 
             IEnumerator run = entry.RunEntry();
@@ -277,7 +274,7 @@ namespace ProjectT.Death.Tests
         {
             var entry = NewEntry(out InputLock newLock);
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             IEnumerator run = entry.RunEntry();
 
             Assert.IsFalse(run.MoveNext());

@@ -19,17 +19,13 @@ namespace ProjectT.Death
 
         public static bool IsActive { get; private set; }
 
-        // CoreEntry가 Room을 다시 불러오며 읽고 비운다.
-        public static bool ReloadedAfterDeath { get; private set; }
-
         // 에디트 모드 테스트에서는 씬을 불러올 수 없어 바꿔 끼운다.
-        internal static Action<CoreEntry> ReloadScene = entry => entry.ReloadRoom();
+        internal static Action<CoreEntry> Restart = entry => entry.RestartFromSave(afterDeath: true);
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void ResetState()
         {
             IsActive = false;
-            ReloadedAfterDeath = false;
         }
 
         public static void Begin(string deathNodeId)
@@ -98,8 +94,7 @@ namespace ProjectT.Death
                 }
 
                 reloading = true;
-                ReloadedAfterDeath = true;
-                ReloadScene(scene);
+                Restart(scene);
             }
             catch (Exception e)
             {
@@ -116,7 +111,6 @@ namespace ProjectT.Death
 
         static void Abort(InputLock inputLock, ScreenFader fader)
         {
-            ReloadedAfterDeath = false;
             IsActive = false;
             if (inputLock != null)
                 inputLock.Unlock(InputLockReason.Death);
@@ -170,15 +164,7 @@ namespace ProjectT.Death
             return false;
         }
 
-        internal static bool ConsumeReload()
-        {
-            if (!ReloadedAfterDeath)
-                return false;
-            ReloadedAfterDeath = false;
-            return true;
-        }
-
-        internal static void CompleteReload()
+        internal static void EndEntry()
         {
             IsActive = false;
         }

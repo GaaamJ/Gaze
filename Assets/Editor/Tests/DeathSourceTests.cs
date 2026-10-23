@@ -17,7 +17,7 @@ namespace ProjectT.Death.Tests
     {
         TempSaveSandbox save;
         InputLock inputLock;
-        Action<CoreEntry> originalReload;
+        Action<CoreEntry> originalRestart;
         int reloadCount;
 
         [SetUp]
@@ -26,9 +26,9 @@ namespace ProjectT.Death.Tests
             save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
-            originalReload = DeathSequence.ReloadScene;
+            originalRestart = DeathSequence.Restart;
             reloadCount = 0;
-            DeathSequence.ReloadScene = _ => reloadCount++;
+            DeathSequence.Restart = _ => reloadCount++;
 
             inputLock = new GameObject("LockOwner").AddComponent<InputLock>();
             var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
@@ -39,7 +39,7 @@ namespace ProjectT.Death.Tests
         public void TearDown()
         {
             DeathSequence.ResetState();
-            DeathSequence.ReloadScene = originalReload;
+            DeathSequence.Restart = originalRestart;
             save.Dispose();
         }
 

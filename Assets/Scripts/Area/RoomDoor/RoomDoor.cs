@@ -1,6 +1,5 @@
 using UnityEngine;
 using ProjectT.Player;
-using ProjectT.Death;
 using ProjectT.Session;
 
 namespace ProjectT.Area

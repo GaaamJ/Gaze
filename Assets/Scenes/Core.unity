@@ -779,6 +779,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1196390258}
   - component: {fileID: 1196390257}
+  - component: {fileID: 1196390259}
   m_Layer: 0
   m_Name: CoreEntry
   m_TagString: Untagged
@@ -800,6 +801,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathSceneEntry
   inputLock: {fileID: 97015914}
   dialogueService: {fileID: 429564803}
+  roomLoader: {fileID: 1196390259}
   laris: {fileID: 97015913}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
   defaultRoom: ParkingLot
@@ -818,6 +820,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1196390259
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196390256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08207232a9634ff4ca9f94139577724f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.RoomLoader
+  inputLock: {fileID: 97015914}
+  laris: {fileID: 97015913}
+  faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
 --- !u!1001 &1225878147
 PrefabInstance:
   m_ObjectHideFlags: 0
