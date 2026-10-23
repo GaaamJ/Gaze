@@ -6,12 +6,12 @@ using ProjectT.Session;
 using ProjectT.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
-    // 에디트 모드에서는 Awake가 불리지 않아 Apply를 직접 부른다.
     public class DeathAftermathTests
     {
         const string NodeId = "Death_DeathObject";
@@ -240,6 +240,45 @@ namespace ProjectT.Death.Tests
 
             Assert.IsFalse(zoneTarget.activeSelf);
             LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RoomEntryEnter_AppliesInactiveAftermathsInOwnSceneOnly()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var entry = new GameObject("RoomEntry").AddComponent<RoomEntry>();
+
+            var source = NewDeathObject();
+            var group = new GameObject("InactiveGroup");
+            var inactive = NewAftermath(source, Vector3.zero, new[] { (prefab, (Transform)null) }, new[] { source.gameObject }, group.transform);
+            group.SetActive(false);
+
+            Scene other = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+            var otherSource = NewDeathObject();
+            var otherAftermath = NewAftermath(otherSource, Vector3.zero, new (GameObject, Transform)[0], new[] { otherSource.gameObject });
+            SceneManager.MoveGameObjectToScene(otherSource.gameObject, other);
+            SceneManager.MoveGameObjectToScene(otherAftermath.gameObject, other);
+
+            entry.Enter();
+
+            Assert.AreEqual(1, Clones().Length);
+            Assert.AreSame(group.transform, Clones()[0].transform.parent);
+            Assert.IsFalse(source.gameObject.activeSelf);
+            Assert.IsTrue(otherSource.gameObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RoomEntryEnteredTwice_SpawnsOnce()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var entry = new GameObject("RoomEntry").AddComponent<RoomEntry>();
+            NewAftermath(NewDeathObject(), Vector3.zero, new[] { (prefab, (Transform)null) }, new GameObject[0]);
+
+            entry.Enter();
+            entry.Enter();
+
+            Assert.AreEqual(1, Clones().Length);
         }
     }
 }
