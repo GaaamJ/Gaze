@@ -67,7 +67,7 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Project T.slnx",
+    "dotnet.defaultSolution": "Project_T.slnx",
     "cSpell.enableFiletypes": [
         "yarnspinner"
     ],
