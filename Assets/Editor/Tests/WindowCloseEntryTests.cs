@@ -26,7 +26,7 @@ namespace ProjectT.Death.Tests
         InputLock inputLock;
         ScreenFader fader;
         Func<DialogueService, string, YarnTask<DialogueResult>> originalPlay;
-        Action originalReload;
+        Action<CoreEntry> originalRestart;
         int reloadCount;
         List<string> played;
         List<float> alphaAtPlay;
@@ -42,16 +42,16 @@ namespace ProjectT.Death.Tests
             DeathSequence.ResetState();
             ExitRecorder.ResetState();
             reloadCount = 0;
-            originalReload = DeathSequence.ReloadScene;
-            DeathSequence.ReloadScene = () => reloadCount++;
+            originalRestart = DeathSequence.Restart;
+            DeathSequence.Restart = _ => reloadCount++;
 
             played = new List<string>();
             alphaAtPlay = new List<float>();
             lockedAtPlay = new List<bool>();
             result = DialogueResult.Completed;
             pending = null;
-            originalPlay = SceneEntry.PlayDialogue;
-            SceneEntry.PlayDialogue = FakeDialogue;
+            originalPlay = CoreEntry.PlayDialogue;
+            CoreEntry.PlayDialogue = FakeDialogue;
 
             fader = NewFader();
             fader.SetAlpha(0f);
@@ -61,8 +61,8 @@ namespace ProjectT.Death.Tests
         [TearDown]
         public void TearDown()
         {
-            SceneEntry.PlayDialogue = originalPlay;
-            DeathSequence.ReloadScene = originalReload;
+            CoreEntry.PlayDialogue = originalPlay;
+            DeathSequence.Restart = originalRestart;
             DeathSequence.ResetState();
             ExitRecorder.ResetState();
             save.Dispose();
@@ -89,9 +89,9 @@ namespace ProjectT.Death.Tests
 
         int SavedExitState() => (int)JsonUtility.FromJson<SaveData>(File.ReadAllText(save.Paths.SaveFile)).exitState;
 
-        SceneEntry NewEntry(bool withDialogue = true)
+        CoreEntry NewEntry(bool withDialogue = true)
         {
-            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
+            var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
             DialogueService dialogue = withDialogue ? new GameObject("Dialogue").AddComponent<DialogueService>() : null;
             Set(entry, so =>
             {
@@ -163,7 +163,7 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
             var entry = NewEntry();
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             Assert.IsTrue(inputLock.IsLocked, "진입 첫 프레임부터 잠근다.");
             Assert.IsTrue(entry.EnteringAfterWindowClose);
 
@@ -193,7 +193,7 @@ namespace ProjectT.Death.Tests
             var entry = NewEntry();
             result = DialogueResult.Rejected;
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             LogAssert.Expect(LogType.Warning, new Regex("창 닫기 사망 노드 'Death_CloseWindow'를 재생하지 못했다"));
             entry.RunWindowCloseEntry().Forget();
             yield return Frames(() => !inputLock.IsLocked);
@@ -209,7 +209,7 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
             var entry = NewEntry(withDialogue: false);
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어 창 닫기 사망 노드"));
             entry.RunWindowCloseEntry().Forget();
             yield return Frames(() => !inputLock.IsLocked);
@@ -225,7 +225,7 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
             var entry = NewEntry();
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             entry.RunWindowCloseEntry().Forget();
 
             CollectionAssert.IsEmpty(played, "Yarn 프레젠터가 준비되도록 같은 프레임에는 재생하지 않는다.");
@@ -248,10 +248,10 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
             var entry = NewEntry();
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             entry.RunWindowCloseEntry().Forget();
             // 에디트 모드에서는 SetActive(false)가 OnDisable을 부르지 않는다.
-            typeof(SceneEntry).GetMethod("OnDisable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(entry, null);
+            typeof(CoreEntry).GetMethod("OnDisable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(entry, null);
 
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsFalse(entry.EnteringAfterWindowClose);
@@ -270,7 +270,7 @@ namespace ProjectT.Death.Tests
             var entry = NewEntry();
             Set(entry, so => so.FindProperty("faderPrefab").objectReferenceValue = fader);
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             entry.RunWindowCloseEntry().Forget();
             yield return Frames(() => pending != null);
 
@@ -286,7 +286,7 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
             var entry = NewEntry();
 
-            entry.EnterScene();
+            entry.EnterScene(afterDeath: false);
             Assert.IsFalse(inputLock.IsLocked);
 
             entry.RunWindowCloseEntry().Forget();
@@ -303,9 +303,9 @@ namespace ProjectT.Death.Tests
             GameSession.Begin();
 
             var first = NewEntry();
-            first.EnterScene();
+            first.EnterScene(afterDeath: false);
             var second = NewEntry();
-            second.EnterScene();
+            second.EnterScene(afterDeath: false);
 
             Assert.IsTrue(first.EnteringAfterWindowClose);
             Assert.IsFalse(second.EnteringAfterWindowClose);

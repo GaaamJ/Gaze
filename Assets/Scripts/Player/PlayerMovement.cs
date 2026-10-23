@@ -31,6 +31,15 @@ namespace ProjectT.Player
             return other.attachedRigidbody.TryGetComponent(out laris);
         }
 
+        public static void MoveTo(Rigidbody2D body, Vector3 position)
+        {
+            position.z = body.transform.position.z;
+            body.position = position;
+            body.linearVelocity = Vector2.zero;
+            // body.position은 다음 물리 단계에야 transform에 반영되므로, 카메라 스냅이 새 위치를 보도록 transform도 바로 옮긴다.
+            body.transform.position = position;
+        }
+
         void Awake()
         {
             body = GetComponent<Rigidbody2D>();

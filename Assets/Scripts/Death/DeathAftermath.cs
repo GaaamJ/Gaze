@@ -15,21 +15,16 @@ namespace ProjectT.Death
             public Transform point;
         }
 
-        [Tooltip("IDeathSource를 구현한 트리거 컴포넌트 (DeathInteractable, DeathZone, PasswordPuzzle)")]
+        [Tooltip("IDeathSource를 구현한 트리거 컴포넌트 (DeathInteractable, DeathZone)")]
         [SerializeField] MonoBehaviour source;
         [SerializeField] Spawn[] spawns;
         [Tooltip("사망 기록이 있으면 끌 오브젝트")]
         [SerializeField] GameObject[] deactivate;
 
-        // Awake 외에 테스트·외부에서 다시 불러도 생성물이 겹치지 않게 막는다.
+        // 다시 불러도 생성물이 겹치지 않게 막는다.
         bool applied;
 
-        // 세이브는 GameSession.Begin(BeforeSceneLoad)에서 이미 불러와 있다.
-        void Awake()
-        {
-            Apply();
-        }
-
+        // Awake에서 부르지 않는다. RoomSceneEntry.Enter()가 CoreEntry의 리셋·리스폰 뒤에 부른다.
         internal void Apply()
         {
             if (!(source is IDeathSource death))

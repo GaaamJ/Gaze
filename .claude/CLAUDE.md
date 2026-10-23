@@ -1,83 +1,61 @@
-# 작업 플로우 (게임 기능 1건 기준)
+# Workflow (per game feature)
 
-1. 사람이 새 기능이나 변경 스펙을 작성해 온다.
-2. 리드가 해당 이슈에 스펙, 이번 구현 범위, 테스트 목표·완료 체크리스트를 정리한다.
-   - 스펙 합의 과정에서 내용이 수정되면 이슈를 업데이트한다.
-   - 새 시스템이거나 기획서가 없으면 구현 전에 ThreadVault에 기획서를 먼저 작성한다.
-   (유니티 코드/씬 구현이 필요 없는 작업, 예: 문서 정리는
-   리드 세션이 직접 처리하고 종료한다.)
-3. implementer가 해당 이슈의 변경 스펙과 ThreadVault의 현재 동작 기획서를 읽고 다음을 정리해 사람에게 확인을 요청한다.
-   - 엣지케이스 및 구현 방향
-   - 기획서의 핵심 메커니즘과 관련된 실제 게임 레퍼런스 (예: "조작감" 기획이면
-     셀레스트·할로우 나이트 등이 어떻게 구현했는지 웹 검색으로 찾아 요약)
-   - 레퍼런스는 2~3개 이내로, 기획서 맥락에 직접 관련된 것만 포함한다.
-4. 사람이 확인/승인하면 implementer가 구현을 시작한다.
-5. implementer가 Unity MCP로 자체 테스트(논리 검증 + 필요시 스크린샷)까지
-   마치고 커밋한다.
-6. implementer가 완료 보고를 리드에게 전달하면, 리드가 verifier를 소환한다.
-7. verifier가 이슈의 승인된 스펙·완료 기준, 기존 기획서, 그리고 이슈 외 사용자 요청(세션 중 구두로 요청된 사항 포함)을 대조 검증한다.
-   - 자동 검증 가능한 항목: Unity MCP로 직접 확인하고 결과를 표로 정리
-   - 자동 검증 불가 항목(조작감, 시각적 완성도 등): 체크리스트로 정리
-   - 검증 완료 후 이슈의 완료된 체크리스트 항목을 GitHub에서 업데이트한다.
-   - 문제 발견 시 재현 방법을 기록하고 implementer에게 수정을 넘긴다.
-     수정이 완료되면 4번부터 다시 시작한다.
-8. 리드가 verifier 보고를 사람에게 전달한다.
-9. 사람이 최종 확인(특히 시각적 완성도 및 체크리스트 항목)을 한다.
-10. 리드가 ThreadVault 기획서를 검증된 실제 동작에 맞게 업데이트한다.
-    구현 중 결정된 사항이나 기획서와 달라진 부분을 반영한다.
-    테스트 결과·결정 과정·구현 메모는 이슈에서 관리한다. 부분 완료 시 확인된 범위만 반영한다.
+Each step ends the turn. Do not roll into the next step on your own.
 
-세션 중 설계/구현 방향이 바뀌면 해당 이슈의 스펙에 반영하고 구현 전에 사람에게 확인받는다.
+1. **Explore** — The user floats an idea ("what if I try X?").
+   The lead researches it (references from real games, implementation approaches, pitfalls),
+   then reviews with the user whether it's worth doing. End turn.
+2. **Plan** — Agree on the test goals, what exactly to implement this time, and a todo list.
+   Record them in the feature's GitHub issue (one issue per feature, plain lists — no checkboxes). If it's a new system with no design doc, write one in `Docs/` first. End turn.
+   (Work that needs no Unity code/scene changes, e.g. doc cleanup, is done directly by the lead.)
+3. **Implement** — The implementer implements only what was agreed (make sure it compiles), commits, and ends the turn.
+   No extra self-testing, no reporting beyond what was done.
+4. **User tests** — The user plays/tests it themselves.
+5. **Verify & fix** — The verifier checks edge cases and genuinely risky parts (crashes, data loss,
+   broken state, logic holes) — not a full spec audit. The implementer fixes what's found. End turn.
+   If the user wants to retest after fixes, go back to step 4.
 
-# 브랜치 규칙
+After that, **the user decides what to do next.** Do not propose next steps, follow-up features, or new tasks.
 
-세션 시작 전 반드시 브랜치를 먼저 생성한다.
+If the design or implementation direction changes mid-session, update the issue and get the user's confirmation before implementing.
 
-- **마일스톤 브랜치**: `milestone/m{N}` (예: `milestone/m1.5`). main에서 분기하는 마일스톤 통합 브랜치다.
-  - 기능 브랜치의 분기 기준이자 PR 대상이다.
-  - 마일스톤의 기능이 모두 완료·검증되면 마일스톤 브랜치를 main에 PR로 머지한다.
-  - 머지 후 다음 마일스톤 착수 전에 유지보수·정리 구간을 둘 수 있다.
-- **기능 작업**: 마일스톤 안의 기능 묶음 하나 = 브랜치 하나 = PR 하나. `feature/m{마일스톤}-{기능}` (예: `feature/m1.5-data-save`). **마일스톤 브랜치에서 분기하고 PR도 마일스톤 브랜치로 올린다.**
-  - 기능 묶음은 사람이 한 번에 확인할 수 있는 단위로 정한다. 묶음 목록은 마일스톤 시작 때 리드가 정하고 사람이 확인한다.
-  - 커밋은 이슈 단위로 나누고 메시지에 `(#번호)`를 붙인다.
-  - PR은 묶음이 끝날 때 올린다. 본문에 포함 이슈와 완료 범위를 적고, 끝난 이슈만 `Closes`, 부분 완료는 `관련`으로 적는다.
-  - 이슈 체크박스는 이슈 단위로 갱신하고, 사람 확인은 PR 단위로 한다.
-- 정리/리팩토링: `chore/{내용}` (예: `chore/folder-cleanup`). 마일스톤 소속이면 마일스톤 브랜치 기준, 아니면 main 기준.
-- main과 마일스톤 브랜치에 직접 커밋하지 않는다.
+# Branch rules
 
-# 기획서 저장소
+- Simple changes (docs, small fixes, tweaks): no branch needed.
+- Building a feature: create `feature/{name}` from main before starting. One feature = one issue = one branch = one PR to main.
+  - Append `(#number)` to commit messages.
+  - In the PR body, write `Closes #number` if the feature is done, `관련 #number` if only partly done.
+- Cleanup/refactoring large enough to deserve review: `chore/{name}` from main.
+- No milestone branches (this is a prototype).
 
-- **ThreadVault** (Obsidian)는 게임 기획서다. 구현 전에는 설계 기준으로, 구현 후에는 실제 동작 기준으로 쓴다.
-- 기본 구조는 역할 / 동작 / 규칙이며, 필요 없는 항목은 생략한다.
-- 조건·수치·제한·예외·다른 시스템과의 연동은 필요한 만큼 포함한다.
-- 구현 후 실제 동작과 다른 부분은 업데이트한다. 구현 완료 전 내용은 설계 방향이지 확정된 동작이 아니다.
-- 테스트 목표·완료 체크리스트, 보류 아이디어, 변경 이력, 코드 구조·구현 메모는 이슈에서 관리한다.
+# Design docs
 
-# 문서 작성 규칙
+- Design docs live in `Docs/` (markdown). Before implementation they describe the intended design; after implementation they describe actual behavior.
+- Basic structure: Role / Behavior / Rules. Omit sections that aren't needed.
+- Include conditions, numbers, limits, exceptions, and interactions with other systems as needed.
+- Update anything that differs from actual behavior after implementation. Content written before implementation is a design direction, not confirmed behavior.
+- Test goals, parked ideas, change history, and code structure/implementation notes belong in the issue, not the design doc.
 
-1. 사용자가 직접 쓴 스펙 원문은 이슈에 그대로 보존한다. 명시적인 문서 정리 요청이 있으면 기획서는 현재 동작 중심으로 정리할 수 있다.
-2. 새로 작성하는 문서의 말투는 사용자의 스타일에 맞춘다.
+# Writing rules
 
-# 협업 규칙 (리드 에이전트용)
+1. Preserve the user's original spec text verbatim in the issue. If the user explicitly asks for doc cleanup, design docs may be reorganized around current behavior.
+2. New documents should match the user's writing style (Korean, their tone).
 
-1. 서브에이전트가 사용자에게 확인이 필요한 질문을 하면, 리드는 절대 대신 판단하거나
-   "합리적인 기본값으로 진행"하도록 지시하지 않는다. 그 질문을 그대로 사용자에게 전달하고,
-   사용자의 답을 받은 뒤에만 서브에이전트를 재개시킨다.
+# Collaboration rules (for the lead agent)
 
-2. 이슈의 변경 스펙과 구현 방향이 명시적으로 승인되기 전까지는 구현(코드 작성)을 시작하지 않는다.
-   스펙 안에서도 아직 논의/디테일 조정 중인 부분이 있다면, 그 부분은 구현하지 않고
-   사용자에게 먼저 확인을 요청한다.
-
-3. 지금 작업 중인 기획서의 스코프를 벗어나는 질문이나 제안은 하지 않는다.
-   스코프 외 사항은 사용자가 명시적으로 다시 논의하자고 하기 전까지 언급하지 않는다.
-
-5. 테스트 중 발견한 수정의 처리 기준:
-   - 값 튜닝(수치 조정 등): 리드가 직접 처리한다.
-   - 동작/로직 변경(확률 추가, 조건 변경, 엣지케이스 등): 리드가 이슈의 변경 스펙에 반영한 뒤
-     implementer에게 넘긴다.
-
-4. Unity MCP 도구 승인 기준:
-   - 자동 승인: GameObject/컴포넌트 생성 및 추가, 속성(위치/값 등) 변경
-   - 항상 확인: 무언가를 삭제·제거하는 모든 동작(GameObject 삭제, 컴포넌트 제거,
-     씬 삭제/전환 등), 대량 일괄 작업
-   - 이 규칙은 리드 세션과 서브에이전트 모두에 동일하게 적용된다.
+1. When a subagent asks a question that needs the user's input, never decide on the user's behalf or
+   tell it to "proceed with a reasonable default". Relay the question to the user as-is and resume
+   the subagent only after the user answers.
+2. Do not start implementation (writing code) until the issue's spec and implementation direction are explicitly approved.
+   If part of the spec is still under discussion, don't implement that part; ask the user first.
+3. Do not raise questions or suggestions outside the scope of the current design doc,
+   unless the user explicitly brings them up again.
+4. Unity MCP tool approval:
+   - Auto-approve: creating/adding GameObjects and components, changing properties (position, values, etc.)
+   - Always confirm: anything that deletes or removes (deleting GameObjects, removing components,
+     deleting/switching scenes, etc.) and bulk operations
+   - Applies to both the lead session and subagents.
+5. Fixes found during testing:
+   - Value tuning (numbers): the lead handles it directly.
+   - Behavior/logic changes (new probabilities, condition changes, edge cases): the lead updates the issue spec,
+     then hands it to the implementer.

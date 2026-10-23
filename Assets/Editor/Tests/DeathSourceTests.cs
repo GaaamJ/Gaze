@@ -12,12 +12,12 @@ using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
-    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathInteractable·PasswordPuzzle이 입구를 부르는지만 본다.
+    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathInteractable이 입구를 부르는지만 본다.
     public class DeathSourceTests
     {
         TempSaveSandbox save;
         InputLock inputLock;
-        Action originalReload;
+        Action<CoreEntry> originalRestart;
         int reloadCount;
 
         [SetUp]
@@ -26,12 +26,12 @@ namespace ProjectT.Death.Tests
             save = new TempSaveSandbox();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             DeathSequence.ResetState();
-            originalReload = DeathSequence.ReloadScene;
+            originalRestart = DeathSequence.Restart;
             reloadCount = 0;
-            DeathSequence.ReloadScene = () => reloadCount++;
+            DeathSequence.Restart = _ => reloadCount++;
 
             inputLock = new GameObject("LockOwner").AddComponent<InputLock>();
-            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
+            var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
             Set(entry, so => so.FindProperty("inputLock").objectReferenceValue = inputLock);
         }
 
@@ -39,7 +39,7 @@ namespace ProjectT.Death.Tests
         public void TearDown()
         {
             DeathSequence.ResetState();
-            DeathSequence.ReloadScene = originalReload;
+            DeathSequence.Restart = originalRestart;
             save.Dispose();
         }
 
@@ -132,27 +132,6 @@ namespace ProjectT.Death.Tests
 
             Assert.IsFalse(DeathSequence.IsActive);
             LogAssert.NoUnexpectedReceived();
-        }
-
-        [UnityTest]
-        public IEnumerator PasswordPuzzle_WrongSymbol_BeginsDeathAfterClearing()
-        {
-            var symbols = NewSymbols(3);
-            var puzzle = AddPuzzle(new GameObject("PuzzleDoor"), symbols, new[] { symbols[0], symbols[1] }, "PasswordDoor", "Death_PasswordWrong");
-            int wrongCount = 0;
-            bool litWhenRaised = true;
-            puzzle.WrongSymbolPressed += () => { wrongCount++; litWhenRaised = symbols[0].IsLit; };
-
-            puzzle.HandlePressed(symbols[0]);
-            ExpectDeath("Death_PasswordWrong");
-            puzzle.HandlePressed(symbols[2]);
-
-            Assert.AreEqual(1, wrongCount);
-            Assert.IsFalse(puzzle.IsSolved);
-            Assert.IsFalse(litWhenRaised);
-            Assert.IsFalse(symbols[0].IsLit);
-            Assert.IsTrue(DeathSequence.IsActive);
-            yield return WaitForReload();
         }
     }
 }

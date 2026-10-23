@@ -1,18 +1,18 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Puzzle;
+using ProjectT.Area;
 using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using static ProjectT.Tests.TestObjects;
 
 namespace ProjectT.Death.Tests
 {
-    // 에디트 모드에서는 Awake가 불리지 않아 Apply를 직접 부른다.
     public class DeathAftermathTests
     {
         const string NodeId = "Death_DeathObject";
@@ -228,24 +228,58 @@ namespace ProjectT.Death.Tests
         }
 
         [Test]
-        public void DeathZoneAndPasswordPuzzle_AreAcceptedAsSource()
+        public void DeathZone_IsAcceptedAsSource()
         {
             SaveManager.Data.diedNodeIds.Add("Death_Falling001");
-            SaveManager.Data.diedNodeIds.Add("Death_PasswordWrong");
             var zoneGo = new GameObject("Zone");
             zoneGo.AddComponent<BoxCollider2D>().isTrigger = true;
             var zone = zoneGo.AddComponent<DeathZone>();
             Set(zone, so => so.FindProperty("deathNodeId").stringValue = "Death_Falling001");
-            var puzzle = AddPuzzle(new GameObject("Puzzle"), new PasswordSymbol[0], new PasswordSymbol[0], "PasswordDoor", "Death_PasswordWrong");
 
             var zoneTarget = new GameObject("ZoneTarget");
-            var puzzleTarget = new GameObject("PuzzleTarget");
             NewAftermath(zone, Vector3.zero, new (GameObject, Transform)[0], new[] { zoneTarget }).Apply();
-            NewAftermath(puzzle, Vector3.zero, new (GameObject, Transform)[0], new[] { puzzleTarget }).Apply();
 
             Assert.IsFalse(zoneTarget.activeSelf);
-            Assert.IsFalse(puzzleTarget.activeSelf);
             LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RoomSceneEntryEnter_AppliesInactiveAftermathsInOwnSceneOnly()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var entry = new GameObject("RoomSceneEntry").AddComponent<RoomSceneEntry>();
+
+            var source = NewDeathObject();
+            var group = new GameObject("InactiveGroup");
+            var inactive = NewAftermath(source, Vector3.zero, new[] { (prefab, (Transform)null) }, new[] { source.gameObject }, group.transform);
+            group.SetActive(false);
+
+            Scene other = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Additive);
+            var otherSource = NewDeathObject();
+            var otherAftermath = NewAftermath(otherSource, Vector3.zero, new (GameObject, Transform)[0], new[] { otherSource.gameObject });
+            SceneManager.MoveGameObjectToScene(otherSource.gameObject, other);
+            SceneManager.MoveGameObjectToScene(otherAftermath.gameObject, other);
+
+            entry.Enter();
+
+            Assert.AreEqual(1, Clones().Length);
+            Assert.AreSame(group.transform, Clones()[0].transform.parent);
+            Assert.IsFalse(source.gameObject.activeSelf);
+            Assert.IsTrue(otherSource.gameObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void RoomSceneEntryEnteredTwice_SpawnsOnce()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var entry = new GameObject("RoomSceneEntry").AddComponent<RoomSceneEntry>();
+            NewAftermath(NewDeathObject(), Vector3.zero, new[] { (prefab, (Transform)null) }, new GameObject[0]);
+
+            entry.Enter();
+            entry.Enter();
+
+            Assert.AreEqual(1, Clones().Length);
         }
     }
 }
