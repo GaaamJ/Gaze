@@ -15,6 +15,7 @@ namespace ProjectT.Death
     {
         const float DialogueStopTimeout = 2f;
         const float TeleportTimeout = 3f;
+        const float RoomMoveTimeout = 10f;
 
         public static bool IsActive { get; private set; }
 
@@ -73,6 +74,7 @@ namespace ProjectT.Death
                 }
 
                 await WaitForTeleports();
+                await WaitForRoomMove(scene);
 
                 SaveProgress(deathNodeId);
 
@@ -138,6 +140,20 @@ namespace ProjectT.Death
                 if (Time.realtimeSinceStartup >= deadline)
                 {
                     Debug.LogWarning("[DeathSequence] 텔레포트 전환이 제때 끝나지 않았다. 그대로 진행한다.");
+                    return;
+                }
+                await YarnTask.Yield();
+            }
+        }
+
+        static async YarnTask WaitForRoomMove(CoreEntry scene)
+        {
+            float deadline = Time.realtimeSinceStartup + RoomMoveTimeout;
+            while (scene != null && scene.IsMovingRoom)
+            {
+                if (Time.realtimeSinceStartup >= deadline)
+                {
+                    Debug.LogWarning("[DeathSequence] Room 이동이 제때 끝나지 않았다. 그대로 진행한다.");
                     return;
                 }
                 await YarnTask.Yield();

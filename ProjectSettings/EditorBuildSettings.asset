@@ -12,6 +12,9 @@ EditorBuildSettings:
     path: Assets/Scenes/ParkingLot.unity
     guid: 31fbf40b686725846b56ef41e7f73de5
   - enabled: 1
+    path: Assets/Scenes/DeathRoom.unity
+    guid: 23e82663033d503489be859692118dfa
+  - enabled: 1
     path: Assets/Scenes/Prototype.unity
     guid: c53e1688df865c843ac07de4186f64a9
   m_configObjects:
