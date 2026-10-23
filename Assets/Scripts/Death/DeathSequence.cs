@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Yarn.Unity;
 using ProjectT.Area;
 using ProjectT.Dialogue;
@@ -19,18 +18,17 @@ namespace ProjectT.Death
 
         public static bool IsActive { get; private set; }
 
-        // 리로드된 씬의 SceneEntry가 Awake에서 읽고 비운다.
+        // CoreEntry가 Room을 다시 불러오며 읽고 비운다.
         public static bool ReloadedAfterDeath { get; private set; }
 
         // 에디트 모드 테스트에서는 씬을 불러올 수 없어 바꿔 끼운다.
-        internal static Action ReloadScene = ReloadActiveScene;
+        internal static Action<CoreEntry> ReloadScene = entry => entry.ReloadRoom();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         internal static void ResetState()
         {
             IsActive = false;
             ReloadedAfterDeath = false;
-            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
 
         public static void Begin(string deathNodeId)
@@ -44,10 +42,10 @@ namespace ProjectT.Death
             if (IsActive)
                 return;
 
-            SceneEntry scene = Object.FindAnyObjectByType<SceneEntry>();
+            CoreEntry scene = Object.FindAnyObjectByType<CoreEntry>();
             if (scene == null)
             {
-                Debug.LogError($"[DeathSequence] 씬에 SceneEntry가 없어 사망 '{deathNodeId}'를 처리하지 못했다.");
+                Debug.LogError($"[DeathSequence] 씬에 CoreEntry가 없어 사망 '{deathNodeId}'를 처리하지 못했다.");
                 return;
             }
 
@@ -60,7 +58,7 @@ namespace ProjectT.Death
             Run(scene, inputLock, deathNodeId).Forget();
         }
 
-        static async YarnTask Run(SceneEntry scene, InputLock inputLock, string deathNodeId)
+        static async YarnTask Run(CoreEntry scene, InputLock inputLock, string deathNodeId)
         {
             bool reloading = false;
             ScreenFader fader = null;
@@ -99,8 +97,7 @@ namespace ProjectT.Death
 
                 reloading = true;
                 ReloadedAfterDeath = true;
-                SceneManager.sceneLoaded += OnSceneLoaded;
-                ReloadScene();
+                ReloadScene(scene);
             }
             catch (Exception e)
             {
@@ -109,7 +106,7 @@ namespace ProjectT.Death
             }
             finally
             {
-                // 리로드에 들어가면 옛 씬 오브젝트는 건드리지 않는다. 잠금은 옛 씬과 함께 사라진다.
+                // 리로드에 들어가면 잠금·페이드 정리는 CoreEntry의 사망 진입이 맡는다.
                 if (!reloading)
                     Abort(inputLock, fader);
             }
@@ -117,7 +114,6 @@ namespace ProjectT.Death
 
         static void Abort(InputLock inputLock, ScreenFader fader)
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
             ReloadedAfterDeath = false;
             IsActive = false;
             if (inputLock != null)
@@ -169,31 +165,6 @@ namespace ProjectT.Death
         internal static void CompleteReload()
         {
             IsActive = false;
-        }
-
-        // SceneEntry가 없는 씬으로 리로드되면 사망 상태가 영구히 남지 않게 여기서 푼다.
-        static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            if (!ReloadedAfterDeath)
-                return;
-            Debug.LogWarning($"[DeathSequence] 리로드된 씬 '{scene.name}'에 SceneEntry가 없어 사망 상태만 푼다.");
-            ReloadedAfterDeath = false;
-            IsActive = false;
-        }
-
-        static void ReloadActiveScene()
-        {
-            Scene scene = SceneManager.GetActiveScene();
-#if UNITY_EDITOR
-            // 빌드 설정에 없는 씬은 에디터에서도 SceneManager.LoadScene으로 불러올 수 없다.
-            if (scene.buildIndex < 0)
-            {
-                UnityEditor.SceneManagement.EditorSceneManager.LoadSceneInPlayMode(scene.path, new LoadSceneParameters(LoadSceneMode.Single));
-                return;
-            }
-#endif
-            SceneManager.LoadScene(scene.buildIndex);
         }
     }
 }

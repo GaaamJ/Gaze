@@ -26,7 +26,7 @@ namespace ProjectT.Death.Tests
         InputLock inputLock;
         ScreenFader fader;
         Func<DialogueService, string, YarnTask<DialogueResult>> originalPlay;
-        Action originalReload;
+        Action<CoreEntry> originalReload;
         int reloadCount;
         List<string> played;
         List<float> alphaAtPlay;
@@ -43,15 +43,15 @@ namespace ProjectT.Death.Tests
             ExitRecorder.ResetState();
             reloadCount = 0;
             originalReload = DeathSequence.ReloadScene;
-            DeathSequence.ReloadScene = () => reloadCount++;
+            DeathSequence.ReloadScene = _ => reloadCount++;
 
             played = new List<string>();
             alphaAtPlay = new List<float>();
             lockedAtPlay = new List<bool>();
             result = DialogueResult.Completed;
             pending = null;
-            originalPlay = SceneEntry.PlayDialogue;
-            SceneEntry.PlayDialogue = FakeDialogue;
+            originalPlay = CoreEntry.PlayDialogue;
+            CoreEntry.PlayDialogue = FakeDialogue;
 
             fader = NewFader();
             fader.SetAlpha(0f);
@@ -61,7 +61,7 @@ namespace ProjectT.Death.Tests
         [TearDown]
         public void TearDown()
         {
-            SceneEntry.PlayDialogue = originalPlay;
+            CoreEntry.PlayDialogue = originalPlay;
             DeathSequence.ReloadScene = originalReload;
             DeathSequence.ResetState();
             ExitRecorder.ResetState();
@@ -89,9 +89,9 @@ namespace ProjectT.Death.Tests
 
         int SavedExitState() => (int)JsonUtility.FromJson<SaveData>(File.ReadAllText(save.Paths.SaveFile)).exitState;
 
-        SceneEntry NewEntry(bool withDialogue = true)
+        CoreEntry NewEntry(bool withDialogue = true)
         {
-            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
+            var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
             DialogueService dialogue = withDialogue ? new GameObject("Dialogue").AddComponent<DialogueService>() : null;
             Set(entry, so =>
             {
@@ -251,7 +251,7 @@ namespace ProjectT.Death.Tests
             entry.EnterScene();
             entry.RunWindowCloseEntry().Forget();
             // 에디트 모드에서는 SetActive(false)가 OnDisable을 부르지 않는다.
-            typeof(SceneEntry).GetMethod("OnDisable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(entry, null);
+            typeof(CoreEntry).GetMethod("OnDisable", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).Invoke(entry, null);
 
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsFalse(entry.EnteringAfterWindowClose);

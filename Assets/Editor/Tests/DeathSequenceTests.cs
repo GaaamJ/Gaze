@@ -24,7 +24,7 @@ namespace ProjectT.Death.Tests
         InputLock inputLock;
         ScreenFader fader;
         int reloadCount;
-        Action originalReload;
+        Action<CoreEntry> originalReload;
 
         [SetUp]
         public void SetUp()
@@ -34,7 +34,7 @@ namespace ProjectT.Death.Tests
             DeathSequence.ResetState();
             reloadCount = 0;
             originalReload = DeathSequence.ReloadScene;
-            DeathSequence.ReloadScene = () => reloadCount++;
+            DeathSequence.ReloadScene = _ => reloadCount++;
 
             fader = NewFader();
             NewEntry(out inputLock);
@@ -48,10 +48,10 @@ namespace ProjectT.Death.Tests
             save.Dispose();
         }
 
-        static SceneEntry NewEntry(out InputLock lockOwner)
+        static CoreEntry NewEntry(out InputLock lockOwner)
         {
             lockOwner = new GameObject("Laris").AddComponent<InputLock>();
-            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
+            var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
             InputLock captured = lockOwner;
             Set(entry, so => so.FindProperty("inputLock").objectReferenceValue = captured);
             return entry;
@@ -94,7 +94,7 @@ namespace ProjectT.Death.Tests
             Assert.IsTrue(DeathSequence.ReloadedAfterDeath);
             Assert.AreEqual(1f, fader.Alpha);
 
-            // 리로드된 씬 흉내: 새 라리스·진입점을 만든다.
+            // Room 리로드 뒤 진입 흉내: 새 라리스·진입점을 만든다.
             var entry = NewEntry(out InputLock newLock);
             fader.SetAlpha(0f);
             entry.EnterScene();
@@ -134,7 +134,7 @@ namespace ProjectT.Death.Tests
         [UnityTest]
         public IEnumerator ReloadThrows_ReleasesLockAndGuard()
         {
-            DeathSequence.ReloadScene = () => throw new InvalidOperationException("reload failed");
+            DeathSequence.ReloadScene = _ => throw new InvalidOperationException("reload failed");
             ExpectNoDialogueWarning();
             LogAssert.Expect(LogType.Exception, new Regex("reload failed"));
 
@@ -218,14 +218,14 @@ namespace ProjectT.Death.Tests
         public void Begin_WithoutEntry_LogsErrorAndStaysInactive()
         {
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-            LogAssert.Expect(LogType.Error, new Regex("SceneEntry가 없어"));
+            LogAssert.Expect(LogType.Error, new Regex("CoreEntry가 없어"));
 
             DeathSequence.Begin("Death_A");
 
             Assert.IsFalse(DeathSequence.IsActive);
         }
 
-        static SceneEntry NewEntryWithLaris(Vector3 start, out PlayerMovement laris)
+        static CoreEntry NewEntryWithLaris(Vector3 start, out PlayerMovement laris)
         {
             var entry = NewEntry(out InputLock _);
             laris = new GameObject("LarisBody").AddComponent<PlayerMovement>();

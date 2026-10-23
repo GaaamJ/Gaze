@@ -43,8 +43,9 @@ namespace ProjectT.Interaction
         {
             Vector2 position = respawn.SpawnPosition;
             string areaId = respawn.Area != null ? respawn.Area.AreaId : null;
-            if (RespawnPoint.Set(position, areaId))
-                Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {position} ({areaId})", this);
+            string roomName = gameObject.scene.name;
+            if (RespawnPoint.Set(position, areaId, roomName))
+                Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {position} ({areaId}, {roomName})", this);
         }
 
         async YarnTask PlayDialogue(InteractContext context)

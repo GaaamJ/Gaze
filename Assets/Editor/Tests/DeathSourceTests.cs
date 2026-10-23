@@ -17,7 +17,7 @@ namespace ProjectT.Death.Tests
     {
         TempSaveSandbox save;
         InputLock inputLock;
-        Action originalReload;
+        Action<CoreEntry> originalReload;
         int reloadCount;
 
         [SetUp]
@@ -28,10 +28,10 @@ namespace ProjectT.Death.Tests
             DeathSequence.ResetState();
             originalReload = DeathSequence.ReloadScene;
             reloadCount = 0;
-            DeathSequence.ReloadScene = () => reloadCount++;
+            DeathSequence.ReloadScene = _ => reloadCount++;
 
             inputLock = new GameObject("LockOwner").AddComponent<InputLock>();
-            var entry = new GameObject("SceneEntry").AddComponent<SceneEntry>();
+            var entry = new GameObject("CoreEntry").AddComponent<CoreEntry>();
             Set(entry, so => so.FindProperty("inputLock").objectReferenceValue = inputLock);
         }
 

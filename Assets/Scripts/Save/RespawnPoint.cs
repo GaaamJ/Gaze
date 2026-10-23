@@ -13,12 +13,13 @@ namespace ProjectT.Save
             return true;
         }
 
-        public static bool Set(Vector2 position, string areaId)
+        public static bool Set(Vector2 position, string areaId, string roomName)
         {
             SaveData data = SaveManager.Data;
             data.respawnPosition = position;
             data.hasRespawnPosition = true;
             data.respawnAreaId = areaId ?? "";
+            data.roomName = roomName ?? "";
             return SaveManager.Save();
         }
     }

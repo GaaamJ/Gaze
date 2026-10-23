@@ -45,6 +45,13 @@ namespace ProjectT.Dialogue
             return !string.IsNullOrEmpty(nodeName) && runner != null && runner.Dialogue.NodeExists(nodeName);
         }
 
+        // 저장값만 지우면 다음 읽기 때 Yarn 프로젝트의 초기값이 쓰인다.
+        public void ResetVariables()
+        {
+            if (runner != null && runner.VariableStorage != null)
+                runner.VariableStorage.Clear();
+        }
+
         public bool RequestCancel()
         {
             if (!isPlaying || cancelRequested || !runner.IsDialogueRunning)

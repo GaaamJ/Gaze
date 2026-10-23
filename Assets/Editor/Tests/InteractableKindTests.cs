@@ -210,6 +210,7 @@ namespace ProjectT.Interaction.Tests
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(2.5f, -4f), SaveManager.Data.respawnPosition);
             Assert.AreEqual("UndergroundParking", SaveManager.Data.respawnAreaId);
+            Assert.AreEqual(target.gameObject.scene.name, SaveManager.Data.roomName);
         }
 
         [Test]

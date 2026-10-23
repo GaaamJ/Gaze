@@ -32,6 +32,7 @@ namespace ProjectT.Core.Tests
             d.respawnAreaId = "UndergroundParking";
             d.hasRespawnPosition = true;
             d.respawnPosition = new Vector2(3.25f, -7.5f);
+            d.roomName = "ParkingLot";
             d.investigatedNodeIds.Add("HintGapA");
             d.investigatedNodeIds.Add("TempRespawn");
             d.diedNodeIds.Add("Death_DeathObject");
@@ -86,6 +87,7 @@ namespace ProjectT.Core.Tests
             Assert.AreEqual(e.respawnAreaId, d.respawnAreaId);
             Assert.AreEqual(e.hasRespawnPosition, d.hasRespawnPosition);
             Assert.AreEqual(e.respawnPosition, d.respawnPosition);
+            Assert.AreEqual(e.roomName, d.roomName);
             CollectionAssert.AreEqual(e.investigatedNodeIds, d.investigatedNodeIds);
             CollectionAssert.AreEqual(e.diedNodeIds, d.diedNodeIds);
             Assert.AreEqual(e.elevatorAreaId, d.elevatorAreaId);

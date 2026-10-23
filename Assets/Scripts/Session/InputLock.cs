@@ -29,5 +29,11 @@ namespace ProjectT.Session
             counts[reason] = count - 1;
             total--;
         }
+
+        public void Clear()
+        {
+            counts.Clear();
+            total = 0;
+        }
     }
 }

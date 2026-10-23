@@ -27,6 +27,9 @@ namespace ProjectT.Save
         public bool hasRespawnPosition;
         public Vector2 respawnPosition;
 
+        // 시작할 때 Core가 불러올 Room 씬 이름. 비어 있으면 기본 Room
+        public string roomName = "";
+
         public List<string> investigatedNodeIds = new List<string>();
 
         // 사망 노드 이름이 사망의 키다. 같은 노드로 여러 번 죽어도 한 번만 남는다.
