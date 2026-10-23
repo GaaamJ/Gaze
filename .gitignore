@@ -84,3 +84,6 @@ Docs/.obsidian/
 # MCP 서버 설정(로컬 경로 포함, 개인 환경)
 .mcp.json
 Project T.slnx
+
+# Yarn Spinner auto-generated language server definitions
+ProjectSettings/Packages/dev.yarnspinner/*-generated.ysls.json
