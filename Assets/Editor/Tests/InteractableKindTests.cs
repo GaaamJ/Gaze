@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Data;
 using ProjectT.Save;
 using ProjectT.Session;
 using ProjectT.Tests;
@@ -52,17 +51,10 @@ namespace ProjectT.Interaction.Tests
             return interactable;
         }
 
-        DialogueInteractable NewRespawn(string areaId, string nodeId = "")
+        DialogueInteractable NewRespawn(string nodeId = "")
         {
             var interactable = NewInteractable(nodeId);
-            var respawn = interactable.gameObject.AddComponent<RespawnArea>();
-            if (areaId != null)
-            {
-                var area = ScriptableObject.CreateInstance<AreaData>();
-                created.Add(area);
-                Set(area, so => so.FindProperty("areaId").stringValue = areaId);
-                Set(respawn, so => so.FindProperty("area").objectReferenceValue = area);
-            }
+            interactable.gameObject.AddComponent<RespawnArea>();
             return interactable;
         }
 
@@ -184,7 +176,7 @@ namespace ProjectT.Interaction.Tests
         [Test]
         public void Respawn_SavesPositionBeforeDialogue_AndLoadRestoresIt()
         {
-            var target = NewRespawn("UndergroundParking", "Respawn");
+            var target = NewRespawn("Respawn");
             target.transform.position = new Vector3(2.5f, -4f, 0f);
             var logs = new List<string>();
             Application.LogCallback capture = (message, _, _) => logs.Add(message);
@@ -209,30 +201,13 @@ namespace ProjectT.Interaction.Tests
             SaveManager.Load();
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(2.5f, -4f), SaveManager.Data.respawnPosition);
-            Assert.AreEqual("UndergroundParking", SaveManager.Data.respawnAreaId);
             Assert.AreEqual(target.gameObject.scene.name, SaveManager.Data.roomName);
-        }
-
-        [Test]
-        public void Respawn_WithoutArea_SavesPositionAndClearsArea()
-        {
-            SaveManager.Data.respawnAreaId = "Temp";
-            var target = NewRespawn(null);
-            target.transform.position = new Vector3(1f, 1f, 0f);
-            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
-
-            target.Interact(Context());
-
-            SaveManager.Load();
-            Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
-            Assert.AreEqual(new Vector2(1f, 1f), SaveManager.Data.respawnPosition);
-            Assert.AreEqual("", RespawnAreaIds.Current);
         }
 
         [Test]
         public void Respawn_UsesSpawnPointWhenSet()
         {
-            var target = NewRespawn("Temp");
+            var target = NewRespawn();
             target.transform.position = new Vector3(5f, 5f, 0f);
             var point = new GameObject("SpawnPoint");
             created.Add(point);
@@ -248,9 +223,9 @@ namespace ProjectT.Interaction.Tests
         [Test]
         public void Respawn_LastInvestigatedWins()
         {
-            var first = NewRespawn("Temp");
+            var first = NewRespawn();
             first.transform.position = new Vector3(1f, 2f, 0f);
-            var second = NewRespawn("Temp");
+            var second = NewRespawn();
             second.transform.position = new Vector3(10f, -20f, 0f);
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
@@ -271,13 +246,12 @@ namespace ProjectT.Interaction.Tests
         {
             Directory.CreateDirectory(save.Base);
             File.WriteAllText(save.Paths.Root, "blocks root folder");
-            var target = NewRespawn("Temp");
+            var target = NewRespawn();
             target.transform.position = new Vector3(4f, 0f, 0f);
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
             target.Interact(Context());
 
-            Assert.AreEqual("Temp", RespawnAreaIds.Current);
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(4f, 0f), SaveManager.Data.respawnPosition);
             Assert.IsFalse(File.Exists(save.Paths.SaveFile));

@@ -136,7 +136,7 @@ namespace ProjectT.Area
                 }
                 else if (body != null)
                 {
-                    Teleport.MoveTo(body, door.transform.position);
+                    PlayerMovement.MoveTo(body, door.transform.position);
                     door.WaitingForExit = true;
                     CinemachineCore.ResetCameraState();
                 }

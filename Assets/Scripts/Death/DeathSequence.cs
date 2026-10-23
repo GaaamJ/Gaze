@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Yarn.Unity;
-using ProjectT.Area;
 using ProjectT.Dialogue;
 using ProjectT.Save;
 using ProjectT.Session;
@@ -14,7 +13,6 @@ namespace ProjectT.Death
     public static class DeathSequence
     {
         const float DialogueStopTimeout = 2f;
-        const float TeleportTimeout = 3f;
         const float RoomMoveTimeout = 10f;
 
         public static bool IsActive { get; private set; }
@@ -69,7 +67,6 @@ namespace ProjectT.Death
                         Debug.LogWarning("[DeathSequence] 진행 중인 대사가 제때 끝나지 않았다. 사망 노드가 거부될 수 있다.");
                 }
 
-                await WaitForTeleports();
                 await WaitForRoomMove(scene);
 
                 SaveProgress(deathNodeId);
@@ -125,21 +122,6 @@ namespace ProjectT.Death
             DeathRecords.Add(deathNodeId);
         }
 
-        static async YarnTask WaitForTeleports()
-        {
-            Teleport[] teleports = Object.FindObjectsByType<Teleport>(FindObjectsSortMode.None);
-            float deadline = Time.realtimeSinceStartup + TeleportTimeout;
-            while (AnyTransitioning(teleports))
-            {
-                if (Time.realtimeSinceStartup >= deadline)
-                {
-                    Debug.LogWarning("[DeathSequence] 텔레포트 전환이 제때 끝나지 않았다. 그대로 진행한다.");
-                    return;
-                }
-                await YarnTask.Yield();
-            }
-        }
-
         static async YarnTask WaitForRoomMove(CoreEntry scene)
         {
             float deadline = Time.realtimeSinceStartup + RoomMoveTimeout;
@@ -152,16 +134,6 @@ namespace ProjectT.Death
                 }
                 await YarnTask.Yield();
             }
-        }
-
-        static bool AnyTransitioning(Teleport[] teleports)
-        {
-            foreach (Teleport teleport in teleports)
-            {
-                if (teleport != null && teleport.IsTransitioning)
-                    return true;
-            }
-            return false;
         }
 
         internal static void EndEntry()

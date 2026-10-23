@@ -29,7 +29,6 @@ namespace ProjectT.Core.Tests
         {
             d.solvedPuzzleIds.Add("PasswordDoor");
             d.solvedPuzzleIds.Add("GapA");
-            d.respawnAreaId = "UndergroundParking";
             d.hasRespawnPosition = true;
             d.respawnPosition = new Vector2(3.25f, -7.5f);
             d.roomName = "ParkingLot";
@@ -37,10 +36,6 @@ namespace ProjectT.Core.Tests
             d.investigatedNodeIds.Add("TempRespawn");
             d.diedNodeIds.Add("Death_DeathObject");
             d.diedNodeIds.Add("Death_Falling001");
-            d.elevatorAreaId = "Temp";
-            d.elevatorFileId = "b3c1e2d4-0000-4000-8000-000000000002";
-            d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000001");
-            d.elevatorFileIdHistory.Add("b3c1e2d4-0000-4000-8000-000000000002");
             d.exitState = ExitState.DeathPending;
         }
 
@@ -84,15 +79,11 @@ namespace ProjectT.Core.Tests
             Fill(e);
 
             CollectionAssert.AreEqual(e.solvedPuzzleIds, d.solvedPuzzleIds);
-            Assert.AreEqual(e.respawnAreaId, d.respawnAreaId);
             Assert.AreEqual(e.hasRespawnPosition, d.hasRespawnPosition);
             Assert.AreEqual(e.respawnPosition, d.respawnPosition);
             Assert.AreEqual(e.roomName, d.roomName);
             CollectionAssert.AreEqual(e.investigatedNodeIds, d.investigatedNodeIds);
             CollectionAssert.AreEqual(e.diedNodeIds, d.diedNodeIds);
-            Assert.AreEqual(e.elevatorAreaId, d.elevatorAreaId);
-            Assert.AreEqual(e.elevatorFileId, d.elevatorFileId);
-            CollectionAssert.AreEqual(e.elevatorFileIdHistory, d.elevatorFileIdHistory);
             Assert.AreEqual(e.exitState, d.exitState);
         }
 
@@ -100,22 +91,22 @@ namespace ProjectT.Core.Tests
         public void Save_OverwritesExistingSave()
         {
             Assert.IsTrue(SaveManager.Save());
-            SaveManager.Data.respawnAreaId = "UndergroundParking";
+            SaveManager.Data.roomName = "002";
             Assert.IsTrue(SaveManager.Save());
 
             SaveManager.Load();
-            Assert.AreEqual("UndergroundParking", SaveManager.Data.respawnAreaId);
+            Assert.AreEqual("002", SaveManager.Data.roomName);
             Assert.IsFalse(File.Exists(SaveManager.TempPath));
         }
 
         [Test]
         public void Save_WhenReplaceFails_KeepsPreviousSaveAndReturnsFalse()
         {
-            SaveManager.Data.respawnAreaId = "Temp";
+            SaveManager.Data.roomName = "001";
             Assert.IsTrue(SaveManager.Save());
             string previous = File.ReadAllText(_save.Paths.SaveFile);
 
-            SaveManager.Data.respawnAreaId = "UndergroundParking";
+            SaveManager.Data.roomName = "002";
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
             bool result;
             using (new FileStream(_save.Paths.SaveFile, FileMode.Open, FileAccess.Read, FileShare.None))
@@ -126,7 +117,7 @@ namespace ProjectT.Core.Tests
             Assert.IsFalse(File.Exists(SaveManager.TempPath));
 
             SaveManager.Load();
-            Assert.AreEqual("Temp", SaveManager.Data.respawnAreaId);
+            Assert.AreEqual("001", SaveManager.Data.roomName);
         }
 
         [Test]
@@ -189,7 +180,6 @@ namespace ProjectT.Core.Tests
             Assert.IsNotNull(d.diedNodeIds);
             CollectionAssert.IsEmpty(d.diedNodeIds);
             CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
-            Assert.AreEqual("Temp", d.respawnAreaId);
         }
 
         [Test]
@@ -208,7 +198,6 @@ namespace ProjectT.Core.Tests
             var d = SaveManager.Data;
 
             CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
-            Assert.AreEqual("Temp", d.respawnAreaId);
             CollectionAssert.AreEqual(new[] { "Death_DeathObject" }, d.diedNodeIds);
             Assert.AreEqual(ExitState.Normal, d.exitState);
 
@@ -216,19 +205,17 @@ namespace ProjectT.Core.Tests
             string saved = File.ReadAllText(_save.Paths.SaveFile);
             StringAssert.DoesNotContain("deathRecords", saved);
             StringAssert.DoesNotContain("corpses", saved);
+            StringAssert.DoesNotContain("respawnAreaId", saved);
+            StringAssert.DoesNotContain("elevator", saved);
         }
 
         static void AssertDefaults(SaveData d)
         {
             Assert.IsNotNull(d);
             CollectionAssert.IsEmpty(d.solvedPuzzleIds);
-            Assert.AreEqual("", d.respawnAreaId);
             Assert.IsFalse(d.hasRespawnPosition);
             CollectionAssert.IsEmpty(d.investigatedNodeIds);
             CollectionAssert.IsEmpty(d.diedNodeIds);
-            Assert.AreEqual("", d.elevatorAreaId);
-            Assert.AreEqual("", d.elevatorFileId);
-            CollectionAssert.IsEmpty(d.elevatorFileIdHistory);
             Assert.AreEqual(ExitState.None, d.exitState);
         }
     }

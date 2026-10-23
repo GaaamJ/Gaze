@@ -131,7 +131,7 @@ namespace ProjectT.Session
             if (dialogueService != null)
                 dialogueService.ResetVariables();
             if (laris != null)
-                Teleport.MoveTo(laris.GetComponent<Rigidbody2D>(), larisStart);
+                PlayerMovement.MoveTo(laris.GetComponent<Rigidbody2D>(), larisStart);
         }
 
         // 다른 컴포넌트의 Update보다 먼저 잠가야 진입 첫 프레임에 방향키가 먹지 않는다.
@@ -200,7 +200,7 @@ namespace ProjectT.Session
             if (laris == null || !RespawnPoint.TryGet(data, out Vector2 position))
                 return;
 
-            Teleport.MoveTo(laris.GetComponent<Rigidbody2D>(), position);
+            PlayerMovement.MoveTo(laris.GetComponent<Rigidbody2D>(), position);
             CinemachineCore.ResetCameraState();
             Debug.Log($"[CoreEntry] 리스폰 위치로 시작: {position}", this);
         }
