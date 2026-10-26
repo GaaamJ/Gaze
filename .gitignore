@@ -88,3 +88,11 @@ Project T.slnx
 
 # Yarn Spinner auto-generated language server definitions
 ProjectSettings/Packages/dev.yarnspinner/*-generated.ysls.json
+
+# 에디터 개인 설정
+.vscode/
+
+# 외부에서 설치하는 AI 스킬 (Unity 스킬 등). 프로젝트 전용 스킬만 저장소에 둔다.
+.agents/
+.claude/skills/*
+!.claude/skills/story/
