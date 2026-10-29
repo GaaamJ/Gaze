@@ -10,11 +10,12 @@ using ProjectT.Session;
 
 namespace ProjectT.Death
 {
-    // 라리스를 막는 것은 같은 프리팹의 콜라이더가 하고, 이 영역은 처음 다가올 때 거부 대사만 한 번 재생한다.
+    // 라리스를 막는 건 같은 프리팹의 콜라이더가 함.
+    // 이 영역은 처음 다가올 때 외면 대사만 한 번 재생함.
     [RequireComponent(typeof(Collider2D))]
     public class DeathRefusalZone : MonoBehaviour
     {
-        [Tooltip("처음 들어오면 한 번 재생할 거부 노드 이름 (예: Death_Falling001_Refuse). 끝까지 보면 조사 기록에 남아 다시 재생하지 않는다.")]
+        [Tooltip("처음 들어오면 한 번 재생할 외면 Yarn 노드 이름 (예: Death_Falling001_Refuse). 끝까지 보면 조사 기록에 남아 다시 재생하지 않음.")]
         [SerializeField] string refusalNodeId;
 
         bool playing;
