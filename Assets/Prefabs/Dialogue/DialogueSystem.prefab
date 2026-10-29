@@ -595,7 +595,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae687d3d9f833f54abf974a92ba66083, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Dialogue.OptionInputPresenter
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.OptionInputPresenter
   cancelAction: {fileID: -1967631576421560919, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   dialogueService: {fileID: 921090457343010250}
   optionsRoot: {fileID: 4245581654146603053}
@@ -746,7 +746,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04482b3055e39864092b4da3e90c53a0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Dialogue.DialogueService
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.DialogueService
   inputLock: {fileID: 0}
 --- !u!114 &8453310923026106724
 MonoBehaviour:
@@ -759,7 +759,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 591dca6178ef6ed4380e9783c781e60e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Dialogue.CutsceneCommand
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.CutsceneCommand
   cutsceneRoot: {fileID: 8689640651562284047}
   cutsceneImage: {fileID: 1889430503042063580}
 --- !u!1 &2775874896189610867
@@ -849,7 +849,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 033d0a47d752fcf49b806dfd2e390f51, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Dialogue.ContinueIndicator
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.ContinueIndicator
   graphic: {fileID: 8054925703065437582}
   blinkInterval: 0.5
 --- !u!1 &3520168981185896109

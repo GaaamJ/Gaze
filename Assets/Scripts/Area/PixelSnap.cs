@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace ProjectT.Area
+namespace Gaze.Area
 {
     // 에디터에서 플레이 모드가 아닐 때만 월드 위치 x, y를 픽셀 격자에 맞춤. 빌드·플레이 중에는 아무것도 안 함.
     // 스프라이트 피벗이 픽셀 경계에 있어야 정확히 맞음(홀수 크기 스프라이트는 Center 피벗이 반 픽셀에 놓임).

@@ -150,5 +150,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.DialogueInteractable
-  dialogueNodeId: Death_DeathObject_Refuse
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.DialogueInteractable
+  dialogueNodeId: 

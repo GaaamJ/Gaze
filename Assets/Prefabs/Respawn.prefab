@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.Interactable
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.Interactable
   dialogueNodeId: 
 --- !u!61 &5836111377586391215
 BoxCollider2D:
@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 72325f420554c164a813079d7fc2d0d5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Interaction.RespawnArea
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.RespawnArea
   area: {fileID: 0}
   spawnPoint: {fileID: 0}
 --- !u!114 &5851207256654093678
@@ -179,5 +179,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.PixelSnap
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.PixelSnap
   pixelsPerUnit: 16

@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Yarn.Unity;
-using ProjectT.Dialogue;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.UI;
+using Gaze.Dialogue;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.UI;
 using Object = UnityEngine.Object;
 
-namespace ProjectT.Death
+namespace Gaze.Death
 {
     // 라리스가 죽은 뒤 다시 시작할 때까지의 사망 처리 전체를 맡음.
     // DeathZone, DeathInteractable이 Begin을 부름.

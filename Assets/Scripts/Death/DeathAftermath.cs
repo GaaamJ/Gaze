@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using ProjectT.Save;
+using Gaze.Save;
 
-namespace ProjectT.Death
+namespace Gaze.Death
 {
     // 사망 기록이 있으면 Room에 흔적을 남김. source의 사망 노드가 기록돼 있으면 프리팹(시체 등)을 놓고 지정한 오브젝트를 끔.
     // RoomSceneEntry.Enter가 Room 진입 때 Apply를 부름.

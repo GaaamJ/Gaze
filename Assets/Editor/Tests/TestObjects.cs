@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
-using ProjectT.Player;
-using ProjectT.UI;
+using Gaze.Player;
+using Gaze.UI;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace ProjectT.Tests
+namespace Gaze.Tests
 {
     internal static class TestObjects
     {

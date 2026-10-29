@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Dialogue;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.Tests;
+using Gaze.Dialogue;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Yarn.Unity;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 
-namespace ProjectT.Death.Tests
+namespace Gaze.Death.Tests
 {
     // 에디트 모드에서는 DialogueRunner가 돌지 않아 대사 재생은 훅으로 바꾸고, 테스트가 직접 끝낸다.
     public class DeathRefusalZoneTests

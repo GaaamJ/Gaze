@@ -154,7 +154,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 15ecf9d882a3166429b9b54c6e910fe4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Player.PlayerMovement
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.PlayerMovement
   moveAction: {fileID: -1680190386980627800, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   inputLock: {fileID: 97015914}
   moveSpeed: 3
@@ -170,7 +170,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f14f34af369a4d24b9c17861344b7473, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Session.InputLock
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Session.InputLock
 --- !u!114 &97015915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,7 +182,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f17b06397d9b4890a692696ca1a77086, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Player.PlayerSprite
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.PlayerSprite
   movement: {fileID: 97015913}
   spriteRenderer: {fileID: 97015920}
   down: {fileID: -2131073498, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c66d24627f6c0e141b37efb7913d8b07, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Player.PlayerInteractInput
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.PlayerInteractInput
   interactAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   inputLock: {fileID: 97015914}
 --- !u!114 &97015917
@@ -215,7 +215,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 62ab906635d46bb49badc9b1cac68ae6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Player.PlayerInteractor
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.PlayerInteractor
   input: {fileID: 97015916}
   detectZone: {fileID: 1233284577}
   dialogueService: {fileID: 429564803}
@@ -526,7 +526,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 04482b3055e39864092b4da3e90c53a0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Dialogue.DialogueService
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.DialogueService
 --- !u!1 &1096427524
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,7 +595,7 @@ MonoBehaviour:
   m_ComponentVersion: 1
   m_AssetsPPU: 16
   m_RefResolutionX: 320
-  m_RefResolutionY: 180
+  m_RefResolutionY: 240
   m_CropFrame: 0
   m_GridSnapping: 0
   m_FilterMode: 0
@@ -691,7 +691,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 9.625
+  orthographic size: 7.15625
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -751,13 +751,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7d44245330c1e794a9fd532f2ab56e9c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathSceneEntry
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Death.DeathSceneEntry
   inputLock: {fileID: 97015914}
   dialogueService: {fileID: 429564803}
   roomLoader: {fileID: 1196390259}
   laris: {fileID: 97015913}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
-  defaultRoom: 002
+  defaultRoom: Prototype
 --- !u!4 &1196390258
 Transform:
   m_ObjectHideFlags: 0
@@ -784,7 +784,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 08207232a9634ff4ca9f94139577724f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.RoomLoader
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.RoomLoader
   inputLock: {fileID: 97015914}
   laris: {fileID: 97015913}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
@@ -914,7 +914,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 58fb526b4b79ef6438e5e1168144f882, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Player.DetectZone
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.DetectZone
   settings: {fileID: 11400000, guid: 2f631224f2857244d8661b0db3248029, type: 2}
   interactableMask:
     serializedVersion: 2

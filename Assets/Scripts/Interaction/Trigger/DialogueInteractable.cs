@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Yarn.Unity;
-using ProjectT.Data;
-using ProjectT.Dialogue;
-using ProjectT.Save;
+using Gaze.Data;
+using Gaze.Dialogue;
+using Gaze.Save;
 
-namespace ProjectT.Interaction
+namespace Gaze.Interaction
 {
     // 조사하면 Yarn 대사를 재생하는 조사 대상. 같은 오브젝트에 Respawn이 있으면 리스폰 지점도 갱신함.
     // 대사를 끝까지 보면 조사 기록에 남기고, 다음 조사부터는 재조사 노드를 씀.

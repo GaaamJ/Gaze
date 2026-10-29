@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // 지난 실행이 어떻게 끝났는지. 다음 실행 시작 때 ExitRecorder.TakeLastExitState가 읽음.
     // None은 기록 없음(튕김 포함), Normal은 정상 종료, DeathPending은 창 닫기 사망 대기.

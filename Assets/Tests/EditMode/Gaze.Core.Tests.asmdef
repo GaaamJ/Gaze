@@ -1,9 +1,9 @@
 {
-    "name": "ProjectT.Core.Tests",
-    "rootNamespace": "ProjectT.Core.Tests",
+    "name": "Gaze.Core.Tests",
+    "rootNamespace": "Gaze.Core.Tests",
     "references": [
-        "ProjectT.Core",
-        "ProjectT.Save",
+        "Gaze.Core",
+        "Gaze.Save",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner"
     ],

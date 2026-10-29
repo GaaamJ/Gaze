@@ -3,17 +3,17 @@ using System.Collections;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Player;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.Tests;
-using ProjectT.UI;
+using Gaze.Player;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
+using Gaze.UI;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 
-namespace ProjectT.Death.Tests
+namespace Gaze.Death.Tests
 {
     // 에디트 모드에서는 Awake·Start가 불리지 않고 씬을 불러올 수 없어, 진입점 메서드를 직접 부르고 리로드는 훅으로 바꾼다.
     public class DeathSequenceTests

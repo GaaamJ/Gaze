@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // 입력 잠금을 사유별 횟수로 셈. 하나라도 걸려 있으면 IsLocked가 참.
     // 사유마다 Lock과 Unlock을 짝지어 부르고, 씬을 다시 시작할 때는 CoreEntry가 Clear로 비움.

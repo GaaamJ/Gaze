@@ -1,11 +1,11 @@
 using System.Threading;
 using NUnit.Framework;
-using ProjectT.Session;
+using Gaze.Session;
 using UnityEditor;
 using UnityEngine;
 using Yarn.Unity;
 
-namespace ProjectT.Dialogue.Tests
+namespace Gaze.Dialogue.Tests
 {
     public class OptionInputTests
     {

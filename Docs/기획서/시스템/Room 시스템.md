@@ -10,8 +10,11 @@
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
-- 지금 있는 Room 씬: `001`, `002` (서로 문으로 이어짐)
-	- 기본 Room: `002` (`Core` 씬의 `CoreEntry`에 설정)
+- 지금 있는 Room 씬: `Prototype`
+	- 기본 Room: `Prototype` (`CoreEntry`에 설정)
+
+- 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
+	- 빌드 설정에는 넣지 않음.
 
 
 # 구성
@@ -54,7 +57,8 @@ sequenceDiagram
 # 쓰는 법
 ---
 - **Room 만들기**
-	1. 새 씬을 만들고 루트 아래에 `RoomSceneEntry`를 붙인 오브젝트를 둠.
+	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Wall` 타일맵(`Wall`에만 콜라이더), `RoomDoor`, `Respawn` Pb
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
@@ -63,7 +67,7 @@ sequenceDiagram
 	1. 양쪽 Room에 Trigger 콜라이더와 `RoomSceneDoor`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
-		- Ex. `001`의 문: `doorId` = `RoomDoorTest001`, `targetScene` = `002`, `targetDoorId` = `RoomDoorTest002`
+		- Ex. A의 문: `doorId` = `A_East`, `targetScene` = `B`, `targetDoorId` = `B_West`
 
 - **픽셀 맞추기**
 	- 오브젝트에 `PixelSnap`을 붙이면 에디터에서 움직일 때 픽셀 격자에 붙음.
@@ -72,7 +76,8 @@ sequenceDiagram
 
 # 확인 필요
 ---
-- `CoreEntry`의 코드 기본값은 `ParkingLot`이지만 `Core` 씬에서는 `002`로 덮어씀.
-	- `ParkingLot` 씬은 프로젝트에 없음.
+- 카메라는 20×15칸(320×240px) 기준이지만, 화면이 16:9면 가로로 더 보임.
+	- 딱 20칸으로 자르려면 `PixelPerfectCamera`의 Crop Frame이나 4:3 창 크기를 정해야 함.
 
-- 카메라가 아직 20×15칸이 아님. Room 크기를 정하기 전에 맞춰야 함.
+- 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
+	- `Wall` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.

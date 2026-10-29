@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using ProjectT.Core.GameFolder;
-using ProjectT.Save;
-using ProjectT.Session;
+using Gaze.Core.GameFolder;
+using Gaze.Save;
+using Gaze.Session;
 
-namespace ProjectT.Tests
+namespace Gaze.Tests
 {
     // 세이브를 읽거나 쓰는 테스트는 반드시 이것을 거친다. 빠뜨리면 실제 Salbyeol\save.json에 쓴다.
-    // Tests/EditMode(ProjectT.Core.Tests)는 이 어셈블리를 참조할 수 없어 같은 이름의 헬퍼를 따로 둔다.
+    // Tests/EditMode(Gaze.Core.Tests)는 이 어셈블리를 참조할 수 없어 같은 이름의 헬퍼를 따로 둔다.
     internal sealed class TempSaveSandbox : IDisposable
     {
         public string Base { get; }
@@ -15,7 +15,7 @@ namespace ProjectT.Tests
 
         public TempSaveSandbox()
         {
-            Base = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
+            Base = Path.Combine(Path.GetTempPath(), "Gaze.Tests." + Guid.NewGuid().ToString("N"));
             Paths = new GameFolderPaths(Path.Combine(Base, GameFolderPaths.RootFolderName));
             SaveManager.Paths = Paths;
             GameSession.Reload();

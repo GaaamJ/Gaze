@@ -1,7 +1,7 @@
-using ProjectT.Core.GameFolder;
+using Gaze.Core.GameFolder;
 using UnityEngine;
 
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // 게임이 어떻게 종료됐는지 세이브에 남김. 창 닫기 사망과 정상 종료를 다룸.
     // 창 닫기(빌드 종료 훅·WM_ENDSESSION·에디터 시뮬레이션)와 정상 종료가 같은 플래그를 보고 서로를 막음.

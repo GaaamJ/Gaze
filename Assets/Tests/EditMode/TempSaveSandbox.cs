@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using ProjectT.Core.GameFolder;
-using ProjectT.Save;
+using Gaze.Core.GameFolder;
+using Gaze.Save;
 
-namespace ProjectT.Core.Tests
+namespace Gaze.Core.Tests
 {
     // 세이브를 읽거나 쓰는 테스트는 반드시 이것을 거친다. 빠뜨리면 실제 Salbyeol\save.json에 쓴다.
     // 이 asmdef는 Assembly-CSharp(GameSession)와 Assets/Editor/Tests의 같은 이름 헬퍼를 참조할 수 없어 따로 둔다.
@@ -14,7 +14,7 @@ namespace ProjectT.Core.Tests
 
         public TempSaveSandbox()
         {
-            Base = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
+            Base = Path.Combine(Path.GetTempPath(), "Gaze.Tests." + Guid.NewGuid().ToString("N"));
             Paths = new GameFolderPaths(Path.Combine(Base, GameFolderPaths.RootFolderName));
             SaveManager.Paths = Paths;
             SaveManager.Load();

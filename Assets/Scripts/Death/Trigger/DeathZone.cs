@@ -1,8 +1,8 @@
 using UnityEngine;
-using ProjectT.Data;
-using ProjectT.Player;
+using Gaze.Data;
+using Gaze.Player;
 
-namespace ProjectT.Death
+namespace Gaze.Death
 {
     [RequireComponent(typeof(Collider2D))]
     // 라리스가 들어오면 사망이 시작되는 영역. 콜라이더는 Trigger여야 함.

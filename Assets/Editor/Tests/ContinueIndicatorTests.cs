@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Yarn.Markup;
 using Yarn.Unity;
 
-namespace ProjectT.Dialogue.Tests
+namespace Gaze.Dialogue.Tests
 {
     public class ContinueIndicatorTests
     {

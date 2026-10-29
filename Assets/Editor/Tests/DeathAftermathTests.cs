@@ -1,17 +1,17 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Area;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.Tests;
+using Gaze.Area;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 
-namespace ProjectT.Death.Tests
+namespace Gaze.Death.Tests
 {
     public class DeathAftermathTests
     {

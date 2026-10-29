@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectT.Death;
+using Gaze.Death;
 
-namespace ProjectT.Area
+namespace Gaze.Area
 {
     // Room 씬마다 하나 두는 진입 지점. Room이 불러와지면 그 Room의 DeathAftermath를 모두 적용함.
     // Core 오브젝트를 인스펙터로 참조하지 않음. RoomSceneLoader.Enter가 Room 씬을 불러온 뒤 찾아 부름.

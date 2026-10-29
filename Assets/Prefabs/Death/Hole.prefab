@@ -184,7 +184,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Area.PixelSnap
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.PixelSnap
   pixelsPerUnit: 16
 --- !u!61 &984798977062251972
 BoxCollider2D:
@@ -243,5 +243,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 269c23e1360dc5e449e80e9a37fee6ed, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.Death.DeathRefusalZone
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Death.DeathRefusalZone
   refusalNodeId: 

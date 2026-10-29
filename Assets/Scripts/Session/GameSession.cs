@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectT.Save;
+using Gaze.Save;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // 게임을 켤 때마다 세이브를 한 번 불러와 세션 메모리(씬을 다시 불러와도 유지)를 다시 채움.
     // 세션 메모리: 조사 기록(Investigated)과 창 닫기 사망 대기 여부.

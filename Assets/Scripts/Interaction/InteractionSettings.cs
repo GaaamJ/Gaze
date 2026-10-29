@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace ProjectT.Interaction
+namespace Gaze.Interaction
 {
     // 조사 범위(거리, 각도) 설정 애셋. DetectZone이 읽어 대상을 고름.
-    [CreateAssetMenu(fileName = "InteractionSettings", menuName = "ProjectT/Interaction Settings")]
+    [CreateAssetMenu(fileName = "InteractionSettings", menuName = "Gaze/Interaction Settings")]
     public class InteractionSettings : ScriptableObject
     {
         [Tooltip("라리스 원점에서 대상 콜라이더의 가장 가까운 점까지의 최대 거리")]

@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using ProjectT.Save;
+using Gaze.Save;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // 창 닫기(X·Alt+F4·작업 관리자 "작업 끝내기")를 감지해 ExitRecorder에 기록시킴.
     // 창 닫기는 Application.quitting으로 옴. 정상 종료 중이면 ExitRecorder가 무시함.

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 using Yarn.Markup;
 using Yarn.Unity;
 
-namespace ProjectT.Dialogue
+namespace Gaze.Dialogue
 {
     // 대사 출력이 끝나 입력을 기다리는 동안 graphic을 깜박이는 표시.
     // Yarn의 ActionMarkupHandler 콜백으로 대사 단위의 시작·완료·닫힘을 받음.
