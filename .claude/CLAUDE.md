@@ -1,26 +1,21 @@
-# 지금 상태
-
-- 2026-10-28에 컨셉을 백지에서 다시 시작했다.
-- 옛 세계관과 기획 문서는 `archive/saint-scenario` 브랜치에 있다. 기본 전제로 끌어오지 않는다. 필요할 때만 꺼내 본다.
-- 코드와 에셋(이벤트, 세이브, 대화, additive scene)은 그대로 쓴다.
-- 목표: 2026년 11월 안에 지역 하나(세이브 포인트 A → B)를 만든다.
-- 지금 하는 일: '바라보다'와 '죽음'으로 마인드맵을 그린다.
-
-
 # 컨셉
+---
+- 한 문장: 플레이어가 소녀를 바라보는 게임.
 
-- 한 문장: 플레이어가 소녀를 바라보는 게임
-- 장르: 탑다운 어드벤처
-- 보고 싶은 장면: 한 소녀가 망가지는 것
-- 테마의 뿌리: 바라보다, 죽음
-	- 메타픽션은 '바라보다'가 드러나는 방식이다.
+- 장르: 탑다운 어드벤처.
+
+- 보고 싶은 장면: 한 소녀가 망가지는 것.
+
+- 테마의 뿌리: 바라보다, 죽음.
+	- 메타픽션은 '바라보다'가 드러나는 방식.
+
 - 플레이어의 경험
-	- 이 소녀를 좋아하게 된다.
-	- 이 소녀가 실존한다고 믿는다.
+	- 이 소녀를 좋아하게 됨.
+	- 이 소녀가 실존한다고 믿음.
 
 
 # 기획할 때
-
+---
 ## 판단 기준
 
 - 게임플레이를 하나 해 볼 때마다 네 가지를 묻는다.
@@ -39,41 +34,71 @@
 - 레퍼런스의 장르 틀이 보이면 탈락시킨다. 사용자는 독자적인 것을 하고 싶어 한다.
 
 
-# 참고 문서
+# Current state
 
-- `Docs/레퍼런스.md`: 레퍼런스 게임 일곱 개(원샷, 언더테일, Ib, 두근두근 문예부, 인격해체, 블랙소울 1·2) 정리. 컨셉이나 장면을 이야기할 때 먼저 읽는다.
-- `Docs/아이디어.md`: 떠오른 아이디어를 짧게 적어 두는 곳. 확정이 아니다.
-- `Docs/결정.md`: 확정된 것(카메라 크기 같은 자잘한 결정 포함)과 하지 않기로 한 것. 무언가를 정하면 여기에 한 줄 적는다.
-- `Docs/맵디자인.md`: 원샷, 오모리, 언더테일의 지도 구조를 공부한 메모. 그레이박스 지도를 짤 때 먼저 읽는다.
-- `Docs/인수인계.md`: 계정을 바꿀 때 넘기는 인수인계. 세션을 시작하면 먼저 읽는다. 계정을 바꾸기 전에 통째로 다시 쓴다.
-- Claude가 참조하려고 쓰는 문서는 토큰을 아끼려고 영어로 쓴다. 사용자가 읽는 문서는 한국어로 쓴다.
+- The concept restarted from scratch on 2026-10-28.
+- The old world and design docs live on the `archive/saint-scenario` branch. Do not use them as premises; open them only when needed.
+- Existing code and assets (events, save, dialogue, additive scenes) stay in use.
+- Goal: build one region (save point A → B) by the end of November 2026.
+- The current task is not kept here. Across account switches it is carried by `Docs/인수인계 문서.md`.
 
 
-# 작업 방식
+# Reference docs
 
-## 브랜치
+- `Docs/레퍼런스/Reference Game.md`: the seven reference games (OneShot, Undertale, Ib, Doki Doki Literature Club, Depersonalization, Black Souls 1·2). Read first when discussing concept or scenes.
+- `Docs/레퍼런스/Reference Map Design.md`: map structure notes on OneShot, OMORI, Undertale. Read first when building a graybox map.
+- `Docs/기획서/아이디어.md`: short notes on ideas. Not decided.
+- `Docs/기획서/결정 사항.md`: what is decided (including small calls like camera size) and what was dropped. Add one line whenever something is decided.
+- `Docs/기획서/시스템/`: one doc per code system (death, interaction, dialogue, save, Room, session, player). The `확인 필요` section at the end of each lists what is missing and the constraints.
+- `Docs/인수인계 문서.md`: handoff between accounts. Exists only right after an account switch.
+	- Written in English just before switching accounts.
+	- Holds the current task and open questions. Does not repeat CLAUDE.md; if they disagree, CLAUDE.md wins.
+	- The first session after the switch reads it, then deletes it in that day's `chore` commit. Forks do not need it.
+	- If it does not exist, there is no pending handoff.
+- Language: docs the user reads and edits are Korean and follow the `doc-writing` skill. Docs only Claude reads (`Reference *.md`, the handoff) are English.
 
-- 간단한 변경(문서, 작은 수정, 값 조정)은 브랜치 없이 한다.
-- 기능을 만들 때는 main에서 `feature/{이름}`을 따서 시작한다. 기능 하나 = 이슈 하나 = 브랜치 하나 = main으로 가는 PR 하나.
-	- 커밋 메시지 끝에 `(#번호)`를 붙인다.
-	- PR 본문에는 기능이 끝났으면 `Closes #번호`, 일부만 했으면 `관련 #번호`를 쓴다.
-- 리뷰가 필요할 만큼 큰 정리·리팩터링은 main에서 `chore/{이름}`을 딴다.
 
-## 커밋
+# Workflow
 
-- 메시지는 `종류: 내용` 형식으로 한국어로 쓴다. (예: `docs: ...`, `feat: ...`, `chore: ...`)
-- 수정할 때마다 커밋하지 않는다. 작업을 끝내기 전에 모아서 커밋한다.
+## Before building a feature
 
-## 코드 주석
+- First find the existing systems the feature depends on. (Ex. shop → inventory, dialogue, save)
+- Check them in the system docs (`Docs/기획서/시스템/`).
+	- `구성`, `쓰는 법`: the existing API.
+	- `확인 필요`: constraints and what is not done.
+- If a doc is missing or disagrees with the code, read the code and fix the doc first.
+- Before building, tell the user which of three it is:
+	- Use the existing API as is.
+	- Add an API to an existing system.
+	- Refactor an existing system.
+- Do not build on plans that `결정 사항` marks as on hold.
 
-- 주석을 쓰거나 고칠 때는 `code-comments` 스킬을 따른다.
+## Branches
 
-## 문서
+- Simple changes (docs, small fixes, value tweaks) go on main with no branch.
+- Features start from main as `feature/{name}`. One feature = one issue = one branch = one PR to main.
+	- End commit messages with `(#number)`.
+	- PR body: `Closes #number` if the feature is done, `관련 #number` if partial.
+- Cleanup or refactoring big enough to need review starts from main as `refactor/{name}`.
 
-- 사용자가 읽는 한국어 문서를 쓰거나 고칠 때는 `doc-writing` 스킬을 따른다.
+## Commits
 
-## Unity MCP 승인
+- Messages are Korean, in `type: content` form. (Ex. `feat: ...`, `fix: ...`, `docs: ...`)
+- Do not commit after every edit.
+- Simple changes are batched into one `chore:` commit a day on main.
+	- Commit when the user says to wrap up the day. Claude cannot tell when the day ends.
+	- Message: `chore: MM-DD 정리`, with one body line per change.
 
-- 바로 해도 됨: GameObject·컴포넌트 만들기와 추가, 속성 바꾸기(위치, 값 등)
-- 항상 먼저 물어봄: 지우거나 빼는 모든 것(GameObject 삭제, 컴포넌트 제거, 씬 삭제·전환 등)과 대량 작업
-- 메인 세션과 서브에이전트 모두 같다.
+## Code comments
+
+- Follow the `code-comments` skill when writing or changing comments.
+
+## Docs
+
+- Follow the `doc-writing` skill when writing or changing Korean docs the user reads.
+
+## Unity MCP approval
+
+- OK without asking: creating and adding GameObjects and components, changing properties (position, values, etc.).
+- Always ask first: anything that deletes or removes (deleting GameObjects, removing components, deleting or switching scenes) and bulk operations.
+- Same for the main session and subagents.

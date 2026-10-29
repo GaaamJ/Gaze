@@ -1,12 +1,12 @@
 ---
 name: doc-writing
-description: Rules for writing and editing Korean docs the user reads in Project_T (Docs/기획서, system docs, 인수인계, 결정 사항, 아이디어). Use when creating or changing any of these, including a new system doc under Docs/기획서/시스템.
+description: Rules for writing and editing Korean docs the user reads in Project_T (Docs/기획서, system docs, 결정 사항, 아이디어, the 컨셉 section of CLAUDE.md). Use when creating or changing any of these, including a new system doc under Docs/기획서/시스템.
 ---
 
 # Doc writing
 
 Docs the user reads are written in Korean. This file is in English because Claude reads it.
-English reference docs Claude writes for itself (`Docs/레퍼런스/Reference *.md`) are out of scope.
+English docs Claude writes for itself (`Docs/레퍼런스/Reference *.md`, `Docs/인수인계 문서.md`) are out of scope.
 
 ## Why
 
@@ -45,7 +45,7 @@ These rules come from the user's own edits to `Docs/기획서/시스템/죽음 �
 	1. Overview (untitled, under the `#` title): what the system does, a few bullets.
 	2. `# 구성`: a table of scripts and what each does. No prefab table unless the user asks.
 	3. `# 흐름`: one mermaid `sequenceDiagram` between the scripts, plus bullets for paths that skip it.
-	4. `# 쓰는 법`: numbered steps per task (making a trigger, setting up what remains, etc.).
+	4. `# 쓰는 법`: numbered steps per task (making a trigger, setting up what remains, etc.). Include the calls other systems use (`DialogueService.Play`, `InputLock.Lock`), because a later feature reads this section to find the existing API before building on it.
 	5. `# 확인 필요`: what is missing or half-done.
 - Only state what the code shows. If unsure, put it under `확인 필요` instead of guessing.
 
