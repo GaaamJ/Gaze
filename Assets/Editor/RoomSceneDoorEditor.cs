@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ProjectT.Area;
+using Gaze.Area;
 
 [CustomEditor(typeof(RoomSceneDoor))]
 [CanEditMultipleObjects]

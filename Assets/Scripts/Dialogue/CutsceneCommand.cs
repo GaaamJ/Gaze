@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
 
-namespace ProjectT.Dialogue
+namespace Gaze.Dialogue
 {
     // Yarn 커맨드 <<Cutscene id>>: Resources/Cutscenes/{id} 이미지를 대사창 뒤에 띄우고 대사는 그대로 진행함.
     // <<CutsceneEnd>> 또는 대화 종료 때 닫음.

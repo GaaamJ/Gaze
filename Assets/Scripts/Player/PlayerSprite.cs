@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectT.Player
+namespace Gaze.Player
 {
     // 라리스의 바라보는 방향(PlayerMovement.Facing)에 맞는 스프라이트를 보여 줌.
     // 왼쪽 계열 그림만 있으므로 오른쪽 계열은 flipX로 좌우 반전해서 보여 줌.

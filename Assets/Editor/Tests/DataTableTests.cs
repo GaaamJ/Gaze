@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace ProjectT.Data.Tests
+namespace Gaze.Data.Tests
 {
     public class DataTableTests
     {

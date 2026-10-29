@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ProjectT.Data
+namespace Gaze.Data
 {
     // 인스펙터에 적은 Yarn 노드 이름이 실제 Yarn 프로젝트에 있는지 검사함.
     // DialogueInteractable, DeathZone, DeathInteractable, DeathRefusalZone이 OnValidate에서 WarnMissingDeferred를 부름.

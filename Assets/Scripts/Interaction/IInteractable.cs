@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectT.Dialogue;
+using Gaze.Dialogue;
 
-namespace ProjectT.Interaction
+namespace Gaze.Interaction
 {
     // 조사할 때 PlayerInteractor가 대상에게 넘기는 값 묶음.
     // Dialogue는 대사 재생용, Investigated는 이번 실행에서 이미 조사한 노드 이름 집합(GameSession.Investigated).

@@ -1,4 +1,4 @@
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // 죽은 적 있는 사망 노드 이름의 기록(SaveData.diedNodeIds).
     // DeathSequence가 Add로 남기고 DeathAftermath가 Has로 확인함.

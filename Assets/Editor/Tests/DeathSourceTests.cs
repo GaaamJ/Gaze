@@ -2,15 +2,15 @@ using System;
 using System.Collections;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Interaction;
-using ProjectT.Session;
-using ProjectT.Tests;
+using Gaze.Interaction;
+using Gaze.Session;
+using Gaze.Tests;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 
-namespace ProjectT.Death.Tests
+namespace Gaze.Death.Tests
 {
     // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathInteractable이 입구를 부르는지만 본다.
     public class DeathSourceTests

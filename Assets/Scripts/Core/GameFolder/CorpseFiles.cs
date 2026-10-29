@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace ProjectT.Core.GameFolder
+namespace Gaze.Core.GameFolder
 {
     // 창 닫기 사망 때 Corpses 폴더에 만드는 빈 시체 파일(Corpse001.txt …). ExitRecorder가 부름.
     public static class CorpseFiles

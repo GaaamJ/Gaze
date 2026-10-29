@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Yarn.Unity;
-using ProjectT.Data;
-using ProjectT.Dialogue;
-using ProjectT.Interaction;
-using ProjectT.Player;
-using ProjectT.Session;
+using Gaze.Data;
+using Gaze.Dialogue;
+using Gaze.Interaction;
+using Gaze.Player;
+using Gaze.Session;
 
-namespace ProjectT.Death
+namespace Gaze.Death
 {
     // 라리스가 처음 들어오면 외면 대사를 재생하는 영역.
     // 라리스를 막는 건 같은 프리팹의 콜라이더가 함.

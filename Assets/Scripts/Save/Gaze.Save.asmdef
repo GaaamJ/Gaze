@@ -1,7 +1,9 @@
 {
-    "name": "ProjectT.Core",
-    "rootNamespace": "ProjectT.Core",
-    "references": [],
+    "name": "Gaze.Save",
+    "rootNamespace": "Gaze.Save",
+    "references": [
+        "Gaze.Core"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

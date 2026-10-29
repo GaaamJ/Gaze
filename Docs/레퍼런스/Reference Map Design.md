@@ -17,9 +17,9 @@
 | OMORI | 20×15 (32px) | ~1/10 |
 | Undertale | ~16×12 (20px, estimated) | ~1/8 |
 | Depersonalization | unknown (~480×270 estimated) | ~1/6 |
-| Project_T now | ~34×19 (16px, 16:9) | ~1/19 |
+| Gaze now | 20×15 (16px, PixelPerfectCamera ref 320×240) | ~1/15 |
 
-- Project_T's camera (Core.unity, orthographic size 9.625) shows the girl 2–3× smaller than any reference. Decide the camera before drawing maps; room sizes below assume a ~20×15 screen.
+- Gaze's camera was ~34×19 (girl 2–3× smaller than any reference) until 2026-10-29; it now matches the references. Room sizes below assume a 20×15 screen.
 
 
 # OneShot

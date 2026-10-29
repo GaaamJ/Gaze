@@ -1,4 +1,4 @@
-namespace ProjectT.Data
+namespace Gaze.Data
 {
     // Yarn 노드 이름 규칙을 한곳에 모음.
     public static class DialogueNodeNames

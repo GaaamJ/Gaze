@@ -7,7 +7,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Yarn.Unity;
 
-namespace ProjectT.Dialogue
+namespace Gaze.Dialogue
 {
     // 선택지가 떠 있는 동안 조작을 다룸. 선택 결과는 Yarn의 OptionsPresenter가 맡고, 이 클래스는 아래 두 가지만 함.
     // 1. 취소 입력(cancelAction)이 오면 대화를 취소함.

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using ProjectT.Core.GameFolder;
+using Gaze.Core.GameFolder;
 using UnityEngine;
 
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // save.json 읽기·쓰기와 메모리의 SaveData(Data)를 맡음.
     // 기록 클래스(DeathRecords, RespawnPoint 등)가 Data를 고친 뒤 Save로 저장함.

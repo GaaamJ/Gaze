@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using AOT;
-using ProjectT.Save;
+using Gaze.Save;
 using Debug = UnityEngine.Debug;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // 윈도우 종료·로그오프에서는 Unity 종료 훅이 불리지 않고 창 메시지만 옴(#71 실측). 게임 창의 WndProc를 가로채 받음.
     // WM_QUERYENDSESSION은 종료가 취소될 수 있어 저장하지 않고, 종료가 확정된 WM_ENDSESSION(wParam != 0)에서만 저장함.

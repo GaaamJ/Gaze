@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
+using Gaze.Core.GameFolder;
 
-namespace ProjectT.Core.Tests
+namespace Gaze.Core.Tests
 {
     public class CorpseFilesTests
     {
@@ -13,7 +13,7 @@ namespace ProjectT.Core.Tests
         [SetUp]
         public void SetUp()
         {
-            _tempBase = Path.Combine(Path.GetTempPath(), "ProjectT.Tests." + Guid.NewGuid().ToString("N"));
+            _tempBase = Path.Combine(Path.GetTempPath(), "Gaze.Tests." + Guid.NewGuid().ToString("N"));
             _paths = new GameFolderPaths(Path.Combine(_tempBase, GameFolderPaths.RootFolderName));
         }
 

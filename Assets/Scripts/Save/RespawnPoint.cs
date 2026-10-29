@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // 세이브된 리스폰 위치와 그 위치가 있는 Room 이름. DialogueInteractable이 조사할 때 Set으로 갱신함.
     public static class RespawnPoint

@@ -3,14 +3,14 @@ using System.Collections;
 using Unity.Cinemachine;
 using UnityEngine;
 using Yarn.Unity;
-using ProjectT.Area;
-using ProjectT.Death;
-using ProjectT.Dialogue;
-using ProjectT.Player;
-using ProjectT.Save;
-using ProjectT.UI;
+using Gaze.Area;
+using Gaze.Death;
+using Gaze.Dialogue;
+using Gaze.Player;
+using Gaze.Save;
+using Gaze.UI;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // Core 씬의 진입점. 시작과 사망 후 다시 시작을 같은 길로 처리함.
     // 흐름: Room 해제 → Core 상태 초기화 → 입력 잠금(사망·창 닫기 진입) → 리스폰 위치 복원 → 세이브된 Room 로드 → 페이드 인 → 잠금 해제.
@@ -26,7 +26,7 @@ namespace ProjectT.Session
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
         [Tooltip("세이브에 기록된 Room이 없을 때 불러올 Room 씬 이름")]
-        [SerializeField] string defaultRoom = "ParkingLot";
+        [SerializeField] string defaultRoom = "Prototype";
 
         // 에디트 모드 테스트에서는 DialogueRunner가 돌지 않아 바꿔 끼움.
         internal static Func<DialogueService, string, YarnTask<DialogueResult>> PlayDialogue = (dialogue, node) => dialogue.Play(node);

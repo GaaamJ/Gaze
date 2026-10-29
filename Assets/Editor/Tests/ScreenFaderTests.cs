@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace ProjectT.UI.Tests
+namespace Gaze.UI.Tests
 {
     public class ScreenFaderTests
     {

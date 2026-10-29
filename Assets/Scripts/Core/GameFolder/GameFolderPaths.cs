@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace ProjectT.Core.GameFolder
+namespace Gaze.Core.GameFolder
 {
     // 게임이 파일을 두는 폴더의 경로 모음. 루트(사용자 폴더 아래 Salbyeol) 아래에 세이브 파일과 시체 폴더가 있음.
     // SaveManager.Paths가 들고 있음.

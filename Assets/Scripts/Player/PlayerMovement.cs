@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using ProjectT.Session;
+using Gaze.Session;
 
-namespace ProjectT.Player
+namespace Gaze.Player
 {
     // 라리스의 8방향 이동과 바라보는 방향(Facing)을 맡음.
     // Update에서 Facing 갱신, FixedUpdate에서 속도 적용. 입력이 잠겨 있으면 멈춤.

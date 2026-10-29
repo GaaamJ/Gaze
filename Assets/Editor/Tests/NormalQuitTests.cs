@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Save;
-using ProjectT.Tests;
+using Gaze.Save;
+using Gaze.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace ProjectT.Session.Tests
+namespace Gaze.Session.Tests
 {
     public class NormalQuitTests
     {

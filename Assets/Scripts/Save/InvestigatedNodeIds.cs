@@ -1,4 +1,4 @@
-namespace ProjectT.Save
+namespace Gaze.Save
 {
     // 조사를 마친 노드 이름의 기록(SaveData.investigatedNodeIds). DialogueInteractable이 남김.
     public static class InvestigatedNodeIds

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace ProjectT.UI
+namespace Gaze.UI
 {
     // 화면 전체를 덮는 검은 이미지의 알파를 바꿔 페이드 아웃·인을 함.
     // FadeOut, FadeIn, HoldThenFadeIn은 IEnumerator라 호출하는 쪽이 MoveNext를 직접 돌려 기다림(await 불가).

@@ -1,8 +1,8 @@
 using System;
 using UnityEngine;
-using ProjectT.Save;
+using Gaze.Save;
 
-namespace ProjectT.Session
+namespace Gaze.Session
 {
     // 정상 종료(대사에서 요청하는 종료)를 맡음. 창 닫기 사망으로 기록되지 않게 막은 뒤 게임을 끔.
     // CoreEntry가 DialogueService.QuitNormallyRequested에 Request를 연결함.

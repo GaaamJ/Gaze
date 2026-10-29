@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Dialogue;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.Tests;
-using ProjectT.UI;
+using Gaze.Dialogue;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
+using Gaze.UI;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Yarn.Unity;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 
-namespace ProjectT.Death.Tests
+namespace Gaze.Death.Tests
 {
     // 다음 실행 흉내: 세이브 파일에 종료 상태를 써 두고 GameSession.Begin으로 다시 켠다.
     public class WindowCloseEntryTests

@@ -1,9 +1,9 @@
 using UnityEngine;
-using ProjectT.Dialogue;
-using ProjectT.Interaction;
-using ProjectT.Session;
+using Gaze.Dialogue;
+using Gaze.Interaction;
+using Gaze.Session;
 
-namespace ProjectT.Player
+namespace Gaze.Player
 {
     // 조사 키가 눌리면 DetectZone이 고른 대상을 조사시킴.
     // 조사 입력 → 대상 확인 → Interact(InteractContext).

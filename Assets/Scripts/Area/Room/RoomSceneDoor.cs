@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.Serialization;
-using ProjectT.Player;
-using ProjectT.Session;
+using Gaze.Player;
+using Gaze.Session;
 
-namespace ProjectT.Area
+namespace Gaze.Area
 {
     // Room 씬에 놓는 문. 라리스가 들어가면 targetScene의 targetDoorId 문으로 Room 이동을 시작함.
     // 이 오브젝트의 위치가 다른 Room에서 올 때의 도착 위치가 됨.

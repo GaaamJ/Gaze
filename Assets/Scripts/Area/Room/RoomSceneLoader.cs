@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using ProjectT.Player;
-using ProjectT.Session;
-using ProjectT.UI;
+using Gaze.Player;
+using Gaze.Session;
+using Gaze.UI;
 
-namespace ProjectT.Area
+namespace Gaze.Area
 {
     // Core 씬에서 Room 씬 하나를 additive로 불러오고 내리고, 문으로 Room을 옮기는 흐름을 맡음.
     // 어느 Room을 불러올지는 정하지 않음. 호출하는 쪽이 이름을 넘김.

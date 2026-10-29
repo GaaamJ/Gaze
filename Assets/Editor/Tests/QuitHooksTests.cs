@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Save;
-using ProjectT.Tests;
+using Gaze.Save;
+using Gaze.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace ProjectT.Session.Tests
+namespace Gaze.Session.Tests
 {
     // 훅 등록은 빌드에서만 하므로 여기서는 Application.quitting이 부를 처리만 직접 부른다.
     public class QuitHooksTests

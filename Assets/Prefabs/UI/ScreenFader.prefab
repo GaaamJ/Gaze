@@ -171,7 +171,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b59506c0281c1154184b4633c2a10dcb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectT.UI.ScreenFader
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.UI.ScreenFader
   image: {fileID: 7169677153607948688}
   duration: 0.2
   holdDuration: 0.3

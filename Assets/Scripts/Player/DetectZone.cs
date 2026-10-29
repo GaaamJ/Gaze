@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
-using ProjectT.Interaction;
+using Gaze.Interaction;
 
-namespace ProjectT.Player
+namespace Gaze.Player
 {
     // 조사할 수 있는 대상 중 지금 조사될 하나(CurrentTarget)를 매 프레임 고름.
     // 트리거 원에 들어온 대상을 후보로 모으고, 거리·바라보는 각도 안에 있는 것 중 가장 가까운 것을 뽑음.

@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Save;
-using ProjectT.Session;
-using ProjectT.Tests;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
 using UnityEngine;
 using UnityEngine.TestTools;
-using static ProjectT.Tests.TestObjects;
+using static Gaze.Tests.TestObjects;
 using Object = UnityEngine.Object;
 
-namespace ProjectT.Interaction.Tests
+namespace Gaze.Interaction.Tests
 {
     public class InteractableKindTests
     {

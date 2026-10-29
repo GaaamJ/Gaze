@@ -2,12 +2,12 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using ProjectT.Core.GameFolder;
-using ProjectT.Save;
+using Gaze.Core.GameFolder;
+using Gaze.Save;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace ProjectT.Core.Tests
+namespace Gaze.Core.Tests
 {
     public class SaveManagerTests
     {

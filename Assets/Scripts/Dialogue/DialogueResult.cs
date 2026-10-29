@@ -1,4 +1,4 @@
-namespace ProjectT.Dialogue
+namespace Gaze.Dialogue
 {
     // DialogueService.Play의 결과.
     public enum DialogueResult

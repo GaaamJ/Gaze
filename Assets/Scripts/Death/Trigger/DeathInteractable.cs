@@ -1,8 +1,8 @@
 using UnityEngine;
-using ProjectT.Data;
-using ProjectT.Interaction;
+using Gaze.Data;
+using Gaze.Interaction;
 
-namespace ProjectT.Death
+namespace Gaze.Death
 {
     // 조사하면 사망이 시작되는 오브젝트.
     public class DeathInteractable : Interactable, IDeathSource

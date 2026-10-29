@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using ProjectT.Session;
+using Gaze.Session;
 
-namespace ProjectT.Player
+namespace Gaze.Player
 {
     // 조사 입력(Z)을 받아 잠금 중이 아닐 때만 InteractPressed로 알림. PlayerInteractor가 구독함.
     // 대화 진행용 Z는 Yarn이 따로 읽음.

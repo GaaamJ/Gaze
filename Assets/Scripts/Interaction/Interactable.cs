@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectT.Interaction
+namespace Gaze.Interaction
 {
     // 조사 대상 컴포넌트의 공통 부모. 켜져 있는 동안만 조사할 수 있음.
     // DialogueInteractable, DeathInteractable이 상속함.

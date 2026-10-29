@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ProjectT.Area
+namespace Gaze.Area
 {
     // Room 씬의 RoomSceneDoor가 Core의 RoomSceneLoader를 인스펙터로 참조할 수 없어 여기서 찾아 넘김.
     public static class RoomSceneTransition
