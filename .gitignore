@@ -96,3 +96,4 @@ ProjectSettings/Packages/dev.yarnspinner/*-generated.ysls.json
 .agents/
 .claude/skills/*
 !.claude/skills/story/
+!.claude/skills/code-comments/
