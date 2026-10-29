@@ -5,7 +5,8 @@ using ProjectT.Session;
 
 namespace ProjectT.Player
 {
-    // 조사 입력(Z)을 받아 잠금 중이 아닐 때만 알린다. 대화 진행용 Z는 Yarn이 따로 읽는다.
+    // 조사 입력(Z)을 받아 잠금 중이 아닐 때만 InteractPressed로 알림. PlayerInteractor가 구독함.
+    // 대화 진행용 Z는 Yarn이 따로 읽음.
     public class PlayerInteractInput : MonoBehaviour
     {
         [SerializeField] InputActionReference interactAction;
@@ -26,7 +27,7 @@ namespace ProjectT.Player
         void OnEnable()
         {
             interactAction.action.performed += OnInteract;
-            // Disable()하지 않는 이유는 PlayerMovement.OnEnable 참고.
+            // OnDisable에서 Disable()하지 않는 이유는 PlayerMovement.OnEnable 참고.
             interactAction.action.Enable();
         }
 

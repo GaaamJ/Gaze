@@ -4,8 +4,8 @@ using Yarn.Unity;
 
 namespace ProjectT.Dialogue
 {
-    // <<Cutscene id>>: Resources/Cutscenes/{id} 이미지를 대사창 뒤에 띄우고 대사는 그대로 진행한다.
-    // <<CutsceneEnd>> 또는 대화 종료 때 닫는다.
+    // Yarn 커맨드 <<Cutscene id>>: Resources/Cutscenes/{id} 이미지를 대사창 뒤에 띄우고 대사는 그대로 진행함.
+    // <<CutsceneEnd>> 또는 대화 종료 때 닫음.
     [RequireComponent(typeof(DialogueRunner))]
     public class CutsceneCommand : MonoBehaviour
     {
@@ -24,6 +24,7 @@ namespace ProjectT.Dialogue
             cutsceneRoot.SetActive(false);
         }
 
+        // 커맨드 핸들러는 러너에 이름으로 등록됨. 켜질 때 등록하고 꺼질 때 뺌.
         void OnEnable()
         {
             runner.AddCommandHandler<string>(ShowCommandName, Show);
@@ -39,6 +40,7 @@ namespace ProjectT.Dialogue
             Hide();
         }
 
+        // <<Cutscene id>> 처리. 이미지가 없으면 경고만 남기고 대사는 계속 진행됨.
         void Show(string id)
         {
             Sprite sprite = Resources.Load<Sprite>(ResourceFolder + id);

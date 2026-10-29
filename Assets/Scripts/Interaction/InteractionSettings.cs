@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace ProjectT.Interaction
 {
+    // 조사 범위(거리, 각도) 설정 애셋. DetectZone이 읽어 대상을 고름.
     [CreateAssetMenu(fileName = "InteractionSettings", menuName = "ProjectT/Interaction Settings")]
     public class InteractionSettings : ScriptableObject
     {

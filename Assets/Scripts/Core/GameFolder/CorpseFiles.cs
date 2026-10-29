@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 
 namespace ProjectT.Core.GameFolder
 {
+    // 창 닫기 사망 때 Corpses 폴더에 만드는 빈 시체 파일(Corpse001.txt …). ExitRecorder가 부름.
     public static class CorpseFiles
     {
         const int MaxAttempts = 100;
@@ -12,6 +13,8 @@ namespace ProjectT.Core.GameFolder
 
         public static string FileName(int number) => $"Corpse{number:D3}.txt";
 
+        // 시체 파일을 새로 만듦. 폴더 만들기 → 가장 큰 기존 번호 + 1부터 빈 이름 찾기 → 빈 파일 만들기.
+        // 성공하면 만든 경로를, 실패하면 error를 채워 거짓을 돌려줌.
         public static bool TryCreate(GameFolderPaths paths, out string filePath, out string error)
         {
             if (paths == null) throw new ArgumentNullException(nameof(paths));
@@ -54,20 +57,21 @@ namespace ProjectT.Core.GameFolder
             }
         }
 
+        // 폴더 안 시체 파일 이름의 가장 큰 번호. 없으면 0.
         static int MaxNumber(string folder)
         {
             int max = 0;
             foreach (string file in Directory.EnumerateFiles(folder))
             {
                 Match match = NamePattern.Match(Path.GetFileName(file));
-                // int 범위를 넘는 번호는 다음 번호를 만들 수 없어 세지 않는다.
+                // int 범위를 넘는 번호는 다음 번호를 만들 수 없어 세지 않음.
                 if (match.Success && int.TryParse(match.Groups[1].Value, out int number) && number > max)
                     max = number;
             }
             return max;
         }
 
-        // 같은 이름이 이미 있으면(다른 프로세스가 먼저 만들었거나 같은 이름의 폴더) false를 돌려 다음 번호로 넘어간다.
+        // 빈 파일을 만듦. 같은 이름이 이미 있으면(다른 프로세스가 먼저 만들었거나 같은 이름의 폴더) false를 돌려 다음 번호로 넘어가게 함.
         static bool TryCreateEmpty(string path)
         {
             try

@@ -4,16 +4,19 @@ using ProjectT.Interaction;
 
 namespace ProjectT.Player
 {
-    // 라리스의 자식에 붙인다. 부모의 Rigidbody2D로 트리거가 동작하므로 Rigidbody2D는 붙이지 않는다.
+    // 조사할 수 있는 대상 중 지금 조사될 하나(CurrentTarget)를 매 프레임 고름.
+    // 트리거 원에 들어온 대상을 후보로 모으고, 거리·바라보는 각도 안에 있는 것 중 가장 가까운 것을 뽑음.
+    // PlayerInteractor가 CurrentTarget을 읽음.
+    // 라리스의 자식에 붙임. 부모의 Rigidbody2D로 트리거가 동작하므로 Rigidbody2D는 붙이지 않음.
     [RequireComponent(typeof(CircleCollider2D))]
     public class DetectZone : MonoBehaviour
     {
         [SerializeField] InteractionSettings settings;
         [SerializeField] LayerMask interactableMask;
 
-        // 경계값(정확히 거리·각도 끝)을 포함시키기 위한 부동소수 오차 허용치
+        // 경계값(정확히 거리·각도 끝)을 포함시키기 위한 부동소수 오차 허용치.
         const float Epsilon = 1e-4f;
-        // 트리거 원이 경계에 딱 닿은 대상을 후보에서 놓치지 않도록 조금 크게 잡고, 실제 판정은 FindBest가 한다.
+        // 트리거 원이 경계에 딱 닿은 대상을 후보에서 놓치지 않도록 조금 크게 잡음. 실제 판정은 FindBest가 함.
         const float TriggerMargin = 0.1f;
 
         struct Candidate
@@ -25,6 +28,7 @@ namespace ProjectT.Player
         readonly List<Candidate> candidates = new List<Candidate>();
         PlayerMovement movement;
 
+        // 지금 조사될 대상. 없으면 null. 매 Update에 FindBest 결과로 갱신됨.
         public IInteractable CurrentTarget { get; private set; }
 
         void Awake()
@@ -56,6 +60,7 @@ namespace ProjectT.Player
             CurrentTarget = null;
         }
 
+        // 조사 레이어의 IInteractable 콜라이더를 후보에 한 번만 추가함.
         void OnTriggerEnter2D(Collider2D other)
         {
             if ((interactableMask.value & (1 << other.gameObject.layer)) == 0)
@@ -88,6 +93,9 @@ namespace ProjectT.Player
             CurrentTarget = FindBest();
         }
 
+        // 후보 중 거리·각도 안에 든 것만 남겨 가장 좋은 하나를 고름. 없으면 null.
+        // 파괴된 후보는 이때 목록에서 지움.
+        // 거리 가까운 순 → 각도 작은 순 → InstanceID 작은 순으로 비교해 같은 조건에서도 결과가 일정함.
         IInteractable FindBest()
         {
             Vector2 origin = transform.position;

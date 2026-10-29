@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace ProjectT.Player
 {
-    // 왼쪽 계열 그림만 있으므로 오른쪽 계열은 flipX로 좌우 반전해서 보여 준다.
+    // 라리스의 바라보는 방향(PlayerMovement.Facing)에 맞는 스프라이트를 보여 줌.
+    // 왼쪽 계열 그림만 있으므로 오른쪽 계열은 flipX로 좌우 반전해서 보여 줌.
     public class PlayerSprite : MonoBehaviour
     {
         [SerializeField] PlayerMovement movement;
@@ -41,13 +42,14 @@ namespace ProjectT.Player
             Show(movement.Facing);
         }
 
-        // PlayerMovement.Update에서 바뀐 방향을 같은 프레임에 반영하려고 LateUpdate에서 읽는다.
+        // PlayerMovement.Update에서 바뀐 방향을 같은 프레임에 반영하려고 LateUpdate에서 읽음.
         void LateUpdate()
         {
             if (movement.Facing != shownFacing)
                 Show(movement.Facing);
         }
 
+        // 위/아래/왼쪽 + 대각선 스프라이트를 고르고, 오른쪽 성분이 있으면 좌우 반전함.
         void Show(Vector2Int facing)
         {
             shownFacing = facing;

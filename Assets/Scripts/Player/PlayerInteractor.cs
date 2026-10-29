@@ -5,6 +5,8 @@ using ProjectT.Session;
 
 namespace ProjectT.Player
 {
+    // 조사 키가 눌리면 DetectZone이 고른 대상을 조사시킴.
+    // 조사 입력 → 대상 확인 → Interact(InteractContext).
     public class PlayerInteractor : MonoBehaviour
     {
         [SerializeField] PlayerInteractInput input;

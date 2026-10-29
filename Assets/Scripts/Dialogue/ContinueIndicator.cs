@@ -9,6 +9,9 @@ using Yarn.Unity;
 
 namespace ProjectT.Dialogue
 {
+    // 대사 출력이 끝나 입력을 기다리는 동안 graphic을 깜박이는 표시.
+    // Yarn의 ActionMarkupHandler 콜백으로 대사 단위의 시작·완료·닫힘을 받음.
+    // DialogueSystem 프리팹에서 LinePresenter의 eventHandlers에 등록되어 있음.
     public class ContinueIndicator : ActionMarkupHandler
     {
         [SerializeField] Graphic? graphic;
@@ -16,6 +19,7 @@ namespace ProjectT.Dialogue
 
         float elapsed;
 
+        // 대사 출력이 끝나 표시가 깜박이는 중이면 참.
         public bool Waiting { get; private set; }
 
         void Awake()
@@ -25,6 +29,7 @@ namespace ProjectT.Dialogue
             Hide();
         }
 
+        // 기다리는 동안 blinkInterval마다 graphic을 켜고 끔. 시간 정지(timeScale 0)에도 깜박이도록 unscaled 시간을 씀.
         void Update()
         {
             if (!Waiting || graphic == null)
@@ -40,7 +45,8 @@ namespace ProjectT.Dialogue
 
         public override YarnTask OnCharacterWillAppear(int currentCharacterIndex, MarkupParseResult line, CancellationToken cancellationToken) => YarnTask.CompletedTask;
 
-        // 출력 중 Z(hurry up)로 끊겨도 타자기는 이 콜백을 부르므로 남은 글자가 한꺼번에 뜬 시점에 켜진다.
+        // 대사 출력이 끝나면 표시를 켬.
+        // 출력 중 Z(hurry up)로 끊겨도 타자기는 이 콜백을 부르므로 남은 글자가 한꺼번에 뜬 시점에 켜짐.
         public override void OnLineDisplayComplete()
         {
             Waiting = true;

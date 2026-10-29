@@ -10,6 +10,7 @@ using ProjectT.Session;
 
 namespace ProjectT.Death
 {
+    // 라리스가 처음 들어오면 외면 대사를 재생하는 영역.
     // 라리스를 막는 건 같은 프리팹의 콜라이더가 함.
     // 이 영역은 처음 다가올 때 외면 대사만 한 번 재생함.
     [RequireComponent(typeof(Collider2D))]
@@ -28,6 +29,7 @@ namespace ProjectT.Death
             HandleEntered(other);
         }
 
+        // 라리스가 들어왔고, 재생 중·사망 중이 아니고, 아직 조사 기록에 없으면 외면 대사를 재생함.
         internal void HandleEntered(Collider2D other)
         {
             if (!PlayerMovement.TryFrom(other, out _) || playing || DeathSequence.IsActive)
@@ -41,6 +43,8 @@ namespace ProjectT.Death
             Refuse(refusalNodeId, investigated).Forget();
         }
 
+        // 외면 대사 재생 → 끝까지 봤으면 조사 기록에 남김.
+        // 재생 중에는 playing으로 다시 들어오는 것을 막음.
         async YarnTask Refuse(string nodeId, HashSet<string> investigated)
         {
             playing = true;
@@ -50,7 +54,7 @@ namespace ProjectT.Death
                 if (result == DialogueResult.Completed)
                     DialogueInteractable.RecordInvestigated(investigated, nodeId);
                 else if (result == DialogueResult.Rejected)
-                    Debug.LogWarning($"[DeathRefusalZone] 거부 노드 '{nodeId}'를 재생하지 못했다.");
+                    Debug.LogWarning($"[DeathRefusalZone] 외면 노드 '{nodeId}'를 재생하지 못했다.");
             }
             finally
             {
@@ -58,6 +62,7 @@ namespace ProjectT.Death
             }
         }
 
+        // 씬의 DialogueService로 노드를 재생. 서비스가 없으면 Rejected, 다른 대화 중이면 Interrupted를 돌려줌.
         static async YarnTask<DialogueResult> PlayWithSceneDialogue(string nodeId)
         {
             DialogueService dialogue = FindAnyObjectByType<DialogueService>();

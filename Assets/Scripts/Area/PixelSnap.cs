@@ -5,8 +5,8 @@ using UnityEditor;
 
 namespace ProjectT.Area
 {
-    // 에디터에서 플레이 모드가 아닐 때만 월드 위치 x, y를 픽셀 격자에 맞춘다.
-    // 스프라이트 피벗이 픽셀 경계에 있어야 정확히 맞는다(홀수 크기 스프라이트는 Center 피벗이 반 픽셀에 놓임).
+    // 에디터에서 플레이 모드가 아닐 때만 월드 위치 x, y를 픽셀 격자에 맞춤. 빌드·플레이 중에는 아무것도 안 함.
+    // 스프라이트 피벗이 픽셀 경계에 있어야 정확히 맞음(홀수 크기 스프라이트는 Center 피벗이 반 픽셀에 놓임).
     [ExecuteAlways]
     [DisallowMultipleComponent]
     public class PixelSnap : MonoBehaviour
@@ -24,6 +24,7 @@ namespace ProjectT.Area
             Snap();
         }
 
+        // 위치를 가장 가까운 픽셀 격자로 반올림. 이미 맞아 있으면 Undo 기록 없이 넘어감.
         [ContextMenu("지금 픽셀에 맞추기")]
         void Snap()
         {

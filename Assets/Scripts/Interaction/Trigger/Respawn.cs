@@ -2,6 +2,8 @@ using UnityEngine;
 
 namespace ProjectT.Interaction
 {
+    // 조사하면 리스폰 지점이 되는 오브젝트에 붙이는 표시 컴포넌트.
+    // 위치만 들고 있고, 저장은 DialogueInteractable.Interact가 함.
     [RequireComponent(typeof(DialogueInteractable))]
     public class Respawn : MonoBehaviour
     {
