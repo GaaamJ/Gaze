@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: GrayScaleTileSet_Light
+  m_Name: Prototype_Wall_L
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.Tilemaps.Tile
-  m_Sprite: {fileID: -1827389520399960917, guid: 09a4d4340e8e9d64eaa06a4ba7d8be4a, type: 3}
+  m_Sprite: {fileID: 1962938623, guid: df8c091f5f25b9245b4da34ace464426, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1

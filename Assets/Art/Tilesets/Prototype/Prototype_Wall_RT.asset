@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 13312, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name: GrayScaleDangerZone
+  m_Name: Prototype_Wall_RT
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.Tilemaps.Tile
-  m_Sprite: {fileID: 5295660050495531344, guid: 8ef328dd61df9094fb418a84b18e4b40, type: 3}
+  m_Sprite: {fileID: -1538908234, guid: df8c091f5f25b9245b4da34ace464426, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Transform:
     e00: 1
