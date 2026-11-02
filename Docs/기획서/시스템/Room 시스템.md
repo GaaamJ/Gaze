@@ -11,7 +11,7 @@
 	- Room 이동은 세이브하지 않음.
 
 - 지금 있는 Room 씬: `Prototype01`, `Prototype02`
-	- 기본 Room: `Prototype01` (`CoreEntry`에 설정)
+	- 기본 Room: `Prototype02` (`CoreEntry`에 설정)
 
 - 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
 	- 빌드 설정에는 넣지 않음.

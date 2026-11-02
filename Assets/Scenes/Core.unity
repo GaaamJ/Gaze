@@ -360,7 +360,7 @@ Transform:
   m_GameObject: {fileID: 97015912}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 2, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -776,7 +776,7 @@ Transform:
   m_GameObject: {fileID: 1096427524}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 2, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -817,7 +817,7 @@ MonoBehaviour:
   roomLoader: {fileID: 1196390259}
   laris: {fileID: 97015913}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
-  defaultRoom: Prototype01
+  defaultRoom: Prototype02
 --- !u!4 &1196390258
 Transform:
   m_ObjectHideFlags: 0
@@ -1129,6 +1129,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.LightBreath
   breathsPerSecond: 0.2
   amplitude: 0.05
+  radiusPixels: 64
+  stepPixels: 0
+  framesPerSecond: 0
 --- !u!1 &2098344993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1200,7 +1203,7 @@ Transform:
   m_GameObject: {fileID: 2098344993}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 2, y: 1, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
