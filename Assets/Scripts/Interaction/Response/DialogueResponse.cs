@@ -9,9 +9,10 @@ using Gaze.Save;
 
 namespace Gaze.Interaction
 {
-    // 조사하면 Yarn 대사를 재생하는 조사 대상. 같은 오브젝트에 Respawn이 있으면 리스폰 지점도 갱신함.
+    // 조사되면 Yarn 대사를 재생하는 부품.
     // 대사를 끝까지 보면 조사 기록에 남기고, 다음 조사부터는 재조사 노드를 씀.
-    public class DialogueInteractable : Interactable
+    [RequireComponent(typeof(Interactable))]
+    public class DialogueResponse : MonoBehaviour, IInteractResponse
     {
         [Tooltip("첫 조사 때 재생할 Yarn 노드 이름. 재조사는 '{dialogueNodeId}_Recheck'가 있으면 그것, 없으면 첫 노드를 반복한다. 비우면 대사 없이 조사만 된다.")]
         [FormerlySerializedAs("nodeId")]
@@ -19,14 +20,9 @@ namespace Gaze.Interaction
 
         public string DialogueNodeId => dialogueNodeId;
 
-        // 리스폰 지점 갱신 → 대사 재생. 노드 이름이 비었으면 리스폰 갱신만 함.
-        // PlayerInteractor가 조사 키를 눌렀을 때 부름.
-        public override void Interact(InteractContext context)
+        // 노드 이름이 비었으면 아무것도 안 함.
+        public void OnInteract(InteractContext context)
         {
-            // 대사 중 '게임 끄기'로 종료해도 갱신된 지점이 남도록 대사보다 먼저 저장함.
-            if (TryGetComponent(out Respawn respawn))
-                UpdateRespawn(respawn);
-
             if (string.IsNullOrWhiteSpace(dialogueNodeId))
                 return;
 
@@ -44,21 +40,12 @@ namespace Gaze.Interaction
             return nodeExists(recheck) ? recheck : dialogueNodeId;
         }
 
-        // 이 오브젝트가 속한 Room의 이름과 Respawn 위치를 리스폰 지점으로 저장함.
-        void UpdateRespawn(Respawn respawn)
-        {
-            Vector2 position = respawn.SpawnPosition;
-            string roomName = gameObject.scene.name;
-            if (RespawnPoint.Set(position, roomName))
-                Debug.Log($"[DialogueInteractable] 리스폰 지점 갱신·저장: {position} ({roomName})", this);
-        }
-
         // 재생할 노드 고르기 → 대사 재생 → 끝까지 봤으면 조사 기록.
         async YarnTask PlayDialogue(InteractContext context)
         {
             if (context.Dialogue == null)
             {
-                Debug.LogWarning($"[DialogueInteractable] '{name}': DialogueService가 없어 대사를 재생하지 못했다.", this);
+                Debug.LogWarning($"[DialogueResponse] '{name}': DialogueService가 없어 대사를 재생하지 못했다.", this);
                 return;
             }
 
@@ -83,7 +70,7 @@ namespace Gaze.Interaction
 #if UNITY_EDITOR
         void OnValidate()
         {
-            YarnNodeCheck.WarnMissingDeferred(this, nameof(DialogueInteractable), dialogueNodeId);
+            YarnNodeCheck.WarnMissingDeferred(this, nameof(DialogueResponse), dialogueNodeId);
         }
 #endif
     }

@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace Gaze.Death
 {
     // 라리스가 죽은 뒤 다시 시작할 때까지의 사망 처리 전체를 맡음.
-    // DeathZone, DeathInteractable이 Begin을 부름.
+    // DeathZone, DeathResponse가 Begin을 부름.
     public static class DeathSequence
     {
         const float DialogueStopTimeout = 2f;
