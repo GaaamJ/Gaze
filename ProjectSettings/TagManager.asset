@@ -53,8 +53,5 @@ TagManager:
   - name: FrontProp
     uniqueID: 1617911051
     locked: 0
-  - name: InteractableBang
-    uniqueID: 149260573
-    locked: 0
   m_RenderingLayers:
   - Default
