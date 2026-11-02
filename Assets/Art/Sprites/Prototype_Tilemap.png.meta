@@ -191,7 +191,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Prototype_Wall_L
+      name: Prototype_Wall_CenterSide
       rect:
         serializedVersion: 2
         x: 0
@@ -341,7 +341,7 @@ TextureImporter:
       Prototype_Tile: -1550051949
       Prototype_Wall_B: -1846148348
       Prototype_Wall_C: 764439392
-      Prototype_Wall_L: 1962938623
+      Prototype_Wall_CenterSide: 1962938623
       Prototype_Wall_LB: 128498227
       Prototype_Wall_LT: -7703448879478576084
       Prototype_Wall_R: 1489941153

@@ -49,7 +49,7 @@
 - `Docs/레퍼런스/Reference Map Design.md`: map structure notes on OneShot, OMORI, Undertale. Read first when building a graybox map.
 - `Docs/기획서/아이디어.md`: short notes on ideas. Not decided.
 - `Docs/기획서/결정 사항.md`: what is decided (including small calls like camera size) and what was dropped. Add one line whenever something is decided.
-- `Docs/기획서/시스템/`: one doc per code system (death, interaction, dialogue, save, Room, session, player). The `확인 필요` section at the end of each lists what is missing and the constraints.
+- `Docs/기획서/시스템/`: one doc per code system (death, interaction, dialogue, save, Room, session, player, light). The `확인 필요` section at the end of each lists what is missing and the constraints.
 - `Docs/인수인계 문서.md`: handoff between accounts. Exists only right after an account switch.
 	- Written in English just before switching accounts.
 	- Holds the current task and open questions. Does not repeat CLAUDE.md; if they disagree, CLAUDE.md wins.
@@ -75,11 +75,14 @@
 
 ## Branches
 
-- Simple changes (docs, small fixes, value tweaks) go on main with no branch.
-- Features start from main as `feature/{name}`. One feature = one issue = one branch = one PR to main.
-	- End commit messages with `(#number)`.
-	- PR body: `Closes #number` if the feature is done, `관련 #number` if partial.
-- Cleanup or refactoring big enough to need review starts from main as `refactor/{name}`.
+- One prototype = one issue = one branch = one PR to main. Start from main as `feature/{name}`.
+	- Everything the prototype needs stays on that branch: features, refactors, small fixes and docs found along the way. Do not open a new branch for each piece.
+	- Split the work into commits by kind instead (`feat`, `refactor`, `chore`, `docs`).
+	- End feature commit messages with `(#number)`.
+	- PR body: `Closes #number` if the prototype is done, `관련 #number` if partial.
+	- The user finds frequent small branches tiring (2026-11-02).
+- Simple changes made while no prototype branch is open go on main with no branch.
+- Only cleanup or refactoring unrelated to the current prototype gets its own `refactor/{name}` branch.
 
 ## Commits
 
