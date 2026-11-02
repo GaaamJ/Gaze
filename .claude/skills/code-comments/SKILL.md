@@ -1,6 +1,6 @@
 ---
 name: code-comments
-description: Rules for writing and editing C# code comments in Project_T. Use when adding, changing, or reviewing comments in Assets/Scripts, or when writing a system doc that quotes them.
+description: Rules for writing and editing C# code comments in Gaze. Use when adding, changing, or reviewing comments in Assets/Scripts, or when writing a system doc that quotes them.
 ---
 
 # Code comments

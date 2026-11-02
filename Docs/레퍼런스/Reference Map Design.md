@@ -17,9 +17,9 @@
 | OMORI | 20×15 (32px) | ~1/10 |
 | Undertale | ~16×12 (20px, estimated) | ~1/8 |
 | Depersonalization | unknown (~480×270 estimated) | ~1/6 |
-| Gaze now | 20×15 (16px, PixelPerfectCamera ref 320×240) | ~1/15 |
+| Gaze now | 20×11.25 (16px, PixelPerfectCamera ref 320×180, 16:9) | ~1/11 |
 
-- Gaze's camera was ~34×19 (girl 2–3× smaller than any reference) until 2026-10-29; it now matches the references. Room sizes below assume a 20×15 screen.
+- Gaze's camera was ~34×19 (girl 2–3× smaller than any reference) until 2026-10-29, then 320×240, and 320×180 since 2026-11-02 (16:9, no side bars). Room sizes below assume a 20×11 screen.
 
 
 # OneShot
@@ -62,6 +62,6 @@
 # For the first graybox
 ---
 - One region = start → (tension) → save point. Tension is not designed yet; leave marked slots for it.
-- Use the spine + short branch + loop pattern. Size: a few screens long at a ~20×15 screen.
+- Use the spine + short branch + loop pattern. Size: a few screens long at a ~20×11 screen.
 - Put at least one side pocket with something the girl reacts to (a "shiny stone" moment).
 - Leave room for a chase: a corridor long enough to run, and a place to hide or a door to shut.

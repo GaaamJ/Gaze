@@ -1,6 +1,6 @@
 ---
 name: doc-writing
-description: Rules for writing and editing Korean docs the user reads in Project_T (Docs/기획서, system docs, 결정 사항, 아이디어, the 컨셉 section of CLAUDE.md). Use when creating or changing any of these, including a new system doc under Docs/기획서/시스템.
+description: Rules for writing and editing Korean docs the user reads in Gaze (Docs/기획서, system docs, 결정 사항, 아이디어, the 컨셉 section of CLAUDE.md). Use when creating or changing any of these, including a new system doc under Docs/기획서/시스템.
 ---
 
 # Doc writing
