@@ -27,7 +27,7 @@ namespace Gaze.Player
 
         // 트리거 콜라이더가 라리스의 몸인지 확인하고 PlayerMovement를 돌려줌.
         // 라리스의 조사 감지 원(트리거)이 먼저 닿아도 반응하지 않도록 몸 콜라이더만 라리스로 봄.
-        // RoomSceneDoor, DeathZone, DeathRefusalZone이 부름.
+        // Door, DeathZone, DeathRefusalZone이 부름.
         public static bool TryFrom(Collider2D other, out PlayerMovement laris)
         {
             laris = null;

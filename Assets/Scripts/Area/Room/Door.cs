@@ -9,7 +9,7 @@ namespace Gaze.Area
     // 이 오브젝트의 위치가 다른 Room에서 올 때의 도착 위치가 됨.
     // Core의 RoomSceneLoader를 인스펙터로 참조할 수 없어 정적 진입점 RoomSceneTransition.Begin으로 넘김.
     [RequireComponent(typeof(Collider2D))]
-    public class RoomSceneDoor : MonoBehaviour
+    public class Door : MonoBehaviour
     {
         [Tooltip("이 문의 id. 다른 Room의 문이 targetDoorId로 가리킨다.")]
         [SerializeField] string doorId;

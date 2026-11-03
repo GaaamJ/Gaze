@@ -91,7 +91,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f7f50bb22ffde747823fea277cb45e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.RoomSceneDoor
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.Door
   doorId: 
   targetScene: 
   targetDoorId: 

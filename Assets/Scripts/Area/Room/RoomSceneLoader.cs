@@ -16,7 +16,7 @@ namespace Gaze.Area
     public class RoomSceneLoader : MonoBehaviour
     {
         [SerializeField] InputLock inputLock;
-        [Tooltip("RoomSceneDoor로 넘어갈 때 도착 문으로 옮길 라리스")]
+        [Tooltip("Door로 넘어갈 때 도착 문으로 옮길 라리스")]
         [SerializeField] PlayerMovement laris;
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
@@ -143,7 +143,7 @@ namespace Gaze.Area
                 Rigidbody2D body = laris != null ? laris.GetComponent<Rigidbody2D>() : null;
                 if (door == null)
                 {
-                    Debug.LogError($"[RoomSceneLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 RoomSceneDoor가 없어 라리스를 옮기지 못했다.", this);
+                    Debug.LogError($"[RoomSceneLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 Door가 없어 라리스를 옮기지 못했다.", this);
                 }
                 else if (body != null)
                 {
@@ -200,14 +200,14 @@ namespace Gaze.Area
             moveFader = null;
         }
 
-        // 씬 안에서 id가 같은 RoomSceneDoor를 찾음. 씬이 불러와 있지 않거나 없으면 null.
-        static RoomSceneDoor FindDoor(Scene scene, string doorId)
+        // 씬 안에서 id가 같은 Door를 찾음. 씬이 불러와 있지 않거나 없으면 null.
+        static Door FindDoor(Scene scene, string doorId)
         {
             if (!scene.IsValid() || !scene.isLoaded)
                 return null;
             foreach (GameObject root in scene.GetRootGameObjects())
             {
-                foreach (RoomSceneDoor door in root.GetComponentsInChildren<RoomSceneDoor>(true))
+                foreach (Door door in root.GetComponentsInChildren<Door>(true))
                 {
                     if (door.DoorId == doorId)
                         return door;

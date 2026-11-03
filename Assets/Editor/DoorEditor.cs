@@ -8,9 +8,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Gaze.Area;
 
-[CustomEditor(typeof(RoomSceneDoor))]
+[CustomEditor(typeof(Door))]
 [CanEditMultipleObjects]
-class RoomSceneDoorEditor : Editor
+class DoorEditor : Editor
 {
     static readonly Regex BlockHeader = new Regex(@"^--- !u!", RegexOptions.Multiline);
     static readonly Regex ScriptGuid = new Regex(@"m_Script: \{fileID: 11500000, guid: ([0-9a-f]{32})");
@@ -44,7 +44,7 @@ class RoomSceneDoorEditor : Editor
         serializedObject.Update();
 
         using (new EditorGUI.DisabledScope(true))
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((RoomSceneDoor)target), typeof(MonoScript), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((Door)target), typeof(MonoScript), false);
 
         EditorGUILayout.PropertyField(doorId);
         string scenePath = DrawTargetScene();
@@ -91,7 +91,7 @@ class RoomSceneDoorEditor : Editor
     // 이 문의 doorId, targetScene, targetDoorId가 모두 있고 이 문이 저장된 씬에 있을 때만 누를 수 있음.
     void DrawLinkBack(string scenePath)
     {
-        var door = (RoomSceneDoor)target;
+        var door = (Door)target;
         Scene own = door.gameObject.scene;
         bool ready = !Application.isPlaying
             && scenePath != null
@@ -113,7 +113,7 @@ class RoomSceneDoorEditor : Editor
 
     // 상대 씬을 열어(이미 열려 있으면 그대로) 그 문을 이 문으로 이음.
     // 직접 연 씬은 저장하고 닫음. 이미 열려 있던 씬은 다른 수정까지 저장되지 않도록 dirty 표시만 함.
-    static void LinkBack(RoomSceneDoor door, string ownScene, string otherScenePath, string otherDoorId)
+    static void LinkBack(Door door, string ownScene, string otherScenePath, string otherDoorId)
     {
         Scene other = SceneManager.GetSceneByPath(otherScenePath);
         bool openedHere = !(other.IsValid() && other.isLoaded);
@@ -122,9 +122,9 @@ class RoomSceneDoorEditor : Editor
 
         try
         {
-            var matches = new List<RoomSceneDoor>();
+            var matches = new List<Door>();
             foreach (GameObject root in other.GetRootGameObjects())
-                foreach (RoomSceneDoor candidate in root.GetComponentsInChildren<RoomSceneDoor>(true))
+                foreach (Door candidate in root.GetComponentsInChildren<Door>(true))
                     if (candidate != door && candidate.DoorId == otherDoorId)
                         matches.Add(candidate);
 
@@ -149,7 +149,7 @@ class RoomSceneDoorEditor : Editor
 
             if (openedHere)
                 UnityEditor.SceneManagement.EditorSceneManager.SaveScene(other);
-            Debug.Log($"[RoomSceneDoorEditor] '{other.name}/{otherDoorId}' → '{ownScene}/{door.DoorId}'로 이었다." + (openedHere ? "" : " 열려 있던 씬이라 저장은 직접 해야 한다."), matches[0]);
+            Debug.Log($"[DoorEditor] '{other.name}/{otherDoorId}' → '{ownScene}/{door.DoorId}'로 이었다." + (openedHere ? "" : " 열려 있던 씬이라 저장은 직접 해야 한다."), matches[0]);
         }
         finally
         {
@@ -197,7 +197,7 @@ class RoomSceneDoorEditor : Editor
         string id = targetDoorId.stringValue;
         if (FindDoorIds(scenePath).Contains(id))
             return;
-        EditorGUILayout.HelpBox($"Room '{Path.GetFileNameWithoutExtension(scenePath)}'에 doorId가 '{id}'인 RoomSceneDoor가 없다.", MessageType.Warning);
+        EditorGUILayout.HelpBox($"Room '{Path.GetFileNameWithoutExtension(scenePath)}'에 doorId가 '{id}'인 Door가 없다.", MessageType.Warning);
     }
 
     static HashSet<string> FindDoorIds(string scenePath)
@@ -208,7 +208,7 @@ class RoomSceneDoorEditor : Editor
         {
             var ids = new HashSet<string>();
             foreach (GameObject root in open.GetRootGameObjects())
-                foreach (RoomSceneDoor door in root.GetComponentsInChildren<RoomSceneDoor>(true))
+                foreach (Door door in root.GetComponentsInChildren<Door>(true))
                     ids.Add(door.DoorId ?? "");
             return ids;
         }
@@ -222,10 +222,10 @@ class RoomSceneDoorEditor : Editor
     {
         if (doorScriptGuid != null)
             return doorScriptGuid;
-        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(RoomSceneDoor)}"))
+        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(Door)}"))
         {
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guid));
-            if (script != null && script.GetClass() == typeof(RoomSceneDoor))
+            if (script != null && script.GetClass() == typeof(Door))
                 return doorScriptGuid = guid;
         }
         return doorScriptGuid = "";

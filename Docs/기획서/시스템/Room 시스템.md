@@ -6,7 +6,7 @@
 	- `Core`: 라리스, 카메라, 대화, 입력 잠금 등 → [[세션 시스템]]
 	- Room 씬: 바닥, 벽, 조사 대상, 죽음 트리거, 문
 
-- Room 사이는 문(`RoomSceneDoor`)으로 넘어감.
+- Room 사이는 문(`Door`)으로 넘어감.
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
@@ -24,7 +24,7 @@
 | --------------------- | ------------------------------------------------------------------------ |
 | `RoomSceneLoader`     | Room 씬 불러오기·내리기, 문으로 Room 이동.<br>`Core` 씬에 하나만 둠.                        |
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
-| `RoomSceneDoor`       | Room 씬에 놓는 문. 라리스가 들어가면 다른 Room의 문으로 이동.<br>이 문의 위치가 도착 위치.          |
+| `Door`       | Room 씬에 놓는 문. 라리스가 들어가면 다른 Room의 문으로 이동.<br>이 문의 위치가 도착 위치.          |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
 
@@ -33,7 +33,7 @@
 ---
 ```mermaid
 sequenceDiagram
-    participant D as RoomSceneDoor
+    participant D as Door
     participant T as RoomSceneTransition
     participant L as RoomSceneLoader
     participant E as RoomSceneEntry
@@ -58,14 +58,14 @@ sequenceDiagram
 ---
 - **Room 만들기**
 	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
-		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Wall`에만 콜라이더, 정렬 레이어 `Background`), `RoomDoor`, `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `RoomDoor`, `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
 		- 리스폰 지점은 템플릿에 없음. 필요한 방에만 `Respawn` Pb를 놓음.
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
 
 - **문 잇기**
-	1. 양쪽 Room에 Trigger 콜라이더와 `RoomSceneDoor`를 붙인 오브젝트를 둠.
+	1. 양쪽 Room에 Trigger 콜라이더와 `Door`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
 		- Ex. A의 문: `doorId` = `East`, `targetScene` = `B`, `targetDoorId` = `West`
@@ -77,6 +77,13 @@ sequenceDiagram
 		- Ex. `East`, `West`, 한쪽에 둘이면 `East1`, `East2`
 	- `targetScene`, `targetDoorId`는 Inspector 목록에서 고름. 목록은 빌드 설정의 씬과 그 씬의 문 id.
 
+- **벽 칠하기**
+	- `Prototype_Wall_Rule`(RuleTile)로 방 전체를 속까지 채워 칠함.
+		- 테두리만 칠하면 왼쪽 벽과 오른쪽 벽을 구분하지 못해 모서리가 틀어짐.
+		- 바닥 칸은 그림도 콜라이더도 없어서 화면에는 안 보임. 바닥 그림은 `Ground` 타일맵에 그대로 둠.
+	- 윗벽은 3칸. `T` 한 줄 아래 `C` 두 줄이 자동으로 깔림.
+	- 이웃이 없는 한 칸 벽, 한 칸 두께의 벽에는 규칙이 없어 그려지지 않음.
+
 - **픽셀 맞추기**
 	- 오브젝트에 `PixelSnap`을 붙이면 에디터에서 움직일 때 픽셀 격자에 붙음.
 	- 스프라이트 피벗이 픽셀 경계에 있어야 정확히 맞음.
@@ -86,4 +93,5 @@ sequenceDiagram
 ---
 
 - 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
-	- `Wall` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
+	- `Ground` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
+		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
