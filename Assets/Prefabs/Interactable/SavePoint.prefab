@@ -41,13 +41,13 @@ GameObject:
   m_Component:
   - component: {fileID: 4817182599462733136}
   - component: {fileID: 5598725107774791993}
-  - component: {fileID: 7611679516158777232}
-  - component: {fileID: 5836111377586391215}
-  - component: {fileID: 256074454724897770}
   - component: {fileID: 5851207256654093678}
+  - component: {fileID: 5836111377586391215}
   - component: {fileID: 7994222688954704266}
+  - component: {fileID: 7611679516158777232}
+  - component: {fileID: 256074454724897770}
   m_Layer: 9
-  m_Name: Respawn
+  m_Name: SavePoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -128,7 +128,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &7611679516158777232
+--- !u!114 &5851207256654093678
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -137,10 +137,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8561351554208887969}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
+  m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.Interactable
-  dialogueNodeId: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.PixelSnap
+  pixelsPerUnit: 16
 --- !u!61 &5836111377586391215
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -187,6 +187,31 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.75, y: 0.75}
   m_EdgeRadius: 0
+--- !u!114 &7994222688954704266
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8561351554208887969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a77e4618c2397a4494c65a252d17cf5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.Interactable
+--- !u!114 &7611679516158777232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8561351554208887969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b75142d2ede12740b82ef6b0b1e340b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.Interactable
+  dialogueNodeId: 
 --- !u!114 &256074454724897770
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -200,28 +225,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.RespawnArea
   spawnPoint: {fileID: 3377707682449886961}
---- !u!114 &5851207256654093678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8561351554208887969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.PixelSnap
-  pixelsPerUnit: 16
---- !u!114 &7994222688954704266
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8561351554208887969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a77e4618c2397a4494c65a252d17cf5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Interaction.Interactable
