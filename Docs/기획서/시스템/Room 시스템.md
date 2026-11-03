@@ -10,8 +10,8 @@
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
-- 지금 있는 Room 씬: `Prototype01`, `Prototype02`
-	- 기본 Room: `Prototype02` (`CoreEntry`에 설정)
+- 지금 있는 Room 씬: `Room01`, `LivingRoom`, `Room02`, `Room03`
+	- 기본 Room: `Room01` (`CoreEntry`에 설정)
 
 - 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
 	- 빌드 설정에는 넣지 않음.
@@ -60,7 +60,7 @@ sequenceDiagram
 ---
 - **Room 만들기**
 	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
-		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `RoomDoor`, `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `PairDoor`(문 프리팹, `Prefabs/SceneDefault/Door/`), `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
 		- 리스폰 지점은 템플릿에 없음. 필요한 방에만 `Respawn` Pb를 놓음.
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
