@@ -10,7 +10,7 @@
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
-- 지금 있는 Room 씬: `Room01`, `LivingRoom`, `Room02`, `Room03`
+- 지금 있는 Room 씬: `Room01`, `LivingRoom`, `FallingRoom`, `Room02`, `Room03`
 	- 기본 Room: `Room01` (`CoreEntry`에 설정)
 
 - 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
