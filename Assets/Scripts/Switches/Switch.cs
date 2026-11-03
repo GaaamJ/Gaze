@@ -1,13 +1,13 @@
 using UnityEngine;
 
-namespace Gaze.Events
+namespace Gaze.Switches
 {
-    // 이벤트 하나를 가리키는 이름표 애셋. 일어났는지는 들고 있지 않고 EventManager가 Id로 기억함.
-    // 이벤트를 남기는 쪽(EventResponse)과 읽는 쪽(LockedDoor, EventToggle)이 같은 애셋을 가리켜 하나로 묶임.
-    [CreateAssetMenu(fileName = "EventFlag", menuName = "Gaze/EventFlag")]
-    public class EventFlag : ScriptableObject
+    // 스위치 하나를 가리키는 이름표 애셋. 켜졌는지는 들고 있지 않고 SwitchRecords가 Id로 기억함.
+    // 스위치를 켜는 쪽(SwitchResponse)과 읽는 쪽(LockedDoor, SwitchToggle)이 같은 애셋을 가리켜 하나로 묶임.
+    [CreateAssetMenu(fileName = "Switch", menuName = "Gaze/Switch")]
+    public class Switch : ScriptableObject
     {
-        [Tooltip("이벤트를 구분하는 id. 이 애셋의 guid로 자동으로 채워진다.")]
+        [Tooltip("스위치를 구분하는 id. 이 애셋의 guid로 자동으로 채워진다.")]
         [SerializeField] string id;
 
         public string Id => id;

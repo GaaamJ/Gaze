@@ -27,8 +27,8 @@ namespace Gaze.Core.Tests
 
         static void Fill(SaveData d)
         {
-            d.solvedPuzzleIds.Add("PasswordDoor");
-            d.solvedPuzzleIds.Add("GapA");
+            d.onSwitchIds.Add("PasswordDoor");
+            d.onSwitchIds.Add("GapA");
             d.hasRespawnPosition = true;
             d.respawnPosition = new Vector2(3.25f, -7.5f);
             d.roomName = "ParkingLot";
@@ -78,7 +78,7 @@ namespace Gaze.Core.Tests
             var e = new SaveData();
             Fill(e);
 
-            CollectionAssert.AreEqual(e.solvedPuzzleIds, d.solvedPuzzleIds);
+            CollectionAssert.AreEqual(e.onSwitchIds, d.onSwitchIds);
             Assert.AreEqual(e.hasRespawnPosition, d.hasRespawnPosition);
             Assert.AreEqual(e.respawnPosition, d.respawnPosition);
             Assert.AreEqual(e.roomName, d.roomName);
@@ -166,7 +166,7 @@ namespace Gaze.Core.Tests
         {
             Directory.CreateDirectory(_save.Paths.Root);
             File.WriteAllText(_save.Paths.SaveFile,
-                "{\n    \"solvedPuzzleIds\": [\"PasswordDoor\"],\n    \"deathRecords\": [],\n    \"corpses\": [],\n" +
+                "{\n    \"onSwitchIds\": [\"PasswordDoor\"],\n    \"deathRecords\": [],\n    \"corpses\": [],\n" +
                 "    \"respawnAreaId\": \"Temp\",\n    \"elevatorAreaId\": \"\",\n    \"elevatorFileId\": \"\",\n" +
                 "    \"elevatorFileIdHistory\": [],\n    \"exitState\": 0\n}");
 
@@ -179,7 +179,7 @@ namespace Gaze.Core.Tests
             CollectionAssert.IsEmpty(d.investigatedNodeIds);
             Assert.IsNotNull(d.diedNodeIds);
             CollectionAssert.IsEmpty(d.diedNodeIds);
-            CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
+            CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.onSwitchIds);
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace Gaze.Core.Tests
         {
             Directory.CreateDirectory(_save.Paths.Root);
             File.WriteAllText(_save.Paths.SaveFile,
-                "{\n    \"solvedPuzzleIds\": [\"PasswordDoor\"],\n" +
+                "{\n    \"onSwitchIds\": [\"PasswordDoor\"],\n" +
                 "    \"deathRecords\": [{\"deathId\": \"FallingRock\", \"count\": 2}],\n" +
                 "    \"corpses\": [{\"id\": \"FallingRock\", \"position\": {\"x\": 1.5, \"y\": -2.0, \"z\": 0.0}, \"areaId\": \"Temp\", \"kind\": 1, \"fileName\": \"corpse_001.txt\"}],\n" +
                 "    \"respawnAreaId\": \"Temp\",\n    \"diedNodeIds\": [\"Death_DeathObject\"],\n" +
@@ -197,7 +197,7 @@ namespace Gaze.Core.Tests
             SaveManager.Load();
             var d = SaveManager.Data;
 
-            CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.solvedPuzzleIds);
+            CollectionAssert.AreEqual(new[] { "PasswordDoor" }, d.onSwitchIds);
             CollectionAssert.AreEqual(new[] { "Death_DeathObject" }, d.diedNodeIds);
             Assert.AreEqual(ExitState.Normal, d.exitState);
 
@@ -212,7 +212,7 @@ namespace Gaze.Core.Tests
         static void AssertDefaults(SaveData d)
         {
             Assert.IsNotNull(d);
-            CollectionAssert.IsEmpty(d.solvedPuzzleIds);
+            CollectionAssert.IsEmpty(d.onSwitchIds);
             Assert.IsFalse(d.hasRespawnPosition);
             CollectionAssert.IsEmpty(d.investigatedNodeIds);
             CollectionAssert.IsEmpty(d.diedNodeIds);

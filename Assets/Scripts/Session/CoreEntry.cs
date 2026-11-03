@@ -8,6 +8,7 @@ using Gaze.Death;
 using Gaze.Dialogue;
 using Gaze.Player;
 using Gaze.Save;
+using Gaze.Switches;
 using Gaze.UI;
 
 namespace Gaze.Session
@@ -130,6 +131,7 @@ namespace Gaze.Session
         }
 
         // 입력 잠금, 진입 상태, Yarn 변수, 라리스 위치(Awake 때 위치)를 처음 상태로 되돌림.
+        // 스위치는 처음 상태가 아니라 마지막으로 확정한 상태로 되돌림. Room을 불러오기 전이라 SwitchToggle 등이 새 상태를 봄.
         void ResetCore()
         {
             if (inputLock != null)
@@ -138,6 +140,7 @@ namespace Gaze.Session
             enteringAfterWindowClose = false;
             if (dialogueService != null)
                 dialogueService.ResetVariables();
+            SwitchRecords.Revert();
             if (laris != null)
                 PlayerMovement.MoveTo(laris.GetComponent<Rigidbody2D>(), larisStart);
         }

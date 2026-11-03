@@ -10,6 +10,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2873d53af41b2884d896097d504301d4, type: 3}
-  m_Name: Room3OpenEvent
-  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Events.EventFlag
+  m_Name: Switch_Room3Open
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Switches.Switch
   id: b08d83e8333bd4e4183ccd96a12fa53e

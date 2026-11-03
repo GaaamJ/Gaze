@@ -108,4 +108,4 @@ MonoBehaviour:
   doorId: 
   targetScene: 
   targetDoorId: 
-  requiredFlag: {fileID: 0}
+  requiredSwitch: {fileID: 0}

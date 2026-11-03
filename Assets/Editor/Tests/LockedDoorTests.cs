@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Gaze.Events;
+using Gaze.Switches;
 using UnityEngine;
 using UnityEngine.TestTools;
 using static Gaze.Tests.TestObjects;
@@ -10,14 +10,14 @@ using Object = UnityEngine.Object;
 
 namespace Gaze.Area.Tests
 {
-    // 잠긴 문이 이벤트가 일어난 뒤에만 열리는지 본다.
+    // 잠긴 문이 스위치가 켜진 뒤에만 열리는지 본다.
     // 라리스가 문에 닿아 Room 이동이 시작되는 부분은 Core·Room 씬이 필요해 플레이로 확인한다.
     public class LockedDoorTests
     {
         readonly List<Object> created = new();
 
         [SetUp]
-        public void SetUp() => EventManager.Clear();
+        public void SetUp() => SwitchRecords.Clear();
 
         [TearDown]
         public void TearDown()
@@ -28,24 +28,24 @@ namespace Gaze.Area.Tests
                     Object.DestroyImmediate(obj);
             }
             created.Clear();
-            EventManager.Clear();
+            SwitchRecords.Clear();
         }
 
-        EventFlag NewFlag(string id)
+        Switch NewSwitch(string id)
         {
-            var flag = ScriptableObject.CreateInstance<EventFlag>();
-            created.Add(flag);
-            Set(flag, so => so.FindProperty("id").stringValue = id);
-            return flag;
+            var made = ScriptableObject.CreateInstance<Switch>();
+            created.Add(made);
+            Set(made, so => so.FindProperty("id").stringValue = id);
+            return made;
         }
 
-        LockedDoor NewDoor(EventFlag requiredFlag)
+        LockedDoor NewDoor(Switch requiredSwitch)
         {
             var go = new GameObject("Room3Door");
             created.Add(go);
             go.AddComponent<BoxCollider2D>();
             var door = go.AddComponent<LockedDoor>();
-            Set(door, so => so.FindProperty("requiredFlag").objectReferenceValue = requiredFlag);
+            Set(door, so => so.FindProperty("requiredSwitch").objectReferenceValue = requiredSwitch);
             return door;
         }
 
@@ -54,32 +54,32 @@ namespace Gaze.Area.Tests
             (bool)typeof(Door).GetMethod("CanEnter", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(door, null);
 
         [Test]
-        public void Locked_UntilEventHappens()
+        public void Locked_UntilSwitchTurnsOn()
         {
-            var key = NewFlag("Key");
+            var key = NewSwitch("Key");
             var door = NewDoor(key);
 
             Assert.IsFalse(CanEnter(door));
 
-            EventManager.Set(key);
+            SwitchRecords.TurnOn(key);
             Assert.IsTrue(CanEnter(door));
         }
 
         [Test]
-        public void OtherEvent_DoesNotOpen()
+        public void OtherSwitch_DoesNotOpen()
         {
-            var door = NewDoor(NewFlag("Key"));
+            var door = NewDoor(NewSwitch("Key"));
 
-            EventManager.Set(NewFlag("Other"));
+            SwitchRecords.TurnOn(NewSwitch("Other"));
 
             Assert.IsFalse(CanEnter(door));
         }
 
         [Test]
-        public void EmptyFlag_WarnsAndStaysLocked()
+        public void EmptySwitch_WarnsAndStaysLocked()
         {
             var door = NewDoor(null);
-            LogAssert.Expect(LogType.Warning, new Regex("'requiredFlag'가 비어"));
+            LogAssert.Expect(LogType.Warning, new Regex("'requiredSwitch'가 비어"));
 
             Assert.IsFalse(CanEnter(door));
         }
