@@ -1,23 +1,18 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 using Gaze.Player;
 using Gaze.Session;
 
 namespace Gaze.Area
 {
-    // Room 씬에 놓는 문. 라리스가 들어가면 targetScene의 targetDoorId 문으로 Room 이동을 시작함.
+    // Room 씬에 놓는 문의 공통 부분. 라리스가 들어가면 행선지 문으로 Room 이동을 시작함.
     // 이 오브젝트의 위치가 다른 Room에서 올 때의 도착 위치가 됨.
+    // 행선지를 정하는 방식은 자식 클래스가 ResolveTarget으로, 들어갈 수 있는지는 CanEnter로 정함.
     // Core의 RoomSceneLoader를 인스펙터로 참조할 수 없어 정적 진입점 RoomSceneTransition.Begin으로 넘김.
     [RequireComponent(typeof(Collider2D))]
-    public class Door : MonoBehaviour
+    public abstract class Door : MonoBehaviour
     {
         [Tooltip("이 문의 id. 다른 Room의 문이 targetDoorId로 가리킨다.")]
         [SerializeField] string doorId;
-        [Tooltip("넘어갈 Scene 이름")]
-        [FormerlySerializedAs("targetRoom")]
-        [SerializeField] string targetScene;
-        [Tooltip("넘어간 Scene에서 도착할 문의 id")]
-        [SerializeField] string targetDoorId;
 
         public string DoorId => doorId;
 
@@ -33,8 +28,14 @@ namespace Gaze.Area
                 WaitingForExit = false;
         }
 
-        // 라리스인지 → 문이 켜져 있고 도착 직후가 아닌지 → 입력이 잠겨 있지 않은지 확인한 뒤 Room 이동을 시작함.
-        // 시작했으면 true.
+        // 지금 들어갈 수 있는지. 잠긴 문처럼 조건이 있는 문이 덮어씀.
+        protected virtual bool CanEnter() => true;
+
+        // 넘어갈 Scene과 도착할 문의 id를 정함. 넘어갈 곳이 없으면 false.
+        protected abstract bool ResolveTarget(out string targetScene, out string targetDoorId);
+
+        // 라리스인지 → 문이 켜져 있고 도착 직후가 아닌지 → 입력이 잠겨 있지 않은지 → CanEnter → 행선지가 있는지 확인한 뒤
+        // Room 이동을 시작함. 시작했으면 true.
         internal bool TryEnter(Collider2D other)
         {
             if (!PlayerMovement.TryFrom(other, out PlayerMovement laris))
@@ -45,6 +46,9 @@ namespace Gaze.Area
             InputLock inputLock = laris.GetComponent<InputLock>();
             // 다른 이동 중이거나 대화·사망 중이면 넘어가지 않음.
             if (inputLock != null && inputLock.IsLocked)
+                return false;
+
+            if (!CanEnter() || !ResolveTarget(out string targetScene, out string targetDoorId))
                 return false;
 
             return RoomSceneTransition.Begin(targetScene, targetDoorId);

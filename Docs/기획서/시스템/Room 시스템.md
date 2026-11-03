@@ -24,7 +24,8 @@
 | --------------------- | ------------------------------------------------------------------------ |
 | `RoomSceneLoader`     | Room 씬 불러오기·내리기, 문으로 Room 이동.<br>`Core` 씬에 하나만 둠.                        |
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
-| `Door`       | Room 씬에 놓는 문. 라리스가 들어가면 다른 Room의 문으로 이동.<br>이 문의 위치가 도착 위치.          |
+| `Door`                | 문의 공통 부분(abstract). 라리스가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
+| `PairDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
 
@@ -65,7 +66,7 @@ sequenceDiagram
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
 
 - **문 잇기**
-	1. 양쪽 Room에 Trigger 콜라이더와 `Door`를 붙인 오브젝트를 둠.
+	1. 양쪽 Room에 Trigger 콜라이더와 `PairDoor`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
 		- Ex. A의 문: `doorId` = `East`, `targetScene` = `B`, `targetDoorId` = `West`
@@ -76,6 +77,12 @@ sequenceDiagram
 	- `doorId`는 그 Room 안에서만 겹치지 않으면 됨. 방향으로 지음.
 		- Ex. `East`, `West`, 한쪽에 둘이면 `East1`, `East2`
 	- `targetScene`, `targetDoorId`는 Inspector 목록에서 고름. 목록은 빌드 설정의 씬과 그 씬의 문 id.
+
+- **새 종류의 문 만들기**
+	1. `Door`를 상속하고 `ResolveTarget`에서 넘어갈 Scene과 도착 문 id를 돌려줌.
+	2. 들어가는 조건이 있으면 `CanEnter`를 덮어씀.
+	- 문 Inspector(`DoorEditor`)는 `PairDoor`와 그 자식 클래스에만 붙음.
+		- Ex. `PairDoor`를 상속하면 행선지 목록과 `반대쪽 문도 이 문으로 잇기` 버튼이 그대로 뜸.
 
 - **벽 칠하기**
 	- `Prototype_Wall_Rule`(RuleTile)로 방 전체를 속까지 채워 칠함.
@@ -95,3 +102,7 @@ sequenceDiagram
 - 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
 	- `Ground` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
 		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
+
+- `DoorEditor`의 행선지 문 id 목록은 `PairDoor`만 찾음.
+	- 열려 있지 않은 씬은 파일에서 `PairDoor`의 `doorId`만 읽음. `PairDoor`가 아닌 문은 그 씬을 열어야 목록에 나옴.
+	- `PairDoor`를 상속한 문은 스크립트 guid가 달라 마찬가지로 목록에 안 나옴.

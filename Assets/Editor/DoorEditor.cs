@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Gaze.Area;
 
-[CustomEditor(typeof(Door))]
+[CustomEditor(typeof(PairDoor), true)]
 [CanEditMultipleObjects]
 class DoorEditor : Editor
 {
@@ -44,7 +44,7 @@ class DoorEditor : Editor
         serializedObject.Update();
 
         using (new EditorGUI.DisabledScope(true))
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((Door)target), typeof(MonoScript), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((PairDoor)target), typeof(MonoScript), false);
 
         EditorGUILayout.PropertyField(doorId);
         string scenePath = DrawTargetScene();
@@ -91,7 +91,7 @@ class DoorEditor : Editor
     // 이 문의 doorId, targetScene, targetDoorId가 모두 있고 이 문이 저장된 씬에 있을 때만 누를 수 있음.
     void DrawLinkBack(string scenePath)
     {
-        var door = (Door)target;
+        var door = (PairDoor)target;
         Scene own = door.gameObject.scene;
         bool ready = !Application.isPlaying
             && scenePath != null
@@ -113,7 +113,7 @@ class DoorEditor : Editor
 
     // 상대 씬을 열어(이미 열려 있으면 그대로) 그 문을 이 문으로 이음.
     // 직접 연 씬은 저장하고 닫음. 이미 열려 있던 씬은 다른 수정까지 저장되지 않도록 dirty 표시만 함.
-    static void LinkBack(Door door, string ownScene, string otherScenePath, string otherDoorId)
+    static void LinkBack(PairDoor door, string ownScene, string otherScenePath, string otherDoorId)
     {
         Scene other = SceneManager.GetSceneByPath(otherScenePath);
         bool openedHere = !(other.IsValid() && other.isLoaded);
@@ -122,9 +122,9 @@ class DoorEditor : Editor
 
         try
         {
-            var matches = new List<Door>();
+            var matches = new List<PairDoor>();
             foreach (GameObject root in other.GetRootGameObjects())
-                foreach (Door candidate in root.GetComponentsInChildren<Door>(true))
+                foreach (PairDoor candidate in root.GetComponentsInChildren<PairDoor>(true))
                     if (candidate != door && candidate.DoorId == otherDoorId)
                         matches.Add(candidate);
 
@@ -222,10 +222,10 @@ class DoorEditor : Editor
     {
         if (doorScriptGuid != null)
             return doorScriptGuid;
-        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(Door)}"))
+        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(PairDoor)}"))
         {
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guid));
-            if (script != null && script.GetClass() == typeof(Door))
+            if (script != null && script.GetClass() == typeof(PairDoor))
                 return doorScriptGuid = guid;
         }
         return doorScriptGuid = "";
