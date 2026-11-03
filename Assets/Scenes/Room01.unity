@@ -3855,7 +3855,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1555551659260036816, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: targetDoorId
-      value: DoorToRoom
+      value: Room1&Room2Door
       objectReference: {fileID: 0}
     - target: {fileID: 3958573716333815111, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_Name

@@ -4171,17 +4171,29 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1555551659260036816, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
+      propertyPath: doorId
+      value: Door
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555551659260036816, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
+      propertyPath: targetScene
+      value: LivingRoom
+      objectReference: {fileID: 0}
+    - target: {fileID: 1555551659260036816, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
+      propertyPath: targetDoorId
+      value: Room3Door
+      objectReference: {fileID: 0}
     - target: {fileID: 3958573716333815111, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_Name
       value: RoomDoor
       objectReference: {fileID: 0}
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 9.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 1.5625
       objectReference: {fileID: 0}
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4214,6 +4226,10 @@ PrefabInstance:
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6118725326914072515, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
+      propertyPath: m_Size.x
+      value: 2
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
