@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Gaze.Area;
 
-[CustomEditor(typeof(PairDoor), true)]
+[CustomEditor(typeof(Door), true)]
 [CanEditMultipleObjects]
 class DoorEditor : Editor
 {
@@ -17,6 +17,16 @@ class DoorEditor : Editor
     static readonly Regex DoorIdField = new Regex(@"^\s*doorId: ?(.*)$", RegexOptions.Multiline);
     static readonly Regex DoorIdOverride = new Regex(@"propertyPath: doorId\s*\r?\n\s*value: ?(.*)$", RegexOptions.Multiline);
     static readonly Regex SourcePrefab = new Regex(@"m_SourcePrefab: \{fileID: \d+, guid: ([0-9a-f]{32})");
+
+    // 행선지 하나를 이루는 Scene 필드와 도착 문 id 필드 이름. 문 클래스에 있는 것만 그림.
+    static readonly (string scene, string doorId)[] TargetFields =
+    {
+        ("targetScene", "targetDoorId"),
+        ("defaultTargetScene", "defaultTargetDoorId"),
+    };
+
+    // 행선지 목록 필드 이름. 원소는 scene·doorId 필드를 가짐.
+    static readonly string[] TargetListFields = { "shiftingTargets" };
 
     class FileScan
     {
@@ -29,44 +39,114 @@ class DoorEditor : Editor
     static HashSet<string> doorScriptGuids;
 
     SerializedProperty doorId;
-    SerializedProperty targetScene;
-    SerializedProperty targetDoorId;
+    readonly List<(SerializedProperty scene, SerializedProperty doorId)> targetProps = new List<(SerializedProperty, SerializedProperty)>();
+    readonly List<SerializedProperty> targetLists = new List<SerializedProperty>();
+    string[] drawnFields;
 
     void OnEnable()
     {
         doorId = serializedObject.FindProperty("doorId");
-        targetScene = serializedObject.FindProperty("targetScene");
-        targetDoorId = serializedObject.FindProperty("targetDoorId");
+        targetProps.Clear();
+        targetLists.Clear();
+        var drawn = new List<string> { "m_Script", "doorId" };
+        foreach ((string scene, string id) in TargetFields)
+        {
+            SerializedProperty sceneProp = serializedObject.FindProperty(scene);
+            SerializedProperty idProp = serializedObject.FindProperty(id);
+            if (sceneProp == null || idProp == null)
+                continue;
+            targetProps.Add((sceneProp, idProp));
+            drawn.Add(scene);
+            drawn.Add(id);
+        }
+        foreach (string list in TargetListFields)
+        {
+            SerializedProperty listProp = serializedObject.FindProperty(list);
+            if (listProp == null || !listProp.isArray)
+                continue;
+            targetLists.Add(listProp);
+            drawn.Add(list);
+        }
+        drawnFields = drawn.ToArray();
     }
 
+    // 행선지마다 Scene 목록, 문 id 목록, 경고, 반대쪽 잇기 버튼을 그림. 행선지 목록은 원소마다 같은 모양에 더하기·빼기 버튼.
+    // 나머지 필드는 기본 모양으로 그림.
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
 
         using (new EditorGUI.DisabledScope(true))
-            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((PairDoor)target), typeof(MonoScript), false);
+            EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((MonoBehaviour)target), typeof(MonoScript), false);
 
         EditorGUILayout.PropertyField(doorId);
-        string scenePath = DrawTargetScene();
-        bool sameTarget = !targetScene.hasMultipleDifferentValues && !targetDoorId.hasMultipleDifferentValues;
+        foreach ((SerializedProperty scene, SerializedProperty id) in targetProps)
+            DrawTarget(scene, id, "");
+
+        foreach (SerializedProperty list in targetLists)
+            DrawTargetList(list);
+
+        DrawPropertiesExcluding(serializedObject, drawnFields);
+        serializedObject.ApplyModifiedProperties();
+    }
+
+    // 행선지 목록. 여러 문을 같이 고르면 목록 길이가 다를 수 있어 기본 모양으로 그림.
+    void DrawTargetList(SerializedProperty list)
+    {
+        EditorGUILayout.Space();
+        if (targets.Length > 1)
+        {
+            EditorGUILayout.PropertyField(list, true);
+            return;
+        }
+
+        EditorGUILayout.LabelField(list.displayName, EditorStyles.boldLabel);
+        int remove = -1;
+        for (int i = 0; i < list.arraySize; i++)
+        {
+            SerializedProperty element = list.GetArrayElementAtIndex(i);
+            using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
+            {
+                using (new EditorGUILayout.HorizontalScope())
+                {
+                    EditorGUILayout.LabelField($"{i + 1}번째", EditorStyles.miniBoldLabel);
+                    if (GUILayout.Button("빼기", GUILayout.Width(48)))
+                        remove = i;
+                }
+                DrawTarget(element.FindPropertyRelative("scene"), element.FindPropertyRelative("doorId"), $" ({i + 1}번째)");
+            }
+        }
+        if (remove >= 0)
+            list.DeleteArrayElementAtIndex(remove);
+        if (GUILayout.Button("행선지 더하기"))
+        {
+            list.arraySize++;
+            SerializedProperty added = list.GetArrayElementAtIndex(list.arraySize - 1);
+            added.FindPropertyRelative("scene").stringValue = "";
+            added.FindPropertyRelative("doorId").stringValue = "";
+        }
+    }
+
+    // 행선지 하나: Scene 목록, 문 id 목록, 경고, 반대쪽 잇기 버튼. label은 버튼 이름 뒤에 붙여 행선지를 구분함.
+    void DrawTarget(SerializedProperty scene, SerializedProperty id, string label)
+    {
+        string scenePath = DrawTargetScene(scene);
+        bool sameTarget = !scene.hasMultipleDifferentValues && !id.hasMultipleDifferentValues;
 
         if (sameTarget && scenePath != null)
-            DrawTargetDoorId(scenePath);
+            DrawTargetDoorId(id, scenePath);
         else
-            EditorGUILayout.PropertyField(targetDoorId);
+            EditorGUILayout.PropertyField(id);
 
         if (sameTarget)
-            DrawDoorWarning(scenePath);
-
-        serializedObject.ApplyModifiedProperties();
-
+            DrawDoorWarning(id, scenePath);
         if (targets.Length == 1)
-            DrawLinkBack(scenePath);
+            DrawLinkBack(id, scenePath, label);
     }
 
     // 상대 Room의 문 id를 목록에서 고름. 목록은 FindDoorIds가 씬 파일(열려 있으면 오브젝트)에서 읽음.
     // 지금 값이 목록에 없으면 "(없음)" 표시를 붙여 남겨 둠. 경고는 DrawDoorWarning이 띄움.
-    void DrawTargetDoorId(string scenePath)
+    void DrawTargetDoorId(SerializedProperty targetDoorId, string scenePath)
     {
         List<string> ids = FindDoorIds(scenePath).Where(id => !string.IsNullOrEmpty(id)).OrderBy(id => id).ToList();
         var names = new List<string> { "(없음)" };
@@ -88,10 +168,12 @@ class DoorEditor : Editor
     }
 
     // 상대 문의 targetScene·targetDoorId를 이 문으로 채우는 버튼.
-    // 이 문의 doorId, targetScene, targetDoorId가 모두 있고 이 문이 저장된 씬에 있을 때만 누를 수 있음.
-    void DrawLinkBack(string scenePath)
+    // 이 문의 doorId, 행선지 Scene, 도착 문 id가 모두 있고 이 문이 저장된 씬에 있을 때만 누를 수 있음.
+    // 행선지가 여럿이면 버튼도 행선지마다 하나씩, label로 구분함.
+    // 누르면 지금까지 고친 값을 먼저 적용한 뒤 상대 씬을 엶.
+    void DrawLinkBack(SerializedProperty targetDoorId, string scenePath, string label)
     {
-        var door = (PairDoor)target;
+        var door = (Door)target;
         Scene own = door.gameObject.scene;
         bool ready = !Application.isPlaying
             && scenePath != null
@@ -99,11 +181,11 @@ class DoorEditor : Editor
             && !string.IsNullOrEmpty(targetDoorId.stringValue)
             && own.IsValid() && !string.IsNullOrEmpty(own.path);
 
-        EditorGUILayout.Space();
         using (new EditorGUI.DisabledScope(!ready))
         {
-            if (GUILayout.Button("반대쪽 문도 이 문으로 잇기"))
+            if (GUILayout.Button("반대쪽 문도 이 문으로 잇기" + label))
             {
+                serializedObject.ApplyModifiedProperties();
                 LinkBack(door, own.name, scenePath, targetDoorId.stringValue);
                 // 씬을 열고 닫으면 이번 GUI 그리기가 어긋나므로 여기서 끊음.
                 GUIUtility.ExitGUI();
@@ -112,8 +194,9 @@ class DoorEditor : Editor
     }
 
     // 상대 씬을 열어(이미 열려 있으면 그대로) 그 문을 이 문으로 이음.
+    // 상대는 행선지가 하나인 PairDoor(와 자식 클래스)만 찾음.
     // 직접 연 씬은 저장하고 닫음. 이미 열려 있던 씬은 다른 수정까지 저장되지 않도록 dirty 표시만 함.
-    static void LinkBack(PairDoor door, string ownScene, string otherScenePath, string otherDoorId)
+    static void LinkBack(Door door, string ownScene, string otherScenePath, string otherDoorId)
     {
         Scene other = SceneManager.GetSceneByPath(otherScenePath);
         bool openedHere = !(other.IsValid() && other.isLoaded);
@@ -158,7 +241,7 @@ class DoorEditor : Editor
         }
     }
 
-    string DrawTargetScene()
+    string DrawTargetScene(SerializedProperty targetScene)
     {
         EditorBuildSettingsScene[] scenes = EditorBuildSettings.scenes.Where(s => s.enabled).ToArray();
         var names = new List<string> { "(없음)" };
@@ -190,7 +273,7 @@ class DoorEditor : Editor
         return index > 0 ? scenes[index - 1].path : null;
     }
 
-    void DrawDoorWarning(string scenePath)
+    void DrawDoorWarning(SerializedProperty targetDoorId, string scenePath)
     {
         if (scenePath == null)
             return;

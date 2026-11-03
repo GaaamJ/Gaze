@@ -26,6 +26,7 @@
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
 | `Door`                | 문의 공통 부분(abstract). 라리스가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
 | `PairDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
+| `ShiftingDoor`        | 안 볼 때 바뀌는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>라리스의 빛 범위(`LarisLight`)가 문에서 벗어날 때마다 다음으로 바뀜. 방이 밝으면 기본 행선지로 고정. → [[빛 시스템]] |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
 
@@ -82,8 +83,21 @@ sequenceDiagram
 - **새 종류의 문 만들기**
 	1. `Door`를 상속하고 `ResolveTarget`에서 넘어갈 Scene과 도착 문 id를 돌려줌.
 	2. 들어가는 조건이 있으면 `CanEnter`를 덮어씀.
-	- 문 Inspector(`DoorEditor`)는 `PairDoor`와 그 자식 클래스에만 붙음.
-		- Ex. `PairDoor`를 상속하면 행선지 목록과 `반대쪽 문도 이 문으로 잇기` 버튼이 그대로 뜸.
+	- 문 Inspector(`DoorEditor`)는 `Door`를 상속한 모든 문에 붙음.
+		- 행선지(`targetScene`·`targetDoorId`, `defaultTargetScene`·`defaultTargetDoorId`, `shiftingTargets`의 원소)마다 목록과 `반대쪽 문도 이 문으로 잇기` 버튼을 그림.
+		- 새 이름의 행선지 필드를 쓰면 `DoorEditor.TargetFields`(하나)나 `TargetListFields`(목록)에 더해야 목록이 뜸.
+		- 나머지 필드는 기본 모양으로 그림.
+
+- **바뀌는 문 놓기**
+	1. 문 오브젝트에 Trigger 콜라이더와 `ShiftingDoor`를 붙임.
+	2. 기본 행선지(`defaultTargetScene`·`defaultTargetDoorId`)를 고름. 방이 밝으면 늘 여기로 감.
+	3. `행선지 더하기`로 바뀌는 행선지(`shiftingTargets`)를 원하는 만큼 더함.
+		- Ex. 거실의 문: 기본 `Room01/South`, 목록 `Room02/South`
+		- 빛 밖으로 나갈 때마다 기본 → 1번째 → 2번째 → … → 기본 순서로 바뀜.
+	4. 행선지마다 있는 버튼으로 각 방의 문을 이 문에 이음.
+	- 바뀐 것을 저장하지 않음. 방을 다시 불러오면 기본 행선지부터.
+		- 다만 문으로 도착하면, 떠나온 Room의 문을 가리키는 행선지부터 시작함. 막 나온 방으로 바로 돌아갈 수 있음.
+		- 도착 문은 `Door.OnArrived`로 떠나온 Room 이름과 들어간 문 id를 받음.
 
 - **벽 칠하기**
 	- `Prototype_Wall_Rule`(RuleTile)로 방 전체를 속까지 채워 칠함.
@@ -103,3 +117,9 @@ sequenceDiagram
 - 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
 	- `Ground` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
 		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
+
+- `반대쪽 문도 이 문으로 잇기`는 상대 씬의 `PairDoor`(와 자식 클래스)만 찾음.
+	- `PairDoor`에서 `ShiftingDoor`로 버튼을 누르면 상대를 못 찾음. `ShiftingDoor` 쪽에서 누르면 됨.
+
+- `ShiftingDoor`는 빛 범위 콜라이더와 문 트리거가 서로 닿아야 바뀜.
+	- 플레이로 아직 확인 안 함. 안 바뀌면 두 오브젝트의 Layer가 Physics 2D 충돌 표에서 서로 닿는지 봄.
