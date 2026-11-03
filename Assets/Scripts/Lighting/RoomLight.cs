@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,10 @@ namespace Gaze.Lighting
 
         // 지금 불러와 있는 방 빛들. LightUp이 등불을 따르는 것을 찾을 때 씀.
         static readonly List<RoomLight> loaded = new List<RoomLight>();
+
+        // 방이 밝아지기 시작할 때 그 방의 Scene을 알림. 이미 밝은 채 들어온 방에는 오지 않음.
+        // 방 안에서 밝기에 따라 바뀌는 부품(LightVariant)이 들음.
+        public static event Action<Scene> SceneLit;
 
         Light2D light2D;
         Coroutine fade;
@@ -65,7 +70,10 @@ namespace Gaze.Lighting
             foreach (RoomLight room in loaded)
             {
                 if (room.lamp == lamp)
+                {
                     room.FadeIn();
+                    SceneLit?.Invoke(room.gameObject.scene);
+                }
             }
         }
 
