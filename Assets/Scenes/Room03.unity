@@ -167,6 +167,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5779720752796513241, guid: d5960f3b9ab8e2f49acdddfc71e63145, type: 3}
+      propertyPath: lamp
+      value: 
+      objectReference: {fileID: 11400000, guid: fbfc251fb6fa7174aaf729cfb23da9b7, type: 2}
     - target: {fileID: 8561351554208887969, guid: d5960f3b9ab8e2f49acdddfc71e63145, type: 3}
       propertyPath: m_Name
       value: SavePoint
@@ -1550,7 +1554,7 @@ TilemapRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 147098367
   m_SortingLayer: 1
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -3623,7 +3627,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 623637939662875010, guid: 5fbd55ec9bbd2804cbfb9313f0f030b6, type: 3}
       propertyPath: m_Intensity
-      value: 3
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 2947029939592411046, guid: 5fbd55ec9bbd2804cbfb9313f0f030b6, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3669,6 +3673,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Global Light 2D
       objectReference: {fileID: 0}
+    - target: {fileID: 7011449596893090378, guid: 5fbd55ec9bbd2804cbfb9313f0f030b6, type: 3}
+      propertyPath: lamp
+      value: 
+      objectReference: {fileID: 11400000, guid: fbfc251fb6fa7174aaf729cfb23da9b7, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3704,7 +3712,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2
+      value: 1.5
       objectReference: {fileID: 0}
     - target: {fileID: 4971047873931160399, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3744,7 +3752,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6118725326914072515, guid: ae19c61ed7ec93542b0ced88881032eb, type: 3}
       propertyPath: m_Size.y
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
