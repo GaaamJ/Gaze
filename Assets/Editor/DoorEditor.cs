@@ -26,7 +26,7 @@ class DoorEditor : Editor
     }
 
     static readonly Dictionary<string, FileScan> cache = new Dictionary<string, FileScan>();
-    static string doorScriptGuid;
+    static HashSet<string> doorScriptGuids;
 
     SerializedProperty doorId;
     SerializedProperty targetScene;
@@ -214,36 +214,45 @@ class DoorEditor : Editor
         }
 
         var found = new HashSet<string>();
-        CollectDoorIds(scenePath, DoorScriptGuid(), new HashSet<string>(), found);
+        CollectDoorIds(scenePath, DoorScriptGuids(), new HashSet<string>(), found);
         return found;
     }
 
-    static string DoorScriptGuid()
+    // Door를 상속한 모든 문 클래스의 스크립트 guid.
+    // 파일에는 실제 클래스의 guid만 적혀 있어 Door 하나로는 찾을 수 없음. 컴파일하면 static이 비워져 새 문 클래스도 다시 모임.
+    static HashSet<string> DoorScriptGuids()
     {
-        if (doorScriptGuid != null)
-            return doorScriptGuid;
-        foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {nameof(PairDoor)}"))
+        if (doorScriptGuids != null)
+            return doorScriptGuids;
+
+        doorScriptGuids = new HashSet<string>();
+        foreach (Type type in TypeCache.GetTypesDerivedFrom<Door>())
         {
-            var script = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guid));
-            if (script != null && script.GetClass() == typeof(PairDoor))
-                return doorScriptGuid = guid;
+            if (type.IsAbstract)
+                continue;
+            foreach (string guid in AssetDatabase.FindAssets($"t:MonoScript {type.Name}"))
+            {
+                var script = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guid));
+                if (script != null && script.GetClass() == type)
+                    doorScriptGuids.Add(guid);
+            }
         }
-        return doorScriptGuid = "";
+        return doorScriptGuids;
     }
 
     // 씬을 열지 않고 텍스트 직렬화된 파일을 읽는다. 프리팹 인스턴스는 원본 프리팹까지 따라가 기본값과 덮어쓴 값을 모두 후보로 본다.
-    static void CollectDoorIds(string assetPath, string scriptGuid, HashSet<string> visited, HashSet<string> found)
+    static void CollectDoorIds(string assetPath, HashSet<string> scriptGuids, HashSet<string> visited, HashSet<string> found)
     {
         if (!visited.Add(assetPath) || !File.Exists(assetPath))
             return;
 
-        FileScan scan = Scan(assetPath, scriptGuid);
+        FileScan scan = Scan(assetPath, scriptGuids);
         found.UnionWith(scan.ids);
         foreach (string prefabPath in scan.prefabs)
-            CollectDoorIds(prefabPath, scriptGuid, visited, found);
+            CollectDoorIds(prefabPath, scriptGuids, visited, found);
     }
 
-    static FileScan Scan(string assetPath, string scriptGuid)
+    static FileScan Scan(string assetPath, HashSet<string> scriptGuids)
     {
         DateTime written = File.GetLastWriteTimeUtc(assetPath);
         if (cache.TryGetValue(assetPath, out FileScan cached) && cached.written == written)
@@ -253,7 +262,7 @@ class DoorEditor : Editor
         foreach (string block in BlockHeader.Split(File.ReadAllText(assetPath)))
         {
             Match script = ScriptGuid.Match(block);
-            if (script.Success && script.Groups[1].Value == scriptGuid)
+            if (script.Success && scriptGuids.Contains(script.Groups[1].Value))
             {
                 Match field = DoorIdField.Match(block);
                 if (field.Success)

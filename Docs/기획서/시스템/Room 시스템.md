@@ -77,6 +77,7 @@ sequenceDiagram
 	- `doorId`는 그 Room 안에서만 겹치지 않으면 됨. 방향으로 지음.
 		- Ex. `East`, `West`, 한쪽에 둘이면 `East1`, `East2`
 	- `targetScene`, `targetDoorId`는 Inspector 목록에서 고름. 목록은 빌드 설정의 씬과 그 씬의 문 id.
+		- 문 id는 `Door`를 상속한 모든 문에서 모음. 닫힌 씬은 파일에서 문 클래스들의 스크립트 guid로 찾음.
 
 - **새 종류의 문 만들기**
 	1. `Door`를 상속하고 `ResolveTarget`에서 넘어갈 Scene과 도착 문 id를 돌려줌.
@@ -102,7 +103,3 @@ sequenceDiagram
 - 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
 	- `Ground` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
 		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
-
-- `DoorEditor`의 행선지 문 id 목록은 `PairDoor`만 찾음.
-	- 열려 있지 않은 씬은 파일에서 `PairDoor`의 `doorId`만 읽음. `PairDoor`가 아닌 문은 그 씬을 열어야 목록에 나옴.
-	- `PairDoor`를 상속한 문은 스크립트 guid가 달라 마찬가지로 목록에 안 나옴.
