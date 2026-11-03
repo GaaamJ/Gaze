@@ -5,7 +5,7 @@ namespace Gaze.Area
 {
     // 행선지가 하나인 문. targetScene의 targetDoorId 문으로 이어짐.
     // 양쪽 Room의 문이 서로를 가리키는 쌍으로 쓰임.
-    public class PairDoor : Door
+    public class NormalDoor : Door
     {
         [Tooltip("넘어갈 Scene 이름")]
         [FormerlySerializedAs("targetRoom")]

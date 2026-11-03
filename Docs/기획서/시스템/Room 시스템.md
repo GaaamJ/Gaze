@@ -25,7 +25,7 @@
 | `RoomSceneLoader`     | Room 씬 불러오기·내리기, 문으로 Room 이동.<br>`Core` 씬에 하나만 둠.                        |
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
 | `Door`                | 문의 공통 부분(abstract). 라리스가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
-| `PairDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
+| `NormalDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
 | `ShiftingDoor`        | 안 볼 때 바뀌는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>라리스의 빛 범위(`LarisLight`)가 문에서 벗어나면 다음으로 한 칸 바뀌고, 문에 들어가기 전까지 다시 안 바뀜. 방이 밝으면 기본 행선지로 고정. → [[빛 시스템]] |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
@@ -60,14 +60,14 @@ sequenceDiagram
 ---
 - **Room 만들기**
 	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
-		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `PairDoor`(문 프리팹, `Prefabs/SceneDefault/Door/`), `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `NormalDoor`(문 프리팹, `Prefabs/SceneDefault/Door/`), `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
 		- 리스폰 지점은 템플릿에 없음. 필요한 방에만 `Respawn` Pb를 놓음.
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
 
 - **문 잇기**
-	1. 양쪽 Room에 Trigger 콜라이더와 `PairDoor`를 붙인 오브젝트를 둠.
+	1. 양쪽 Room에 Trigger 콜라이더와 `NormalDoor`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
 		- Ex. A의 문: `doorId` = `East`, `targetScene` = `B`, `targetDoorId` = `West`
@@ -119,8 +119,8 @@ sequenceDiagram
 	- `Ground` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
 		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
 
-- `반대쪽 문도 이 문으로 잇기`는 상대 씬의 `PairDoor`(와 자식 클래스)만 찾음.
-	- `PairDoor`에서 `ShiftingDoor`로 버튼을 누르면 상대를 못 찾음. `ShiftingDoor` 쪽에서 누르면 됨.
+- `반대쪽 문도 이 문으로 잇기`는 상대 씬의 `NormalDoor`(와 자식 클래스)만 찾음.
+	- `NormalDoor`에서 `ShiftingDoor`로 버튼을 누르면 상대를 못 찾음. `ShiftingDoor` 쪽에서 누르면 됨.
 
 - `ShiftingDoor`는 빛 범위 콜라이더와 문 트리거가 서로 닿아야 바뀜.
 	- 플레이로 아직 확인 안 함. 안 바뀌면 두 오브젝트의 Layer가 Physics 2D 충돌 표에서 서로 닿는지 봄.

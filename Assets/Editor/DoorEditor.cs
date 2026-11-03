@@ -194,7 +194,7 @@ class DoorEditor : Editor
     }
 
     // 상대 씬을 열어(이미 열려 있으면 그대로) 그 문을 이 문으로 이음.
-    // 상대는 행선지가 하나인 PairDoor(와 자식 클래스)만 찾음.
+    // 상대는 행선지가 하나인 NormalDoor(와 자식 클래스)만 찾음.
     // 직접 연 씬은 저장하고 닫음. 이미 열려 있던 씬은 다른 수정까지 저장되지 않도록 dirty 표시만 함.
     static void LinkBack(Door door, string ownScene, string otherScenePath, string otherDoorId)
     {
@@ -205,9 +205,9 @@ class DoorEditor : Editor
 
         try
         {
-            var matches = new List<PairDoor>();
+            var matches = new List<NormalDoor>();
             foreach (GameObject root in other.GetRootGameObjects())
-                foreach (PairDoor candidate in root.GetComponentsInChildren<PairDoor>(true))
+                foreach (NormalDoor candidate in root.GetComponentsInChildren<NormalDoor>(true))
                     if (candidate != door && candidate.DoorId == otherDoorId)
                         matches.Add(candidate);
 
