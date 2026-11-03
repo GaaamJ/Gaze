@@ -48,12 +48,114 @@ class RoomSceneDoorEditor : Editor
 
         EditorGUILayout.PropertyField(doorId);
         string scenePath = DrawTargetScene();
-        EditorGUILayout.PropertyField(targetDoorId);
+        bool sameTarget = !targetScene.hasMultipleDifferentValues && !targetDoorId.hasMultipleDifferentValues;
 
-        if (!targetScene.hasMultipleDifferentValues && !targetDoorId.hasMultipleDifferentValues)
+        if (sameTarget && scenePath != null)
+            DrawTargetDoorId(scenePath);
+        else
+            EditorGUILayout.PropertyField(targetDoorId);
+
+        if (sameTarget)
             DrawDoorWarning(scenePath);
 
         serializedObject.ApplyModifiedProperties();
+
+        if (targets.Length == 1)
+            DrawLinkBack(scenePath);
+    }
+
+    // 상대 Room의 문 id를 목록에서 고름. 목록은 FindDoorIds가 씬 파일(열려 있으면 오브젝트)에서 읽음.
+    // 지금 값이 목록에 없으면 "(없음)" 표시를 붙여 남겨 둠. 경고는 DrawDoorWarning이 띄움.
+    void DrawTargetDoorId(string scenePath)
+    {
+        List<string> ids = FindDoorIds(scenePath).Where(id => !string.IsNullOrEmpty(id)).OrderBy(id => id).ToList();
+        var names = new List<string> { "(없음)" };
+        names.AddRange(ids);
+
+        string current = targetDoorId.stringValue;
+        int index = string.IsNullOrEmpty(current) ? 0 : names.IndexOf(current, 1);
+        bool missing = index < 0;
+        if (missing)
+        {
+            names.Add($"{current} (없음)");
+            index = names.Count - 1;
+        }
+
+        EditorGUI.BeginChangeCheck();
+        int picked = EditorGUILayout.Popup(new GUIContent(targetDoorId.displayName, targetDoorId.tooltip), index, names.ToArray());
+        if (EditorGUI.EndChangeCheck() && !(missing && picked == names.Count - 1))
+            targetDoorId.stringValue = picked == 0 ? "" : names[picked];
+    }
+
+    // 상대 문의 targetScene·targetDoorId를 이 문으로 채우는 버튼.
+    // 이 문의 doorId, targetScene, targetDoorId가 모두 있고 이 문이 저장된 씬에 있을 때만 누를 수 있음.
+    void DrawLinkBack(string scenePath)
+    {
+        var door = (RoomSceneDoor)target;
+        Scene own = door.gameObject.scene;
+        bool ready = !Application.isPlaying
+            && scenePath != null
+            && !string.IsNullOrEmpty(door.DoorId)
+            && !string.IsNullOrEmpty(targetDoorId.stringValue)
+            && own.IsValid() && !string.IsNullOrEmpty(own.path);
+
+        EditorGUILayout.Space();
+        using (new EditorGUI.DisabledScope(!ready))
+        {
+            if (GUILayout.Button("반대쪽 문도 이 문으로 잇기"))
+            {
+                LinkBack(door, own.name, scenePath, targetDoorId.stringValue);
+                // 씬을 열고 닫으면 이번 GUI 그리기가 어긋나므로 여기서 끊음.
+                GUIUtility.ExitGUI();
+            }
+        }
+    }
+
+    // 상대 씬을 열어(이미 열려 있으면 그대로) 그 문을 이 문으로 이음.
+    // 직접 연 씬은 저장하고 닫음. 이미 열려 있던 씬은 다른 수정까지 저장되지 않도록 dirty 표시만 함.
+    static void LinkBack(RoomSceneDoor door, string ownScene, string otherScenePath, string otherDoorId)
+    {
+        Scene other = SceneManager.GetSceneByPath(otherScenePath);
+        bool openedHere = !(other.IsValid() && other.isLoaded);
+        if (openedHere)
+            other = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(otherScenePath, UnityEditor.SceneManagement.OpenSceneMode.Additive);
+
+        try
+        {
+            var matches = new List<RoomSceneDoor>();
+            foreach (GameObject root in other.GetRootGameObjects())
+                foreach (RoomSceneDoor candidate in root.GetComponentsInChildren<RoomSceneDoor>(true))
+                    if (candidate != door && candidate.DoorId == otherDoorId)
+                        matches.Add(candidate);
+
+            if (matches.Count != 1)
+            {
+                EditorUtility.DisplayDialog("문 잇기", $"Room '{other.name}'에 doorId가 '{otherDoorId}'인 문이 {matches.Count}개다. 하나여야 한다.", "확인");
+                return;
+            }
+
+            var so = new SerializedObject(matches[0]);
+            SerializedProperty scene = so.FindProperty("targetScene");
+            SerializedProperty id = so.FindProperty("targetDoorId");
+            bool pointsElsewhere = !string.IsNullOrEmpty(id.stringValue) && (scene.stringValue != ownScene || id.stringValue != door.DoorId);
+            if (pointsElsewhere && !EditorUtility.DisplayDialog("문 잇기",
+                    $"'{other.name}/{otherDoorId}'는 지금 '{scene.stringValue}/{id.stringValue}'로 이어져 있다. 이 문으로 바꿀까?", "바꾸기", "취소"))
+                return;
+
+            scene.stringValue = ownScene;
+            id.stringValue = door.DoorId;
+            so.ApplyModifiedProperties();
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(other);
+
+            if (openedHere)
+                UnityEditor.SceneManagement.EditorSceneManager.SaveScene(other);
+            Debug.Log($"[RoomSceneDoorEditor] '{other.name}/{otherDoorId}' → '{ownScene}/{door.DoorId}'로 이었다." + (openedHere ? "" : " 열려 있던 씬이라 저장은 직접 해야 한다."), matches[0]);
+        }
+        finally
+        {
+            if (openedHere)
+                UnityEditor.SceneManagement.EditorSceneManager.CloseScene(other, true);
+        }
     }
 
     string DrawTargetScene()

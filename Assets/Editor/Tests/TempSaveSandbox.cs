@@ -6,7 +6,7 @@ using Gaze.Session;
 
 namespace Gaze.Tests
 {
-    // 세이브를 읽거나 쓰는 테스트는 반드시 이것을 거친다. 빠뜨리면 실제 Salbyeol\save.json에 쓴다.
+    // 세이브를 읽거나 쓰는 테스트는 반드시 이것을 거친다. 빠뜨리면 실제 Gaze\save.json에 쓴다.
     // Tests/EditMode(Gaze.Core.Tests)는 이 어셈블리를 참조할 수 없어 같은 이름의 헬퍼를 따로 둔다.
     internal sealed class TempSaveSandbox : IDisposable
     {

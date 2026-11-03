@@ -3,6 +3,16 @@
 // 창 닫기 죽음에서 코드가 이 이름으로 부름(ExitRecorder.WindowCloseDeathNodeId).
 title: Death_CloseWindow
 ---
-// 대사 작성 전
 <<stop>>
+===
+
+title: Prototype_Respawn_Interact_01
+---
+당신과 소녀는 별빛을 밝혔다.
+<<jump Prototype_Respawn_Interact_02>>
+===
+
+title: Prototype_Respawn_Interact_02
+---
+소녀는 당신과의 이야기를 기록했다.
 ===

@@ -34,6 +34,9 @@ namespace Gaze.Save
         // 사망 노드 이름이 사망의 키. 같은 노드로 여러 번 죽어도 한 번만 남음.
         public List<string> diedNodeIds = new List<string>();
 
+        // 켠 등불의 id(Lamp.Id). 죽어도 꺼지지 않음.
+        public List<string> litLampIds = new List<string>();
+
         public ExitState exitState = ExitState.None;
     }
 }

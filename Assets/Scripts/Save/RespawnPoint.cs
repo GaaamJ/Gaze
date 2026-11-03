@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Gaze.Save
 {
-    // 세이브된 리스폰 위치와 그 위치가 있는 Room 이름. DialogueInteractable이 조사할 때 Set으로 갱신함.
+    // 세이브된 리스폰 위치와 그 위치가 있는 Room 이름. RespawnResponse가 조사될 때 Set으로 갱신함.
     public static class RespawnPoint
     {
         // 저장된 리스폰 위치를 꺼냄. 세이브가 없거나 위치가 기록된 적 없으면 거짓.

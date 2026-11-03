@@ -42,28 +42,31 @@ namespace Gaze.Interaction.Tests
         static bool AllExist(string node) => true;
         static bool NoneExist(string node) => false;
 
-        DialogueInteractable NewInteractable(string nodeId = "")
+        // Interactable(진입점) + DialogueResponse. RequireComponent로 Interactable이 같이 붙음.
+        DialogueResponse NewDialogue(string nodeId = "")
         {
-            var go = new GameObject("DialogueInteractable");
+            var go = new GameObject("Interactable");
             created.Add(go);
-            var interactable = go.AddComponent<DialogueInteractable>();
-            Set(interactable, so => so.FindProperty("dialogueNodeId").stringValue = nodeId);
-            return interactable;
+            var dialogue = go.AddComponent<DialogueResponse>();
+            Set(dialogue, so => so.FindProperty("dialogueNodeId").stringValue = nodeId);
+            return dialogue;
         }
 
-        DialogueInteractable NewRespawn(string nodeId = "")
+        // 대사 부품 뒤에 리스폰 부품을 붙임. 부품 순서와 상관없이 저장되는지 보려고 대사를 먼저 둠.
+        RespawnResponse NewRespawn(string nodeId = "")
         {
-            var interactable = NewInteractable(nodeId);
-            interactable.gameObject.AddComponent<Respawn>();
-            return interactable;
+            var dialogue = NewDialogue(nodeId);
+            return dialogue.gameObject.AddComponent<RespawnResponse>();
         }
+
+        void Interact(Component target) => target.GetComponent<Interactable>().Interact(Context());
 
         [Test]
         public void WithNodeId_TriesDialogue()
         {
-            var target = NewInteractable("Desk");
+            var target = NewDialogue("Desk");
 
-            target.Interact(Context());
+            Interact(target);
 
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
             Assert.IsEmpty(investigated);
@@ -72,9 +75,9 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void WithoutNodeId_DoesNothingQuietly()
         {
-            var target = NewInteractable();
+            var target = NewDialogue();
 
-            target.Interact(Context());
+            Interact(target);
 
             LogAssert.NoUnexpectedReceived();
             Assert.IsEmpty(investigated);
@@ -83,17 +86,30 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void CanInteract_TrueWithoutNodeId()
         {
-            var target = NewInteractable();
+            var target = NewDialogue();
 
-            Assert.IsTrue(target.CanInteract);
+            var entry = target.GetComponent<Interactable>();
+
+            Assert.IsTrue(entry.CanInteract);
             target.gameObject.SetActive(false);
-            Assert.IsFalse(target.CanInteract);
+            Assert.IsFalse(entry.CanInteract);
+        }
+
+        [Test]
+        public void DisabledResponse_IsSkipped()
+        {
+            var target = NewRespawn();
+            target.enabled = false;
+
+            Interact(target);
+
+            Assert.IsFalse(SaveManager.Data.hasRespawnPosition);
         }
 
         [Test]
         public void ResolvesFirstThenRecheckNode()
         {
-            var target = NewInteractable("Desk");
+            var target = NewDialogue("Desk");
 
             Assert.AreEqual("Desk", target.ResolveDialogueNode(investigated, AllExist));
             investigated.Add("Desk");
@@ -103,7 +119,7 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void RecheckMissing_RepeatsFirstNodeWithoutWarning()
         {
-            var target = NewInteractable("HintGap");
+            var target = NewDialogue("HintGap");
             investigated.Add("HintGap");
 
             Assert.AreEqual("HintGap", target.ResolveDialogueNode(investigated, NoneExist));
@@ -113,7 +129,7 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void RecheckLookup_AsksForRecheckNodeName()
         {
-            var target = NewInteractable("Desk");
+            var target = NewDialogue("Desk");
             investigated.Add("Desk");
             var asked = new List<string>();
 
@@ -125,9 +141,9 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void SameNodeId_SharesInvestigatedRecord()
         {
-            var first = NewInteractable("Symbol");
-            var second = NewInteractable("Symbol");
-            var other = NewInteractable("Other");
+            var first = NewDialogue("Symbol");
+            var second = NewDialogue("Symbol");
+            var other = NewDialogue("Other");
 
             investigated.Add(first.DialogueNodeId);
 
@@ -138,8 +154,8 @@ namespace Gaze.Interaction.Tests
         [Test]
         public void RecordInvestigated_SavesNodeIdOnce()
         {
-            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
-            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
+            DialogueResponse.RecordInvestigated(investigated, "HintGapA");
+            DialogueResponse.RecordInvestigated(investigated, "HintGapA");
 
             CollectionAssert.AreEquivalent(new[] { "HintGapA" }, investigated);
             SaveManager.Load();
@@ -153,7 +169,7 @@ namespace Gaze.Interaction.Tests
             File.WriteAllText(save.Paths.Root, "blocks root folder");
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
 
-            DialogueInteractable.RecordInvestigated(investigated, "HintGapA");
+            DialogueResponse.RecordInvestigated(investigated, "HintGapA");
 
             Assert.IsTrue(investigated.Contains("HintGapA"));
             CollectionAssert.AreEqual(new[] { "HintGapA" }, SaveManager.Data.investigatedNodeIds);
@@ -168,35 +184,22 @@ namespace Gaze.Interaction.Tests
 
             GameSession.Begin();
 
-            var target = NewInteractable("HintGapA");
+            var target = NewDialogue("HintGapA");
             Assert.IsTrue(GameSession.Investigated.Contains("HintGapA"));
             Assert.AreEqual("HintGapA_Recheck", target.ResolveDialogueNode(GameSession.Investigated, AllExist));
         }
 
+        // 대사 부품이 앞에 있어도 Interact가 돌아올 때는 이미 저장돼 있어야 함.
+        // 대사 중 창을 닫아도 리스폰 지점이 남는 근거.
         [Test]
-        public void Respawn_SavesPositionBeforeDialogue_AndLoadRestoresIt()
+        public void Respawn_SavedWhenInteractReturns_AndLoadRestoresIt()
         {
             var target = NewRespawn("Respawn");
             target.transform.position = new Vector3(2.5f, -4f, 0f);
-            var logs = new List<string>();
-            Application.LogCallback capture = (message, _, _) => logs.Add(message);
-            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
+            LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
-            Application.logMessageReceived += capture;
-            try
-            {
-                target.Interact(Context());
-            }
-            finally
-            {
-                Application.logMessageReceived -= capture;
-            }
-
-            int saved = logs.FindIndex(m => m.Contains("리스폰 지점 갱신·저장"));
-            int dialogue = logs.FindIndex(m => m.Contains("DialogueService가 없어"));
-            Assert.That(saved, Is.GreaterThanOrEqualTo(0));
-            Assert.That(saved, Is.LessThan(dialogue), "리스폰 저장이 대사보다 먼저여야 한다.");
+            Interact(target);
 
             SaveManager.Load();
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
@@ -212,10 +215,10 @@ namespace Gaze.Interaction.Tests
             var point = new GameObject("SpawnPoint");
             created.Add(point);
             point.transform.position = new Vector3(-3f, 7f, 0f);
-            Set(target.GetComponent<Respawn>(), so => so.FindProperty("spawnPoint").objectReferenceValue = point.transform);
+            Set(target, so => so.FindProperty("spawnPoint").objectReferenceValue = point.transform);
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
-            target.Interact(Context());
+            Interact(target);
 
             Assert.AreEqual(new Vector2(-3f, 7f), SaveManager.Data.respawnPosition);
         }
@@ -231,12 +234,12 @@ namespace Gaze.Interaction.Tests
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
             LogAssert.Expect(LogType.Log, new Regex("리스폰 지점 갱신·저장"));
 
-            first.Interact(Context());
-            second.Interact(Context());
+            Interact(first);
+            Interact(second);
             SaveManager.Load();
             Assert.AreEqual(new Vector2(10f, -20f), SaveManager.Data.respawnPosition);
 
-            first.Interact(Context());
+            Interact(first);
             SaveManager.Load();
             Assert.AreEqual(new Vector2(1f, 2f), SaveManager.Data.respawnPosition);
         }
@@ -250,7 +253,7 @@ namespace Gaze.Interaction.Tests
             target.transform.position = new Vector3(4f, 0f, 0f);
 
             LogAssert.Expect(LogType.Error, new Regex(@"\[SaveManager\] 세이브 저장 실패"));
-            target.Interact(Context());
+            Interact(target);
 
             Assert.IsTrue(SaveManager.Data.hasRespawnPosition);
             Assert.AreEqual(new Vector2(4f, 0f), SaveManager.Data.respawnPosition);

@@ -36,9 +36,9 @@ namespace Gaze.Death.Tests
             save.Dispose();
         }
 
-        static DeathInteractable NewDeathObject(string nodeId = NodeId)
+        static DeathResponse NewDeathObject(string nodeId = NodeId)
         {
-            var source = new GameObject("DeathObject").AddComponent<DeathInteractable>();
+            var source = new GameObject("DeathObject").AddComponent<DeathResponse>();
             Set(source, so => so.FindProperty("deathNodeId").stringValue = nodeId);
             return source;
         }

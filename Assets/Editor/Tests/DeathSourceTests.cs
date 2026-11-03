@@ -12,7 +12,7 @@ using static Gaze.Tests.TestObjects;
 
 namespace Gaze.Death.Tests
 {
-    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathInteractable이 입구를 부르는지만 본다.
+    // Begin 이후의 연출은 DeathSequenceTests가 본다. 여기서는 DeathZone·DeathResponse가 입구를 부르는지만 본다.
     public class DeathSourceTests
     {
         TempSaveSandbox save;
@@ -59,14 +59,14 @@ namespace Gaze.Death.Tests
         }
 
         [UnityTest]
-        public IEnumerator DeathInteractable_Interact_BeginsDeath()
+        public IEnumerator DeathResponse_Interact_BeginsDeath()
         {
-            var target = new GameObject("Gap").AddComponent<DeathInteractable>();
+            var target = new GameObject("Gap").AddComponent<DeathResponse>();
             Set(target, so => so.FindProperty("deathNodeId").stringValue = "Death_DangerousGap");
-            Assert.IsTrue(target.CanInteract);
+            Assert.IsTrue(target.GetComponent<Interactable>().CanInteract);
 
             ExpectDeath("Death_DangerousGap");
-            target.Interact(new InteractContext(null, null));
+            target.GetComponent<Interactable>().Interact(new InteractContext(null, null));
 
             Assert.IsTrue(DeathSequence.IsActive);
             Assert.IsTrue(inputLock.IsLocked);
@@ -74,12 +74,12 @@ namespace Gaze.Death.Tests
         }
 
         [Test]
-        public void DeathInteractable_BlankNode_WarnsWithoutDying()
+        public void DeathResponse_BlankNode_WarnsWithoutDying()
         {
-            var target = new GameObject("Gap").AddComponent<DeathInteractable>();
+            var target = new GameObject("Gap").AddComponent<DeathResponse>();
 
             LogAssert.Expect(LogType.Warning, new Regex("사망 노드 이름이 비어"));
-            target.Interact(new InteractContext(null, null));
+            target.GetComponent<Interactable>().Interact(new InteractContext(null, null));
 
             Assert.IsFalse(DeathSequence.IsActive);
             Assert.IsFalse(inputLock.IsLocked);

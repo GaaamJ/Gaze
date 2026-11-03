@@ -3,11 +3,11 @@ using System.IO;
 
 namespace Gaze.Core.GameFolder
 {
-    // 게임이 파일을 두는 폴더의 경로 모음. 루트(사용자 폴더 아래 Salbyeol) 아래에 세이브 파일과 시체 폴더가 있음.
+    // 게임이 파일을 두는 폴더의 경로 모음. 루트(사용자 폴더 아래 Gaze) 아래에 세이브 파일과 시체 폴더가 있음.
     // SaveManager.Paths가 들고 있음.
     public sealed class GameFolderPaths
     {
-        public const string RootFolderName = "Salbyeol";
+        public const string RootFolderName = "Gaze";
         public const string CorpsesFolderName = "Corpses";
         public const string SaveFileName = "save.json";
 

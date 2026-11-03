@@ -13,8 +13,8 @@ namespace Gaze.Save
     {
         static GameFolderPaths paths;
 
-        // 세이브·시체 폴더 경로. 기본값은 사용자 폴더 아래 Salbyeol.
-        // 테스트는 임시 루트를 주입해 실제 Salbyeol\ 폴더를 건드리지 않음.
+        // 세이브·시체 폴더 경로. 기본값은 사용자 폴더 아래 Gaze.
+        // 테스트는 임시 루트를 주입해 실제 Gaze\ 폴더를 건드리지 않음.
         public static GameFolderPaths Paths
         {
             get => paths ??= GameFolderPaths.CreateDefault();

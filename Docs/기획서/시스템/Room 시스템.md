@@ -10,8 +10,8 @@
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
-- 지금 있는 Room 씬: `Prototype`
-	- 기본 Room: `Prototype` (`CoreEntry`에 설정)
+- 지금 있는 Room 씬: `Prototype01`, `Prototype02`
+	- 기본 Room: `Prototype02` (`CoreEntry`에 설정)
 
 - 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
 	- 빌드 설정에는 넣지 않음.
@@ -58,7 +58,8 @@ sequenceDiagram
 ---
 - **Room 만들기**
 	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
-		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Wall` 타일맵(`Wall`에만 콜라이더), `RoomDoor`, `Respawn` Pb
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Wall`에만 콜라이더, 정렬 레이어 `Background`), `RoomDoor`, `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
+		- 리스폰 지점은 템플릿에 없음. 필요한 방에만 `Respawn` Pb를 놓음.
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
@@ -67,7 +68,14 @@ sequenceDiagram
 	1. 양쪽 Room에 Trigger 콜라이더와 `RoomSceneDoor`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
-		- Ex. A의 문: `doorId` = `A_East`, `targetScene` = `B`, `targetDoorId` = `B_West`
+		- Ex. A의 문: `doorId` = `East`, `targetScene` = `B`, `targetDoorId` = `West`
+	4. 반대쪽 문은 `반대쪽 문도 이 문으로 잇기` 버튼으로 채움.
+		- 상대 씬을 열어 그 문의 `targetScene`·`targetDoorId`를 이 문으로 적고 저장한 뒤 닫음.
+		- 상대 씬이 이미 열려 있으면 저장하지 않음. 직접 저장.
+		- 상대 문이 다른 곳으로 이어져 있으면 바꿀지 물어봄.
+	- `doorId`는 그 Room 안에서만 겹치지 않으면 됨. 방향으로 지음.
+		- Ex. `East`, `West`, 한쪽에 둘이면 `East1`, `East2`
+	- `targetScene`, `targetDoorId`는 Inspector 목록에서 고름. 목록은 빌드 설정의 씬과 그 씬의 문 id.
 
 - **픽셀 맞추기**
 	- 오브젝트에 `PixelSnap`을 붙이면 에디터에서 움직일 때 픽셀 격자에 붙음.

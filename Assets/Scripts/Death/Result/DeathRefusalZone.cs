@@ -52,7 +52,7 @@ namespace Gaze.Death
             {
                 DialogueResult result = await PlayDialogue(nodeId);
                 if (result == DialogueResult.Completed)
-                    DialogueInteractable.RecordInvestigated(investigated, nodeId);
+                    DialogueResponse.RecordInvestigated(investigated, nodeId);
                 else if (result == DialogueResult.Rejected)
                     Debug.LogWarning($"[DeathRefusalZone] 외면 노드 '{nodeId}'를 재생하지 못했다.");
             }
