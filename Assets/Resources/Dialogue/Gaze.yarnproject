@@ -11,5 +11,15 @@
     "baseLanguage": "ko",
     "compilerOptions": {
         "diagnosticsSeverity": {}
+    },
+    "editorOptions": {
+        "yarnScriptEditor": {
+            "projectGraphPositions": {
+                "Prototype.yarn": {
+                    "x": 52,
+                    "y": 166
+                }
+            }
+        }
     }
 }

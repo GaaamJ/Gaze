@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 97015914}
   - component: {fileID: 97015915}
   m_Layer: 0
-  m_Name: Laris
+  m_Name: Girl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -407,6 +407,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 776929843078822756, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 921090457343010250, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: inputLock
       value: 
@@ -454,6 +458,14 @@ PrefabInstance:
     - target: {fileID: 2838931213327837518, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 305.64
+      objectReference: {fileID: 0}
+    - target: {fileID: 3399105197858824690, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_text
+      value: "\u200B"
+      objectReference: {fileID: 0}
+    - target: {fileID: 3399105197858824690, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
       objectReference: {fileID: 0}
     - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_AnchorMax.y
@@ -539,6 +551,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6281323879218781412, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6281323879218781412, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 1509949439
+      objectReference: {fileID: 0}
+    - target: {fileID: 6281323879218781412, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 6698537452920158157, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -570,6 +594,10 @@ PrefabInstance:
     - target: {fileID: 6735207016223344612, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_enableAutoSizing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6835377472286265451, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: lettersPerSecond
+      value: 22
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

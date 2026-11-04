@@ -1,18 +1,19 @@
-// 본문에 문장이 하나도 없는 노드는 Yarn 컴파일에서 빠지므로 대사 작성 전 노드에는 <<stop>>을 둔다.
-
-// 창 닫기 죽음에서 코드가 이 이름으로 부름(ExitRecorder.WindowCloseDeathNodeId).
+// 창 닫기 대사 스크립트
 title: Death_CloseWindow
+position: -111,58
 ---
 <<stop>>
 ===
 
 title: Prototype_Respawn_Interact_01
+position: 163,49
 ---
 당신과 소녀는 별빛을 밝혔다.
 <<jump Prototype_Respawn_Interact_02>>
 ===
 
 title: Prototype_Respawn_Interact_02
+position: 163,242
 ---
 소녀는 당신과의 이야기를 기록했다.
 ===
