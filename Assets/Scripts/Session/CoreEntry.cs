@@ -33,6 +33,8 @@ namespace Gaze.Session
         internal static Func<DialogueService, string, YarnTask<DialogueResult>> PlayDialogue = (dialogue, node) => dialogue.Play(node);
 
         bool enteringAfterDeath;
+        // 사망도 창 닫기 사망도 아닌 일반 시작. 사망 후 재시작과 같은 검은 화면 → 페이드 인을 탐.
+        bool enteringAtStart;
         bool enteringAfterWindowClose;
         bool holdingLock;
         Vector3 larisStart;
@@ -73,7 +75,7 @@ namespace Gaze.Session
 
             if (enteringAfterWindowClose)
                 FinishWindowCloseEntry();
-            if (!enteringAfterDeath)
+            if (!enteringAfterDeath && !enteringAtStart)
                 return;
             StopAllCoroutines();
             FinishEntry();
@@ -145,18 +147,28 @@ namespace Gaze.Session
                 PlayerMovement.MoveTo(laris.GetComponent<Rigidbody2D>(), larisStart);
         }
 
-        // 사망 후 재시작이거나 창 닫기 사망이 대기 중이면 진입 상태로 들어가 Death 잠금을 건 채 시작함.
-        // 둘 다 아니면 아무것도 하지 않음(일반 시작).
+        // 진입 상태로 들어가 Death 잠금을 건 채 시작함.
+        // 사망 후 재시작이거나 창 닫기 사망이 대기 중이거나 일반 시작이거나, 어느 쪽이든 잠금.
+        // 일반 시작은 Room이 불러와지는 동안 화면을 검게 덮어 둠. 창 닫기 사망 진입은 화면을 덮지 않음.
         // 다른 컴포넌트의 Update보다 먼저 잠가야 진입 첫 프레임에 방향키가 먹지 않음.
         // RunRestartFromSave가 부름. internal인 건 에디트 모드 테스트가 직접 부르기 위함.
         internal void EnterScene(bool afterDeath)
         {
             if (afterDeath)
+            {
                 enteringAfterDeath = true;
+            }
             else if (GameSession.ConsumePendingDeath())
+            {
                 enteringAfterWindowClose = true;
+            }
             else
-                return;
+            {
+                enteringAtStart = true;
+                ScreenFader fader = FindOrCreateFader();
+                if (fader != null)
+                    fader.SetAlpha(1f);
+            }
 
             if (inputLock != null)
             {
@@ -226,12 +238,12 @@ namespace Gaze.Session
             Debug.Log($"[CoreEntry] 리스폰 위치로 시작: {position}", this);
         }
 
-        // 사망 후 재시작 진입 연출. 검은 화면 → 한 프레임 뒤 잠금 해제 → 페이드 인.
-        // 사망 후 재시작이 아니면 바로 끝남.
+        // 사망 후 재시작·일반 시작 진입 연출. 검은 화면 → 한 프레임 뒤 잠금 해제 → 페이드 인.
+        // 창 닫기 사망 진입(이미 RunWindowCloseEntry가 맡음)이면 바로 끝남.
         // RunRestartFromSave가 마지막에 돌림. internal인 건 에디트 모드 테스트가 직접 돌리기 위함.
         internal IEnumerator RunEntry()
         {
-            if (!enteringAfterDeath)
+            if (!enteringAfterDeath && !enteringAtStart)
                 yield break;
 
             // 반복기 안에서는 yield를 catch로 감쌀 수 없어 finally로 정리만 보장함.
@@ -258,18 +270,19 @@ namespace Gaze.Session
             finally
             {
                 // 페이드 인 중 새 사망이 시작됐을 수 있어, 이미 끝낸 진입은 다시 끝내지 않음.
-                if (enteringAfterDeath)
+                if (enteringAfterDeath || enteringAtStart)
                     FinishEntry();
             }
         }
 
-        // 사망 후 재시작 진입을 끝냄. 건 Death 잠금을 풀고 DeathSequence의 사망 상태를 끝냄.
+        // 사망 후 재시작·일반 시작 진입을 끝냄. 건 Death 잠금을 풀고 DeathSequence의 사망 상태를 끝냄.
         void FinishEntry()
         {
             if (holdingLock && inputLock != null)
                 inputLock.Unlock(InputLockReason.Death);
             holdingLock = false;
             enteringAfterDeath = false;
+            enteringAtStart = false;
             DeathSequence.EndEntry();
         }
 
