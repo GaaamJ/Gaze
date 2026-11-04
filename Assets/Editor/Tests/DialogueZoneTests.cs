@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
-using Gaze.Dialogue;
+using Gaze.Death;
 using Gaze.Save;
 using Gaze.Session;
 using Gaze.Tests;
@@ -14,10 +14,10 @@ using UnityEngine.TestTools;
 using Yarn.Unity;
 using static Gaze.Tests.TestObjects;
 
-namespace Gaze.Death.Tests
+namespace Gaze.Dialogue.Tests
 {
     // 에디트 모드에서는 DialogueRunner가 돌지 않아 대사 재생은 훅으로 바꾸고, 테스트가 직접 끝낸다.
-    public class DeathRefusalZoneTests
+    public class DialogueZoneTests
     {
         const string Node = "Death_Falling001_Refuse";
 
@@ -38,15 +38,15 @@ namespace Gaze.Death.Tests
             played = new List<string>();
             result = DialogueResult.Completed;
             pending = null;
-            originalPlayDialogue = DeathRefusalZone.PlayDialogue;
-            DeathRefusalZone.PlayDialogue = FakeDialogue;
+            originalPlayDialogue = DialogueZone.PlayDialogue;
+            DialogueZone.PlayDialogue = FakeDialogue;
             inputLock = new GameObject("InputLock").AddComponent<InputLock>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            DeathRefusalZone.PlayDialogue = originalPlayDialogue;
+            DialogueZone.PlayDialogue = originalPlayDialogue;
             DeathSequence.ResetState();
             save.Dispose();
         }
@@ -81,12 +81,12 @@ namespace Gaze.Death.Tests
                 yield return null;
         }
 
-        static DeathRefusalZone NewZone(string nodeId)
+        static DialogueZone NewZone(string nodeId)
         {
             var go = new GameObject("Hole");
             go.AddComponent<BoxCollider2D>().isTrigger = true;
-            var zone = go.AddComponent<DeathRefusalZone>();
-            Set(zone, so => so.FindProperty("refusalNodeId").stringValue = nodeId);
+            var zone = go.AddComponent<DialogueZone>();
+            Set(zone, so => so.FindProperty("dialogueNodeId").stringValue = nodeId);
             return zone;
         }
 
@@ -101,9 +101,9 @@ namespace Gaze.Death.Tests
             var zone = NewZone(Node);
             var body = NewLaris(out _);
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             Assert.IsTrue(inputLock.IsLocked, "대사가 재생되는 동안 입력이 잠긴다.");
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             CollectionAssert.AreEqual(new[] { Node }, played, "재생 중에는 새로 시작하지 않는다.");
             Assert.IsFalse(GameSession.Investigated.Contains(Node), "끝나기 전에는 기록하지 않는다.");
 
@@ -113,7 +113,7 @@ namespace Gaze.Death.Tests
             Assert.IsTrue(GameSession.Investigated.Contains(Node));
             Assert.IsTrue(SavedOnDisk(Node), "기록이 세이브 파일에 저장돼야 한다.");
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             CollectionAssert.AreEqual(new[] { Node }, played, "기록이 있으면 다시 들어와도 재생하지 않는다.");
         }
 
@@ -124,7 +124,7 @@ namespace Gaze.Death.Tests
             var zone = NewZone(Node);
             var body = NewLaris(out _);
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
 
             CollectionAssert.IsEmpty(played);
             Assert.IsFalse(inputLock.IsLocked);
@@ -135,13 +135,13 @@ namespace Gaze.Death.Tests
         {
             var zone = NewZone(Node);
             var body = NewLaris(out _);
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             yield return FinishDialogue();
 
             // 게임을 다시 켠 것처럼 세이브에서 세션 기록을 다시 채운다.
             GameSession.Begin();
             var reloaded = NewZone(Node);
-            reloaded.HandleEntered(body);
+            reloaded.HandleInside(body);
 
             Assert.IsTrue(GameSession.Investigated.Contains(Node));
             CollectionAssert.AreEqual(new[] { Node }, played);
@@ -154,8 +154,8 @@ namespace Gaze.Death.Tests
             NewLaris(out var detectTrigger);
             var other = new GameObject("Box").AddComponent<BoxCollider2D>();
 
-            zone.HandleEntered(detectTrigger);
-            zone.HandleEntered(other);
+            zone.HandleInside(detectTrigger);
+            zone.HandleInside(other);
 
             CollectionAssert.IsEmpty(played);
         }
@@ -168,12 +168,33 @@ namespace Gaze.Death.Tests
             var body = NewLaris(out _);
             LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             yield return null;
 
             Assert.IsFalse(inputLock.IsLocked);
             Assert.IsFalse(GameSession.Investigated.Contains(Node));
             Assert.IsFalse(SavedOnDisk(Node));
+        }
+
+        [UnityTest]
+        public IEnumerator Rejected_DoesNotRetryWhileInside_ButRetriesAfterReentering()
+        {
+            result = DialogueResult.Rejected;
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+            LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
+            zone.HandleInside(body);
+            yield return null;
+
+            zone.HandleInside(body);
+            yield return null;
+            CollectionAssert.AreEqual(new[] { Node }, played, "영역 안에 있는 동안은 다시 시도하지 않는다.");
+
+            zone.HandleExited(body);
+            LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
+            zone.HandleInside(body);
+            yield return null;
+            CollectionAssert.AreEqual(new[] { Node, Node }, played, "나갔다 다시 들어오면 다시 시도한다.");
         }
 
         [UnityTest]
@@ -183,7 +204,7 @@ namespace Gaze.Death.Tests
             var zone = NewZone(Node);
             var body = NewLaris(out _);
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             yield return FinishDialogue();
 
             Assert.IsFalse(inputLock.IsLocked);
@@ -193,13 +214,13 @@ namespace Gaze.Death.Tests
         [UnityTest]
         public IEnumerator WithoutDialogueService_WarnsAndDoesNotRecord()
         {
-            DeathRefusalZone.PlayDialogue = originalPlayDialogue;
+            DialogueZone.PlayDialogue = originalPlayDialogue;
             var zone = NewZone(Node);
             var body = NewLaris(out _);
             LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
             LogAssert.Expect(LogType.Warning, new Regex("재생하지 못했다"));
 
-            zone.HandleEntered(body);
+            zone.HandleInside(body);
             yield return null;
 
             Assert.IsFalse(GameSession.Investigated.Contains(Node));
