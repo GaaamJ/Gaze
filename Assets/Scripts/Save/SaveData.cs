@@ -38,6 +38,9 @@ namespace Gaze.Save
         // 켠 등불의 id(Lamp.Id). 죽어도 꺼지지 않음.
         public List<string> litLampIds = new List<string>();
 
+        // 플레이어가 정한 이름. 비어 있으면 아직 안 정함. 정하는 즉시 저장되고 죽어도 남음.
+        public string playerName = "";
+
         public ExitState exitState = ExitState.None;
     }
 }
