@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using Yarn.Unity;
@@ -87,6 +88,7 @@ namespace Gaze.Dialogue
             finally
             {
                 optionsRunning = false;
+                ClearSelection();
             }
             // 선택 결과는 OptionsPresenter가 돌려주고 러너는 null이 아닌 결과를 쓰므로, 이 프레젠터는 X 입력만 감시하고 null을 돌려줌.
             return null;
@@ -130,6 +132,15 @@ namespace Gaze.Dialogue
                 await YarnTask.Yield();
             // optionsRunning이 꺼진 같은 프레임에는 러너가 아직 선택지 취소를 처리하기 전이라 한 프레임 더 늦춤.
             await YarnTask.Yield();
+        }
+
+        // 선택지가 끝나면 EventSystem의 선택을 비움.
+        // OptionsPresenter는 OptionItem을 재사용하는데, 마지막에 고른 것이 선택된 채 남으면
+        // 다음 선택지에서 Select()를 불러도 OnSelect가 오지 않아 선택 표시가 켜지지 않음.
+        static void ClearSelection()
+        {
+            if (EventSystem.current != null)
+                EventSystem.current.SetSelectedGameObject(null);
         }
 
         // root 아래 켜진 OptionItem이 하나라도 있으면 참.
