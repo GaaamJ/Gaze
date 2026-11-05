@@ -415,49 +415,9 @@ PrefabInstance:
       propertyPath: inputLock
       value: 
       objectReference: {fileID: 97015914}
-    - target: {fileID: 936615460709051359, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1256334037113167525, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2687782343961581468, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_Name
       value: DialogueSystem
-      objectReference: {fileID: 0}
-    - target: {fileID: 2838931213327837518, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_Pivot.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2838931213327837518, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2838931213327837518, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 305.64
       objectReference: {fileID: 0}
     - target: {fileID: 3399105197858824690, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_text
@@ -466,50 +426,6 @@ PrefabInstance:
     - target: {fileID: 3399105197858824690, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_TextStyleHashCode
       value: -1183493901
-      objectReference: {fileID: 0}
-    - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3846135392929966844, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4245581654146603053, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4896530558945115022, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -583,33 +499,9 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 40
       objectReference: {fileID: 0}
-    - target: {fileID: 6735207016223344612, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_text
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 6735207016223344612, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_fontSize
-      value: 36
-      objectReference: {fileID: 0}
-    - target: {fileID: 6735207016223344612, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_enableAutoSizing
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6835377472286265451, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: lettersPerSecond
-      value: 22
-      objectReference: {fileID: 0}
     - target: {fileID: 7280266876297121254, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: blinkInterval
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7967554913512363486, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_fontSize
-      value: 36
-      objectReference: {fileID: 0}
-    - target: {fileID: 7967554913512363486, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_fontSizeBase
-      value: 36
       objectReference: {fileID: 0}
     - target: {fileID: 8851312316167356933, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: hideDelay
@@ -694,10 +586,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
   m_Padding:
-    m_Left: 40
-    m_Right: 40
-    m_Top: 24
-    m_Bottom: 24
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
   m_ChildAlignment: 4
   m_Spacing: 24
   m_ChildForceExpandWidth: 1
