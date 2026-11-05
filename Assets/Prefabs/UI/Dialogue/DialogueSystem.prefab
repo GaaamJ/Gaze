@@ -476,6 +476,7 @@ MonoBehaviour:
   - {fileID: 7280266876297121254}
   - {fileID: 8248357609425071820}
   - {fileID: 3974080325673428436}
+  - {fileID: 8851312316167356933}
 --- !u!225 &8502371565270064332
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -896,6 +897,9 @@ MonoBehaviour:
   sources:
   - {fileID: 8502371565270064332}
   - {fileID: 2563454590120095956}
+  fadeInSeconds: 0.2
+  fadeOutSeconds: 0.15
+  hideDelay: 0.15
 --- !u!1 &1959098016170282566
 GameObject:
   m_ObjectHideFlags: 0
