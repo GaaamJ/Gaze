@@ -372,6 +372,7 @@ GameObject:
   - component: {fileID: 8248357609425071820}
   - component: {fileID: 3974080325673428436}
   - component: {fileID: 4203813765272716845}
+  - component: {fileID: 8978485726863348838}
   m_Layer: 5
   m_Name: LinePresenter
   m_TagString: Untagged
@@ -432,6 +433,7 @@ MonoBehaviour:
   - {fileID: 3974080325673428436}
   - {fileID: 8851312316167356933}
   - {fileID: 4203813765272716845}
+  - {fileID: 8978485726863348838}
 --- !u!225 &8502371565270064332
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -530,6 +532,21 @@ MonoBehaviour:
   lastLineText: {fileID: 7967554913512363486}
   amplitude: 0.06
   interval: 0.05
+--- !u!114 &8978485726863348838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030209760822217531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c8135a30a98a00429baa180273db67e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.LineAdvanceHold
+  lineAdvancer: {fileID: 6297295382968203786}
+  advanceAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  holdSeconds: 0.3
 --- !u!1 &1152840887329841266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1282,6 +1299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.ContinueIndicator
   graphic: {fileID: 8054925703065437582}
   blinkInterval: 1
+  hold: {fileID: 8978485726863348838}
 --- !u!1 &6387880438769957086
 GameObject:
   m_ObjectHideFlags: 0
@@ -1632,7 +1650,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.LineAdvancerInput.InputActions
   lineAdvancer: {fileID: 6297295382968203786}
-  hurryUpLineAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
+  hurryUpLineAction: {fileID: 0}
   nextLineAction: {fileID: 0}
   hurryUpOptionsAction: {fileID: 1781555164194001046, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   cancelDialogueAction: {fileID: 0}

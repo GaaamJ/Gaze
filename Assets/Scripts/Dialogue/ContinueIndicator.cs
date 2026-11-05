@@ -16,6 +16,8 @@ namespace Gaze.Dialogue
     {
         [SerializeField] Graphic? graphic;
         [SerializeField, Min(0.05f)] float blinkInterval = 0.5f;
+        [Tooltip("있으면 Z를 받지 않는 동안(HoldSeconds)은 표시를 띄우지 않음. Z가 먹힐 때 표시가 뜨게 맞춤")]
+        [SerializeField] LineAdvanceHold? hold;
 
         float elapsed;
 
@@ -30,14 +32,18 @@ namespace Gaze.Dialogue
         }
 
         // 기다리는 동안 blinkInterval마다 graphic을 켜고 끔. 시간 정지(timeScale 0)에도 깜박이도록 unscaled 시간을 씀.
+        // hold가 있으면 HoldSeconds가 지난 뒤부터 켜진 상태로 깜박이기 시작함.
         void Update()
         {
             if (!Waiting || graphic == null)
                 return;
 
             elapsed += Time.unscaledDeltaTime;
-            graphic.enabled = Mathf.FloorToInt(elapsed / blinkInterval) % 2 == 0;
+            float shown = elapsed - HoldDelay;
+            graphic.enabled = shown >= 0f && Mathf.FloorToInt(shown / blinkInterval) % 2 == 0;
         }
+
+        float HoldDelay => hold != null ? hold.HoldSeconds : 0f;
 
         public override void OnPrepareForLine(MarkupParseResult line, TMP_Text text) => Hide();
 
@@ -45,14 +51,14 @@ namespace Gaze.Dialogue
 
         public override YarnTask OnCharacterWillAppear(int currentCharacterIndex, MarkupParseResult line, CancellationToken cancellationToken) => YarnTask.CompletedTask;
 
-        // 대사 출력이 끝나면 표시를 켬.
+        // 대사 출력이 끝나면 표시를 켬. hold가 있으면 HoldSeconds 뒤에 켜짐(Update).
         // 출력 중 Z(hurry up)로 끊겨도 타자기는 이 콜백을 부르므로 남은 글자가 한꺼번에 뜬 시점에 켜짐.
         public override void OnLineDisplayComplete()
         {
             Waiting = true;
             elapsed = 0f;
             if (graphic != null)
-                graphic.enabled = true;
+                graphic.enabled = HoldDelay <= 0f;
         }
 
         public override void OnLineWillDismiss() => Hide();
