@@ -66,15 +66,14 @@ namespace Gaze.Dialogue
         }
 
         // 타자기가 글자를 늘릴 때마다 TMP가 메시를 새로 만들므로,
-        // 매 프레임 원래 정점으로 되돌린 뒤(ForceMeshUpdate) 출렁임을 더함.
+        // 매 프레임 원래 정점으로 되돌린 뒤 출렁임을 더함. 되돌리기는 TextMotion이 다른 효과와 나눠 맡음.
         // 시간 정지(timeScale 0)에도 움직이도록 unscaled 시간을 씀.
         void LateUpdate()
         {
             if (target == null || waveChars.Count == 0)
                 return;
 
-            target.ForceMeshUpdate();
-            TMP_TextInfo info = target.textInfo;
+            TMP_TextInfo info = TextMotion.BeginFrame(target);
             float time = Time.unscaledTime * speed;
 
             for (int n = 0; n < waveChars.Count; n++)
@@ -96,11 +95,7 @@ namespace Gaze.Dialogue
                     vertices[character.vertexIndex + v].y += offset;
             }
 
-            for (int m = 0; m < info.meshInfo.Length; m++)
-            {
-                info.meshInfo[m].mesh.vertices = info.meshInfo[m].vertices;
-                target.UpdateGeometry(info.meshInfo[m].mesh, m);
-            }
+            TextMotion.Push(target);
         }
     }
 }

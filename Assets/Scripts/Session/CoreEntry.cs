@@ -132,7 +132,8 @@ namespace Gaze.Session
                 yield return entry.Current;
         }
 
-        // 입력 잠금, 진입 상태, Yarn 변수, 라리스 위치(Awake 때 위치)를 처음 상태로 되돌림.
+        // 입력 잠금, 진입 상태, Yarn 변수, 컷신, 라리스 위치(Awake 때 위치)를 처음 상태로 되돌림.
+        // 컷신은 사망 대사가 끝나도 남겨 두므로 여기서 닫음. 화면이 검게 덮인 동안이라 보이지 않음.
         // 스위치는 처음 상태가 아니라 마지막으로 확정한 상태로 되돌림. Room을 불러오기 전이라 SwitchToggle 등이 새 상태를 봄.
         void ResetCore()
         {
@@ -141,7 +142,11 @@ namespace Gaze.Session
             holdingLock = false;
             enteringAfterWindowClose = false;
             if (dialogueService != null)
+            {
                 dialogueService.ResetVariables();
+                if (dialogueService.TryGetComponent(out CutsceneCommand cutscene))
+                    cutscene.Hide();
+            }
             SwitchRecords.Revert();
             if (laris != null)
                 PlayerMovement.MoveTo(laris.GetComponent<Rigidbody2D>(), larisStart);

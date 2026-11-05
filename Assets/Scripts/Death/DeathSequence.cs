@@ -113,14 +113,17 @@ namespace Gaze.Death
             {
                 // 리로드 진입 시 잠금·페이드 정리는 CoreEntry의 사망 진입이 맡음.
                 if (!reloading)
-                    Abort(inputLock, fader);
+                    Abort(scene, inputLock, fader);
             }
         }
 
-        // 다시 시작에 진입을 실패하면 사망 상태, 입력 잠금, 검은 화면을 되돌림.
-        static void Abort(InputLock inputLock, ScreenFader fader)
+        // 다시 시작에 진입을 실패하면 사망 상태, 입력 잠금, 컷신, 검은 화면을 되돌림.
+        // 컷신은 사망 중 대화가 끝나도 닫히지 않으므로 여기서 닫음.
+        static void Abort(CoreEntry scene, InputLock inputLock, ScreenFader fader)
         {
             IsActive = false;
+            if (scene != null && scene.Dialogue != null && scene.Dialogue.TryGetComponent(out CutsceneCommand cutscene))
+                cutscene.Hide();
             if (inputLock != null)
                 inputLock.Unlock(InputLockReason.Death);
             if (fader != null)
