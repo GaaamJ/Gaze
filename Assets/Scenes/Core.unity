@@ -493,7 +493,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6701653073028985270, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 40
+      value: 39
       objectReference: {fileID: 0}
     - target: {fileID: 7280266876297121254, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: blinkInterval
