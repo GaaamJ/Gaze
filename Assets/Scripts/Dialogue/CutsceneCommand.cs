@@ -20,6 +20,12 @@ namespace Gaze.Dialogue
 
         DialogueRunner runner;
 
+        // 컷신이 떠 있으면 참. PortraitPresenter가 초상화를 띄울지 정할 때 봄.
+        public bool IsShowing => cutsceneRoot != null && cutsceneRoot.activeSelf;
+
+        // 컷신을 띄울 때마다 알림. PortraitPresenter가 받아 초상화를 숨김.
+        public event System.Action Shown;
+
         void Awake()
         {
             runner = GetComponent<DialogueRunner>();
@@ -62,6 +68,7 @@ namespace Gaze.Dialogue
 
             cutsceneImage.sprite = sprite;
             cutsceneRoot.SetActive(true);
+            Shown?.Invoke();
         }
 
         // <<CutsceneEnd>>, 대화 종료, 리스폰(CoreEntry.ResetCore), 사망 중단(DeathSequence.Abort)에서 부름.
