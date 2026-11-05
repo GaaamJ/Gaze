@@ -191,6 +191,7 @@ GameObject:
   - component: {fileID: 7967554913512363486}
   - component: {fileID: 2286338337701900247}
   - component: {fileID: 8730468185564089297}
+  - component: {fileID: 3272805515657274992}
   m_Layer: 5
   m_Name: LastLine
   m_TagString: Untagged
@@ -214,8 +215,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 51, y: 30}
-  m_SizeDelta: {x: 930, y: 240}
+  m_AnchoredPosition: {x: 93, y: 62}
+  m_SizeDelta: {x: 760, y: 184}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &469368250408933977
 CanvasRenderer:
@@ -342,6 +343,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.AlphaFollow
   source: {fileID: 2563454590120095956}
+--- !u!114 &3272805515657274992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910558305908546140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0afeb6b95bebee44b9956c36701885f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.RectFollow
+  source: {fileID: 1256334037113167525}
 --- !u!1 &1030209760822217531
 GameObject:
   m_ObjectHideFlags: 0
@@ -497,6 +511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6769a13729a80cc4f88c984ecfa64621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.WaveEffect
+  lastLineText: {fileID: 7967554913512363486}
   amplitude: 0.12
   speed: 8
   phaseStep: 0.6
@@ -512,6 +527,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e53abd5f709523246ae3c9511aa11161, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.ShakeEffect
+  lastLineText: {fileID: 7967554913512363486}
   amplitude: 0.06
   interval: 0.05
 --- !u!1 &1152840887329841266
