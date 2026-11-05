@@ -43,7 +43,7 @@ namespace Gaze.Death.Tests
             return source;
         }
 
-        static DeathAftermath NewAftermath(MonoBehaviour source, Vector3 position, (GameObject prefab, Transform point)[] spawns, GameObject[] deactivate, Transform parent = null)
+        static DeathAftermath NewAftermath(MonoBehaviour source, Vector3 position, (GameObject prefab, Transform point)[] spawns, GameObject[] deactivate, Transform parent = null, GameObject[] activate = null)
         {
             var go = new GameObject("Aftermath");
             go.transform.SetParent(parent, false);
@@ -64,6 +64,13 @@ namespace Gaze.Death.Tests
                 off.arraySize = deactivate.Length;
                 for (int i = 0; i < deactivate.Length; i++)
                     off.GetArrayElementAtIndex(i).objectReferenceValue = deactivate[i];
+                if (activate != null)
+                {
+                    var on = so.FindProperty("activate");
+                    on.arraySize = activate.Length;
+                    for (int i = 0; i < activate.Length; i++)
+                        on.GetArrayElementAtIndex(i).objectReferenceValue = activate[i];
+                }
             });
             return aftermath;
         }
@@ -138,6 +145,36 @@ namespace Gaze.Death.Tests
             Assert.AreEqual(1, clones.Length);
             Assert.AreSame(parent, clones[0].transform.parent);
             Assert.That(Vector3.Distance(point.position, clones[0].transform.position), Is.LessThan(0.001f));
+        }
+
+        [Test]
+        public void WithRecord_ActivatesHiddenObject()
+        {
+            SaveManager.Data.diedNodeIds.Add(NodeId);
+            var source = NewDeathObject();
+            var refusal = new GameObject("RefusalZone");
+            refusal.SetActive(false);
+            var aftermath = NewAftermath(source, Vector3.zero, new (GameObject, Transform)[0], new[] { source.gameObject }, activate: new[] { refusal });
+
+            aftermath.Apply();
+
+            Assert.IsTrue(refusal.activeSelf);
+            Assert.IsFalse(source.gameObject.activeSelf);
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [Test]
+        public void WithoutRecord_KeepsActivateTargetHidden()
+        {
+            var source = NewDeathObject();
+            var refusal = new GameObject("RefusalZone");
+            refusal.SetActive(false);
+            var aftermath = NewAftermath(source, Vector3.zero, new (GameObject, Transform)[0], new GameObject[0], activate: new[] { refusal });
+
+            aftermath.Apply();
+
+            Assert.IsFalse(refusal.activeSelf);
+            LogAssert.NoUnexpectedReceived();
         }
 
         [Test]

@@ -102,6 +102,8 @@ namespace Gaze.Death
                 }
 
                 reloading = true;
+                if (scene != null)
+                    scene.QueueRespawnDialogue(deathNodeId);
                 Restart(scene);
             }
             catch (Exception e)

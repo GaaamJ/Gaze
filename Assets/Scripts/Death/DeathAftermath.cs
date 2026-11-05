@@ -4,7 +4,8 @@ using Gaze.Save;
 
 namespace Gaze.Death
 {
-    // 사망 기록이 있으면 Room에 흔적을 남김. source의 사망 노드가 기록돼 있으면 프리팹(시체 등)을 놓고 지정한 오브젝트를 끔.
+    // 사망 기록이 있으면 Room에 흔적을 남김. source의 사망 노드가 기록돼 있으면 프리팹(시체 등)을 놓고 지정한 오브젝트를 끄고 켬.
+    // Ex. 자식 DeathTrigger를 끄고, 꺼 둔 자식 RefusalZone(외면 대사)을 켬.
     // RoomSceneEntry.Enter가 Room 진입 때 Apply를 부름.
     public class DeathAftermath : MonoBehaviour
     {
@@ -22,11 +23,13 @@ namespace Gaze.Death
         [SerializeField] Spawn[] spawns;
         [Tooltip("사망 기록이 있으면 끌 오브젝트")]
         [SerializeField] GameObject[] deactivate;
+        [Tooltip("사망 기록이 있으면 켤 오브젝트. 씬에는 꺼 둔 채로 저장한다.")]
+        [SerializeField] GameObject[] activate;
 
         // 다시 불러도 생성물이 겹치지 않게 막음.
         bool applied;
 
-        // source의 사망 기록 확인 → spawns 프리팹 생성 → deactivate 오브젝트 끔.
+        // source의 사망 기록 확인 → spawns 프리팹 생성 → deactivate 오브젝트 끔 → activate 오브젝트 켬.
         // 기록이 없거나 이미 적용했으면 아무것도 안 함.
         // Awake에서 부르지 않음. RoomSceneEntry.Enter()가 CoreEntry의 리셋·리스폰 뒤에 부름.
         internal void Apply()
@@ -48,17 +51,23 @@ namespace Gaze.Death
                     Place(spawn);
             }
 
-            if (deactivate != null)
+            SetAll(deactivate, false, nameof(deactivate));
+            SetAll(activate, true, nameof(activate));
+        }
+
+        // targets를 모두 켜거나 끔. 빈 항목은 경고하고 건너뜀.
+        void SetAll(GameObject[] targets, bool active, string listName)
+        {
+            if (targets == null)
+                return;
+            foreach (GameObject target in targets)
             {
-                foreach (GameObject target in deactivate)
+                if (target == null)
                 {
-                    if (target == null)
-                    {
-                        Debug.LogWarning($"[DeathAftermath] '{name}': deactivate에 빈 항목이 있어 건너뛴다.", this);
-                        continue;
-                    }
-                    target.SetActive(false);
+                    Debug.LogWarning($"[DeathAftermath] '{name}': {listName}에 빈 항목이 있어 건너뛴다.", this);
+                    continue;
                 }
+                target.SetActive(active);
             }
         }
 
@@ -89,12 +98,23 @@ namespace Gaze.Death
             if (source != null && !(source is IDeathSource))
                 Debug.LogWarning($"[DeathAftermath] '{name}': source '{source.GetType().Name}'는 IDeathSource가 아니다.", this);
 
-            if (deactivate == null)
-                return;
-            foreach (GameObject target in deactivate)
+            if (deactivate != null)
             {
-                if (target != null && transform.IsChildOf(target.transform))
-                    Debug.LogWarning($"[DeathAftermath] '{name}': deactivate의 '{target.name}'를 끄면 이 컴포넌트도 꺼진다.", this);
+                foreach (GameObject target in deactivate)
+                {
+                    if (target != null && transform.IsChildOf(target.transform))
+                        Debug.LogWarning($"[DeathAftermath] '{name}': deactivate의 '{target.name}'를 끄면 이 컴포넌트도 꺼진다.", this);
+                }
+            }
+
+            // 켜진 채 저장하면 사망 기록이 없어도 처음부터 보임.
+            if (activate != null)
+            {
+                foreach (GameObject target in activate)
+                {
+                    if (target != null && target.activeSelf)
+                        Debug.LogWarning($"[DeathAftermath] '{name}': activate의 '{target.name}'가 켜져 있어 사망 기록이 없어도 보인다. 꺼 둬야 한다.", this);
+                }
             }
         }
 #endif
