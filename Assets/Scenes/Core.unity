@@ -479,10 +479,6 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
-    - target: {fileID: 6698537452920158157, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 6701653073028985270, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_SizeDelta.x
       value: 30
