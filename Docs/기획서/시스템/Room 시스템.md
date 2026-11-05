@@ -26,6 +26,7 @@
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
 | `Door`                | 문의 공통 부분(abstract). 소녀가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
 | `NormalDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
+| `LockedDoor`          | 스위치가 켜져야 들어갈 수 있는 문. 행선지는 `NormalDoor`와 같음.<br>잠겨 있을 때 대사는 재생하지 않음. → [[스위치 시스템]] |
 | `ShiftingDoor`        | 안 볼 때 바뀌는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>소녀의 빛 범위(`LarisLight`)가 문에서 벗어나면 다음으로 한 칸 바뀌고, 문에 들어가기 전까지 다시 안 바뀜. 방이 밝으면 기본 행선지로 고정. → [[빛 시스템]] |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |

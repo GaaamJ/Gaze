@@ -49,7 +49,7 @@
 - `Docs/레퍼런스/Reference Map Design.md`: map structure notes on OneShot, OMORI, Undertale. Read first when building a graybox map.
 - `Docs/기획서/아이디어.md`: short notes on ideas. Not decided.
 - `Docs/기획서/결정 사항.md`: what is decided (including small calls like camera size) and what was dropped. Add one line whenever something is decided.
-- `Docs/기획서/시스템/`: one doc per code system (death, interaction, dialogue, save, Room, session, player, light). The `확인 필요` section at the end of each lists what is missing and the constraints.
+- `Docs/기획서/시스템/`: one doc per code system (death, interaction, dialogue, save, Room, session, player, light, switch). The `확인 필요` section at the end of each lists what is missing and the constraints.
 - `Docs/인수인계 문서.md`: handoff between accounts. Exists only right after an account switch.
 	- Written in English just before switching accounts.
 	- Holds the current task and open questions. Does not repeat CLAUDE.md; if they disagree, CLAUDE.md wins.
