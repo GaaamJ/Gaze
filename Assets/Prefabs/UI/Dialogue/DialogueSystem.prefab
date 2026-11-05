@@ -417,6 +417,7 @@ GameObject:
   - component: {fileID: 2248135958652057595}
   - component: {fileID: 4623986826486394096}
   - component: {fileID: 8248357609425071820}
+  - component: {fileID: 3974080325673428436}
   m_Layer: 5
   m_Name: LinePresenter
   m_TagString: Untagged
@@ -474,6 +475,7 @@ MonoBehaviour:
   eventHandlers:
   - {fileID: 7280266876297121254}
   - {fileID: 8248357609425071820}
+  - {fileID: 3974080325673428436}
 --- !u!225 &8502371565270064332
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -541,6 +543,21 @@ MonoBehaviour:
   lineBreakMs: 200
   sentenceMs: 150
   commaMs: 80
+--- !u!114 &3974080325673428436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030209760822217531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6769a13729a80cc4f88c984ecfa64621, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.WaveEffect
+  amplitude: 0.12
+  speed: 8
+  phaseStep: 0.6
 --- !u!1 &1152840887329841266
 GameObject:
   m_ObjectHideFlags: 0
@@ -1429,7 +1446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a968ef973edc54520b248fa3113ae925, type: 3}
   m_Name: 
   m_EditorClassIdentifier: YarnSpinner.Unity::PaletteMarkerProcessor
-  palette: {fileID: 11400000, guid: 6df01bf68e01943908f9e625c3b0bbc6, type: 2}
+  palette: {fileID: 11400000, guid: 50afc9b587039cf44bc31111e67ce36d, type: 2}
   lineProvider: {fileID: 0}
 --- !u!114 &7361626369504309770
 MonoBehaviour:
