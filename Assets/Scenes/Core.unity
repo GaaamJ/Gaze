@@ -599,10 +599,38 @@ PrefabInstance:
       propertyPath: lettersPerSecond
       value: 22
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 7280266876297121254, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: blinkInterval
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967554913512363486, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_fontSize
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 7967554913512363486, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_fontSizeBase
+      value: 36
+      objectReference: {fileID: 0}
+    - target: {fileID: 8851312316167356933, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: hideDelay
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8851312316167356933, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: fadeInSeconds
+      value: 0.175
+      objectReference: {fileID: 0}
+    - target: {fileID: 8851312316167356933, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: fadeOutSeconds
+      value: 0.1
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8068532421881479702, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1959098016170282566, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 861163210}
   m_SourcePrefab: {fileID: 100100000, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
 --- !u!114 &429564803 stripped
 MonoBehaviour:
@@ -648,6 +676,37 @@ Transform:
   - {fileID: 1580546747}
   m_Father: {fileID: 97015921}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &861163204 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1959098016170282566, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+  m_PrefabInstance: {fileID: 429564802}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &861163210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 861163204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.HorizontalLayoutGroup
+  m_Padding:
+    m_Left: 40
+    m_Right: 40
+    m_Top: 24
+    m_Bottom: 24
+  m_ChildAlignment: 4
+  m_Spacing: 24
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &1096427524
 GameObject:
   m_ObjectHideFlags: 0
