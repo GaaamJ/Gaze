@@ -270,16 +270,24 @@ namespace Gaze.Death.Tests
         }
 
         [Test]
-        public void Entry_WithoutDeath_DoesNotLock()
+        public void Entry_AtPlainStart_FadesInFromBlackWithoutDeathState()
         {
             var entry = NewEntry(out InputLock newLock);
+            fader.SetAlpha(0f);
 
             entry.EnterScene(afterDeath: false);
-            IEnumerator run = entry.RunEntry();
+            Assert.IsTrue(newLock.IsLocked, "일반 시작도 진입 첫 프레임부터 잠근다.");
+            Assert.AreEqual(1f, fader.Alpha, "Room이 불러와지는 동안 화면을 검게 덮는다.");
 
-            Assert.IsFalse(run.MoveNext());
+            IEnumerator run = entry.RunEntry();
+            Assert.IsTrue(run.MoveNext());
+            Assert.AreEqual(1f, fader.Alpha);
+            Assert.IsTrue(newLock.IsLocked, "한 프레임 동안은 잠금을 유지한다.");
+
+            while (run.MoveNext()) { }
             Assert.IsFalse(newLock.IsLocked);
             Assert.AreEqual(0f, fader.Alpha);
+            Assert.IsFalse(DeathSequence.IsActive, "사망 상태를 만들지 않는다.");
         }
     }
 }

@@ -8,9 +8,9 @@ namespace Gaze.Session
     // 세션 메모리: 조사 기록(Investigated)과 창 닫기 사망 대기 여부.
     public static class GameSession
     {
-        // 조사를 마친 DialogueResponse의 dialogueNodeId와 재생을 마친 DeathRefusalZone의 refusalNodeId.
+        // 조사를 마친 DialogueResponse의 dialogueNodeId와 재생을 마친 DialogueZone의 dialogueNodeId.
         // 같은 노드 이름을 쓰는 오브젝트는 기록을 공유함.
-        // PlayerInteractor가 상호작용 때 넘기고 DeathRefusalZone이 읽음.
+        // PlayerInteractor가 상호작용 때 넘기고 DialogueZone이 읽음.
         public static HashSet<string> Investigated { get; private set; }
 
         static bool pendingWindowCloseDeath;

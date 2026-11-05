@@ -20,7 +20,8 @@ namespace Gaze.Save
     [Serializable]
     public class SaveData
     {
-        public List<string> solvedPuzzleIds = new List<string>();
+        // 리스폰 지점에서 확정한 켜진 스위치의 id(Switch.Id). 죽거나 다시 켜면 여기서 시작함.
+        public List<string> onSwitchIds = new List<string>();
 
         // false면 씬의 라리스 기본 위치에서 시작함.
         public bool hasRespawnPosition;
@@ -36,6 +37,9 @@ namespace Gaze.Save
 
         // 켠 등불의 id(Lamp.Id). 죽어도 꺼지지 않음.
         public List<string> litLampIds = new List<string>();
+
+        // 플레이어가 정한 이름. 비어 있으면 아직 안 정함. 정하는 즉시 저장되고 죽어도 남음.
+        public string playerName = "";
 
         public ExitState exitState = ExitState.None;
     }

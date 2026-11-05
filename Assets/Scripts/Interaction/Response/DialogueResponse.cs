@@ -60,7 +60,7 @@ namespace Gaze.Interaction
         }
 
         // 노드를 메모리 집합과 세이브 데이터(InvestigatedNodeIds) 양쪽에 조사 기록으로 남김.
-        // DeathRefusalZone도 부름.
+        // DialogueZone도 부름.
         internal static void RecordInvestigated(ICollection<string> investigated, string nodeId)
         {
             investigated.Add(nodeId);

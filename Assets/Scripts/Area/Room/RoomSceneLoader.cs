@@ -16,7 +16,7 @@ namespace Gaze.Area
     public class RoomSceneLoader : MonoBehaviour
     {
         [SerializeField] InputLock inputLock;
-        [Tooltip("RoomSceneDoor로 넘어갈 때 도착 문으로 옮길 라리스")]
+        [Tooltip("Door로 넘어갈 때 도착 문으로 옮길 라리스")]
         [SerializeField] PlayerMovement laris;
         [Tooltip("씬에 ScreenFader가 없을 때 만들어 쓸 페이더")]
         [SerializeField] ScreenFader faderPrefab;
@@ -97,7 +97,8 @@ namespace Gaze.Area
 
         // 문으로 Room을 옮기는 이동 시작. 이동 중이거나 대상 씬이 빌드 설정에 없으면 false.
         // 입력을 잠근 뒤 RunMove를 돌림. Room 사이 이동은 세이브를 쓰지 않음.
-        internal bool BeginMove(string targetRoom, string targetDoorId)
+        // fromDoorId는 지금 Room에서 들어간 문의 id. 도착 문에 어디서 왔는지 알려 줄 때 씀.
+        internal bool BeginMove(string targetRoom, string targetDoorId, string fromDoorId)
         {
             if (IsMovingRoom || !isActiveAndEnabled)
                 return false;
@@ -113,14 +114,16 @@ namespace Gaze.Area
                 inputLock.Lock(InputLockReason.RoomMove);
                 moveLock = inputLock;
             }
-            StartCoroutine(RunMove(targetRoom, targetDoorId));
+            StartCoroutine(RunMove(targetRoom, targetDoorId, fromDoorId));
             return true;
         }
 
-        // 페이드 아웃 → 현재 Room 내림 → 대상 Room 불러옴 → 라리스를 도착 문으로 옮김 → Enter → 페이드 인.
+        // 페이드 아웃 → 현재 Room 내림 → 대상 Room 불러옴 → 라리스를 도착 문으로 옮기고 어디서 왔는지 알림 → Enter → 페이드 인.
         // 어디서 끊기든 finally에서 EndMove로 잠금과 페이드를 되돌림.
-        IEnumerator RunMove(string targetRoom, string targetDoorId)
+        IEnumerator RunMove(string targetRoom, string targetDoorId, string fromDoorId)
         {
+            // 내리기 전에 떠나는 Room 이름을 잡아 둠.
+            string fromRoom = room.IsValid() ? room.name : null;
             try
             {
                 moveFader = ScreenFader.FindOrCreate(faderPrefab, this);
@@ -143,12 +146,13 @@ namespace Gaze.Area
                 Rigidbody2D body = laris != null ? laris.GetComponent<Rigidbody2D>() : null;
                 if (door == null)
                 {
-                    Debug.LogError($"[RoomSceneLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 RoomSceneDoor가 없어 라리스를 옮기지 못했다.", this);
+                    Debug.LogError($"[RoomSceneLoader] Room '{targetRoom}'에 id '{targetDoorId}'인 Door가 없어 라리스를 옮기지 못했다.", this);
                 }
                 else if (body != null)
                 {
                     PlayerMovement.MoveTo(body, door.transform.position);
                     door.WaitingForExit = true;
+                    door.Arrive(fromRoom, fromDoorId);
                     CinemachineCore.ResetCameraState();
                 }
 
@@ -200,14 +204,14 @@ namespace Gaze.Area
             moveFader = null;
         }
 
-        // 씬 안에서 id가 같은 RoomSceneDoor를 찾음. 씬이 불러와 있지 않거나 없으면 null.
-        static RoomSceneDoor FindDoor(Scene scene, string doorId)
+        // 씬 안에서 id가 같은 Door를 찾음. 씬이 불러와 있지 않거나 없으면 null.
+        static Door FindDoor(Scene scene, string doorId)
         {
             if (!scene.IsValid() || !scene.isLoaded)
                 return null;
             foreach (GameObject root in scene.GetRootGameObjects())
             {
-                foreach (RoomSceneDoor door in root.GetComponentsInChildren<RoomSceneDoor>(true))
+                foreach (Door door in root.GetComponentsInChildren<Door>(true))
                 {
                     if (door.DoorId == doorId)
                         return door;

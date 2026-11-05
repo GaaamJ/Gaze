@@ -1,0 +1,229 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
+using NUnit.Framework;
+using Gaze.Death;
+using Gaze.Save;
+using Gaze.Session;
+using Gaze.Tests;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.TestTools;
+using Yarn.Unity;
+using static Gaze.Tests.TestObjects;
+
+namespace Gaze.Dialogue.Tests
+{
+    // 에디트 모드에서는 DialogueRunner가 돌지 않아 대사 재생은 훅으로 바꾸고, 테스트가 직접 끝낸다.
+    public class DialogueZoneTests
+    {
+        const string Node = "Death_Falling001_Refuse";
+
+        TempSaveSandbox save;
+        Func<string, YarnTask<DialogueResult>> originalPlayDialogue;
+        List<string> played;
+        DialogueResult result;
+        AwaitableCompletionSource pending;
+        InputLock inputLock;
+
+        [SetUp]
+        public void SetUp()
+        {
+            save = new TempSaveSandbox();
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            DeathSequence.ResetState();
+
+            played = new List<string>();
+            result = DialogueResult.Completed;
+            pending = null;
+            originalPlayDialogue = DialogueZone.PlayDialogue;
+            DialogueZone.PlayDialogue = FakeDialogue;
+            inputLock = new GameObject("InputLock").AddComponent<InputLock>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            DialogueZone.PlayDialogue = originalPlayDialogue;
+            DeathSequence.ResetState();
+            save.Dispose();
+        }
+
+        // DialogueService.Play처럼 재생하는 동안만 Dialogue 잠금을 건다.
+        async YarnTask<DialogueResult> FakeDialogue(string nodeId)
+        {
+            played.Add(nodeId);
+            if (result == DialogueResult.Rejected)
+                return DialogueResult.Rejected;
+
+            inputLock.Lock(InputLockReason.Dialogue);
+            try
+            {
+                pending = new AwaitableCompletionSource();
+                await pending.Awaitable;
+            }
+            finally
+            {
+                inputLock.Unlock(InputLockReason.Dialogue);
+            }
+            return result;
+        }
+
+        IEnumerator FinishDialogue()
+        {
+            Assert.IsNotNull(pending, "재생 중인 대사가 없다.");
+            var source = pending;
+            pending = null;
+            source.SetResult();
+            for (int i = 0; i < 3; i++)
+                yield return null;
+        }
+
+        static DialogueZone NewZone(string nodeId)
+        {
+            var go = new GameObject("Hole");
+            go.AddComponent<BoxCollider2D>().isTrigger = true;
+            var zone = go.AddComponent<DialogueZone>();
+            Set(zone, so => so.FindProperty("dialogueNodeId").stringValue = nodeId);
+            return zone;
+        }
+
+        static bool SavedOnDisk(string nodeId)
+        {
+            return File.Exists(SaveManager.SavePath) && File.ReadAllText(SaveManager.SavePath).Contains($"\"{nodeId}\"");
+        }
+
+        [UnityTest]
+        public IEnumerator FirstEntry_PlaysOnce_RecordsAndSavesWhenCompleted()
+        {
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+
+            zone.HandleInside(body);
+            Assert.IsTrue(inputLock.IsLocked, "대사가 재생되는 동안 입력이 잠긴다.");
+            zone.HandleInside(body);
+            CollectionAssert.AreEqual(new[] { Node }, played, "재생 중에는 새로 시작하지 않는다.");
+            Assert.IsFalse(GameSession.Investigated.Contains(Node), "끝나기 전에는 기록하지 않는다.");
+
+            yield return FinishDialogue();
+
+            Assert.IsFalse(inputLock.IsLocked);
+            Assert.IsTrue(GameSession.Investigated.Contains(Node));
+            Assert.IsTrue(SavedOnDisk(Node), "기록이 세이브 파일에 저장돼야 한다.");
+
+            zone.HandleInside(body);
+            CollectionAssert.AreEqual(new[] { Node }, played, "기록이 있으면 다시 들어와도 재생하지 않는다.");
+        }
+
+        [Test]
+        public void AlreadyRecorded_DoesNotPlay()
+        {
+            GameSession.Investigated.Add(Node);
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+
+            zone.HandleInside(body);
+
+            CollectionAssert.IsEmpty(played);
+            Assert.IsFalse(inputLock.IsLocked);
+        }
+
+        [UnityTest]
+        public IEnumerator SavedRecord_SurvivesRestart()
+        {
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+            zone.HandleInside(body);
+            yield return FinishDialogue();
+
+            // 게임을 다시 켠 것처럼 세이브에서 세션 기록을 다시 채운다.
+            GameSession.Begin();
+            var reloaded = NewZone(Node);
+            reloaded.HandleInside(body);
+
+            Assert.IsTrue(GameSession.Investigated.Contains(Node));
+            CollectionAssert.AreEqual(new[] { Node }, played);
+        }
+
+        [Test]
+        public void IgnoresDetectTriggerAndOthers()
+        {
+            var zone = NewZone(Node);
+            NewLaris(out var detectTrigger);
+            var other = new GameObject("Box").AddComponent<BoxCollider2D>();
+
+            zone.HandleInside(detectTrigger);
+            zone.HandleInside(other);
+
+            CollectionAssert.IsEmpty(played);
+        }
+
+        [UnityTest]
+        public IEnumerator Rejected_LeavesNoLockAndNoRecord()
+        {
+            result = DialogueResult.Rejected;
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+            LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
+
+            zone.HandleInside(body);
+            yield return null;
+
+            Assert.IsFalse(inputLock.IsLocked);
+            Assert.IsFalse(GameSession.Investigated.Contains(Node));
+            Assert.IsFalse(SavedOnDisk(Node));
+        }
+
+        [UnityTest]
+        public IEnumerator Rejected_DoesNotRetryWhileInside_ButRetriesAfterReentering()
+        {
+            result = DialogueResult.Rejected;
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+            LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
+            zone.HandleInside(body);
+            yield return null;
+
+            zone.HandleInside(body);
+            yield return null;
+            CollectionAssert.AreEqual(new[] { Node }, played, "영역 안에 있는 동안은 다시 시도하지 않는다.");
+
+            zone.HandleExited(body);
+            LogAssert.Expect(LogType.Warning, new Regex($"'{Node}'를 재생하지 못했다"));
+            zone.HandleInside(body);
+            yield return null;
+            CollectionAssert.AreEqual(new[] { Node, Node }, played, "나갔다 다시 들어오면 다시 시도한다.");
+        }
+
+        [UnityTest]
+        public IEnumerator Cancelled_DoesNotRecord()
+        {
+            result = DialogueResult.Cancelled;
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+
+            zone.HandleInside(body);
+            yield return FinishDialogue();
+
+            Assert.IsFalse(inputLock.IsLocked);
+            Assert.IsFalse(GameSession.Investigated.Contains(Node));
+        }
+
+        [UnityTest]
+        public IEnumerator WithoutDialogueService_WarnsAndDoesNotRecord()
+        {
+            DialogueZone.PlayDialogue = originalPlayDialogue;
+            var zone = NewZone(Node);
+            var body = NewLaris(out _);
+            LogAssert.Expect(LogType.Warning, new Regex("DialogueService가 없어"));
+            LogAssert.Expect(LogType.Warning, new Regex("재생하지 못했다"));
+
+            zone.HandleInside(body);
+            yield return null;
+
+            Assert.IsFalse(GameSession.Investigated.Contains(Node));
+        }
+    }
+}

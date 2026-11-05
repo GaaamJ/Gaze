@@ -52,7 +52,7 @@ namespace Gaze.UI
             // duration이 0이면 연출 전체를 즉시로 봄. 시간이 흐르지 않는 테스트에서 유지 대기에 멈추지 않게 하기 위함.
             if (duration > 0f)
             {
-                for (float t = 0f; t < holdDuration; t += Time.unscaledDeltaTime)
+                for (float t = 0f; t < holdDuration; t += Mathf.Min(Time.unscaledDeltaTime, MaxStepSeconds))
                     yield return null;
             }
             IEnumerator fadeIn = FadeIn();
@@ -60,11 +60,14 @@ namespace Gaze.UI
                 yield return fadeIn.Current;
         }
 
+        // 한 프레임에 더하는 시간의 상한(초). Room을 처음 불러온 직후처럼 프레임이 튀어도 페이드가 한 번에 끝나지 않게 함.
+        const float MaxStepSeconds = 0.05f;
+
         // 현재 Alpha에서 target까지 duration 동안 선형으로 바꿈. 시간 정지에도 진행되도록 unscaled 시간을 씀.
         IEnumerator FadeTo(float target)
         {
             float start = Alpha;
-            for (float t = 0f; t < duration; t += Time.unscaledDeltaTime)
+            for (float t = 0f; t < duration; t += Mathf.Min(Time.unscaledDeltaTime, MaxStepSeconds))
             {
                 SetAlpha(Mathf.Lerp(start, target, t / duration));
                 yield return null;

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Gaze.Data
 {
     // 인스펙터에 적은 Yarn 노드 이름이 실제 Yarn 프로젝트에 있는지 검사함.
-    // DialogueResponse, DeathZone, DeathResponse, DeathRefusalZone이 OnValidate에서 WarnMissingDeferred를 부름.
+    // DialogueResponse, DeathZone, DeathResponse, DialogueZone이 OnValidate에서 WarnMissingDeferred를 부름.
     public static class YarnNodeCheck
     {
         // nodes 중 existing에 없는 이름을 중복 없이 모아 돌려줌. 빈 이름은 건너뜀.

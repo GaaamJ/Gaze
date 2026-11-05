@@ -3,15 +3,15 @@
 - 지도를 Room 씬 단위로 나눠 불러오는 시스템.
 
 - `Core` 씬은 늘 떠 있고, 그 위에 Room 씬 하나를 additive로 불러옴.
-	- `Core`: 라리스, 카메라, 대화, 입력 잠금 등 → [[세션 시스템]]
+	- `Core`: 소녀, 카메라, 대화, 입력 잠금 등 → [[세션 시스템]]
 	- Room 씬: 바닥, 벽, 조사 대상, 죽음 트리거, 문
 
-- Room 사이는 문(`RoomSceneDoor`)으로 넘어감.
+- Room 사이는 문(`Door`)으로 넘어감.
 	- 넘어갈 때 페이드 아웃 → 페이드 인.
 	- Room 이동은 세이브하지 않음.
 
-- 지금 있는 Room 씬: `Prototype01`, `Prototype02`
-	- 기본 Room: `Prototype02` (`CoreEntry`에 설정)
+- 지금 있는 Room 씬: `Room01`, `LivingRoom`, `FallingRoom`, `Room02`, `Room03`
+	- 기본 Room: `Room01` (`CoreEntry`에 설정)
 
 - 빈 방 템플릿: `Assets/Scenes/Templates/RoomTemplate.unity`
 	- 빌드 설정에는 넣지 않음.
@@ -24,7 +24,9 @@
 | --------------------- | ------------------------------------------------------------------------ |
 | `RoomSceneLoader`     | Room 씬 불러오기·내리기, 문으로 Room 이동.<br>`Core` 씬에 하나만 둠.                        |
 | `RoomSceneEntry`      | Room 씬마다 하나. Room에 들어올 때 `DeathAftermath`를 적용함. → [[죽음 시스템]]           |
-| `RoomSceneDoor`       | Room 씬에 놓는 문. 라리스가 들어가면 다른 Room의 문으로 이동.<br>이 문의 위치가 도착 위치.          |
+| `Door`                | 문의 공통 부분(abstract). 소녀가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
+| `NormalDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
+| `ShiftingDoor`        | 안 볼 때 바뀌는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>소녀의 빛 범위(`LarisLight`)가 문에서 벗어나면 다음으로 한 칸 바뀌고, 문에 들어가기 전까지 다시 안 바뀜. 방이 밝으면 기본 행선지로 고정. → [[빛 시스템]] |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(16 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
 
@@ -33,17 +35,17 @@
 ---
 ```mermaid
 sequenceDiagram
-    participant D as RoomSceneDoor
+    participant D as Door
     participant T as RoomSceneTransition
     participant L as RoomSceneLoader
     participant E as RoomSceneEntry
 
-    D->>D: 라리스가 들어옴 (입력 잠금 중이면 무시)
+    D->>D: 소녀가 들어옴 (입력 잠금 중이면 무시)
     D->>T: Begin(넘어갈 Room, 도착 문 id)
     T->>L: BeginMove
     L->>L: 입력 잠금, 페이드 아웃
     L->>L: 지금 Room 내림 → 넘어갈 Room 불러옴
-    L->>L: 라리스를 도착 문 위치로 옮김
+    L->>L: 소녀를 도착 문 위치로 옮김
     L->>E: Enter()
     L->>L: 페이드 인, 잠금 해제
 ```
@@ -51,21 +53,21 @@ sequenceDiagram
 - 시작할 때와 죽어서 다시 시작할 때는 문을 거치지 않음.
 	- `CoreEntry`가 세이브된 Room을 바로 불러옴. → [[세션 시스템]]
 
-- 도착한 문에 바로 다시 들어가지 않도록, 라리스가 문 트리거 밖으로 나가야 그 문이 다시 켜짐.
+- 도착한 문에 바로 다시 들어가지 않도록, 소녀가 문 트리거 밖으로 나가야 그 문이 다시 켜짐.
 
 
 # 쓰는 법
 ---
 - **Room 만들기**
 	1. `RoomTemplate`을 복제해 `Assets/Scenes/`에 둠.
-		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Wall`에만 콜라이더, 정렬 레이어 `Background`), `RoomDoor`, `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
+		- 템플릿에 있는 것: `RoomEntry`(`RoomSceneEntry`), `Grid` 아래 `Ground`·`Door`·`Wall` 타일맵(`Ground`에만 콜라이더(Merged), 정렬 레이어 `Background`), `NormalDoor`(문 프리팹, `Prefabs/SceneDefault/Door/`), `Global Light 2D`(`RoomLight`, 등불 비어 있음) → [[빛 시스템]]
 		- 리스폰 지점은 템플릿에 없음. 필요한 방에만 `Respawn` Pb를 놓음.
 	2. 씬을 Build Settings에 추가함.
 		- 없으면 넘어가지 못하고 오류가 남.
 	3. 씬 이름이 곧 Room 이름. 세이브와 문이 이 이름을 씀.
 
 - **문 잇기**
-	1. 양쪽 Room에 Trigger 콜라이더와 `RoomSceneDoor`를 붙인 오브젝트를 둠.
+	1. 양쪽 Room에 Trigger 콜라이더와 `NormalDoor`를 붙인 오브젝트를 둠.
 	2. 각 문에 `doorId`를 적음.
 	3. `targetScene`에 넘어갈 Room 이름, `targetDoorId`에 도착할 문의 `doorId`를 적음.
 		- Ex. A의 문: `doorId` = `East`, `targetScene` = `B`, `targetDoorId` = `West`
@@ -76,6 +78,34 @@ sequenceDiagram
 	- `doorId`는 그 Room 안에서만 겹치지 않으면 됨. 방향으로 지음.
 		- Ex. `East`, `West`, 한쪽에 둘이면 `East1`, `East2`
 	- `targetScene`, `targetDoorId`는 Inspector 목록에서 고름. 목록은 빌드 설정의 씬과 그 씬의 문 id.
+		- 문 id는 `Door`를 상속한 모든 문에서 모음. 닫힌 씬은 파일에서 문 클래스들의 스크립트 guid로 찾음.
+
+- **새 종류의 문 만들기**
+	1. `Door`를 상속하고 `ResolveTarget`에서 넘어갈 Scene과 도착 문 id를 돌려줌.
+	2. 들어가는 조건이 있으면 `CanEnter`를 덮어씀.
+	- 문 Inspector(`DoorEditor`)는 `Door`를 상속한 모든 문에 붙음.
+		- 행선지(`targetScene`·`targetDoorId`, `defaultTargetScene`·`defaultTargetDoorId`, `shiftingTargets`의 원소)마다 목록과 `반대쪽 문도 이 문으로 잇기` 버튼을 그림.
+		- 새 이름의 행선지 필드를 쓰면 `DoorEditor.TargetFields`(하나)나 `TargetListFields`(목록)에 더해야 목록이 뜸.
+		- 나머지 필드는 기본 모양으로 그림.
+
+- **바뀌는 문 놓기**
+	1. 문 오브젝트에 Trigger 콜라이더와 `ShiftingDoor`를 붙임.
+	2. 기본 행선지(`defaultTargetScene`·`defaultTargetDoorId`)를 고름. 방이 밝으면 늘 여기로 감.
+	3. `행선지 더하기`로 바뀌는 행선지(`shiftingTargets`)를 원하는 만큼 더함.
+		- Ex. 거실의 문: 기본 `Room01/South`, 목록 `Room02/South`
+		- 빛 밖으로 나가면 기본 → 1번째 → 2번째 → … → 기본 순서로 한 칸 바뀜.
+		- 한 칸 바뀐 뒤로는 몇 번을 빛 밖으로 나가도 그대로. 문에 들어갔다 돌아오면 다시 한 칸 바뀔 수 있음.
+	4. 행선지마다 있는 버튼으로 각 방의 문을 이 문에 이음.
+	- 바뀐 것을 저장하지 않음. 방을 다시 불러오면 기본 행선지부터.
+		- 다만 문으로 도착하면, 떠나온 Room의 문을 가리키는 행선지부터 시작함. 막 나온 방으로 바로 돌아갈 수 있음.
+		- 도착 문은 `Door.OnArrived`로 떠나온 Room 이름과 들어간 문 id를 받음.
+
+- **벽 칠하기**
+	- `Prototype_Wall_Rule`(RuleTile)로 방 전체를 속까지 채워 칠함.
+		- 테두리만 칠하면 왼쪽 벽과 오른쪽 벽을 구분하지 못해 모서리가 틀어짐.
+		- 바닥 칸은 그림도 콜라이더도 없어서 화면에는 안 보임. 바닥 그림은 `Ground` 타일맵에 그대로 둠.
+	- 윗벽은 3칸. `T` 한 줄 아래 `C` 두 줄이 자동으로 깔림.
+	- 이웃이 없는 한 칸 벽, 한 칸 두께의 벽에는 규칙이 없어 그려지지 않음.
 
 - **픽셀 맞추기**
 	- 오브젝트에 `PixelSnap`을 붙이면 에디터에서 움직일 때 픽셀 격자에 붙음.
@@ -86,4 +116,11 @@ sequenceDiagram
 ---
 
 - 템플릿의 `Grid`·타일맵은 새로 만든 것. 예전 Room에는 타일맵이 없었음.
-	- `Wall` 콜라이더로 라리스가 막히는지는 아직 확인 안 함.
+	- `Ground` 콜라이더로 소녀가 막히는지는 아직 확인 안 함.
+		- `Wall` 안쪽을 채워 칠하므로 `Wall`이 아니라 `Ground`(Merged) 콜라이더를 이동 경계로 씀.
+
+- `반대쪽 문도 이 문으로 잇기`는 상대 씬의 `NormalDoor`(와 자식 클래스)만 찾음.
+	- `NormalDoor`에서 `ShiftingDoor`로 버튼을 누르면 상대를 못 찾음. `ShiftingDoor` 쪽에서 누르면 됨.
+
+- `ShiftingDoor`는 빛 범위 콜라이더와 문 트리거가 서로 닿아야 바뀜.
+	- 플레이로 아직 확인 안 함. 안 바뀌면 두 오브젝트의 Layer가 Physics 2D 충돌 표에서 서로 닿는지 봄.

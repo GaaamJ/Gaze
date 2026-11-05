@@ -7,7 +7,7 @@ namespace Gaze.Dialogue
 {
     // DialogueRunner를 감싸 Yarn 노드 하나를 재생하고 결과(DialogueResult)를 돌려줌.
     // 재생 중 입력 잠금(InputLock)을 걸고, 취소·대기·변수 초기화·노드 존재 확인을 제공함.
-    // DialogueResponse, DeathSequence, DeathRefusalZone, CoreEntry(PlayDialogue)가 Play를 부름.
+    // DialogueResponse, DeathSequence, DialogueZone, CoreEntry(PlayDialogue)가 Play를 부름.
     [RequireComponent(typeof(DialogueRunner))]
     public class DialogueService : MonoBehaviour
     {

@@ -287,13 +287,12 @@ namespace Gaze.Death.Tests
             var entry = NewEntry();
 
             entry.EnterScene(afterDeath: false);
-            Assert.IsFalse(inputLock.IsLocked);
+            Assert.IsFalse(entry.EnteringAfterWindowClose, "창 닫기 사망이 없으면 창 닫기 진입이 아니다.");
 
             entry.RunWindowCloseEntry().Forget();
             yield return null;
 
-            CollectionAssert.IsEmpty(played);
-            Assert.AreEqual(0f, fader.Alpha);
+            CollectionAssert.IsEmpty(played, "창 닫기 사망 대사를 재생하지 않는다.");
         }
 
         [Test]
