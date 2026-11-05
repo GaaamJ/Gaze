@@ -12,7 +12,7 @@ namespace Gaze.Dialogue
 {
     // 선택지가 떠 있는 동안 조작을 다룸. 선택 결과는 Yarn의 OptionsPresenter가 맡고, 이 클래스는 아래 두 가지만 함.
     // 1. 취소 입력(cancelAction)이 오면 대화를 취소함.
-    // 2. 가로로 놓인 선택지를 ↑↓로 오갈 수 있게 연결함.
+    // 2. 가로로 놓인 선택지를 ←→로 오갈 수 있게 연결함.
     // Yarn 러너의 프레젠터 목록에 OptionsPresenter와 함께 들어가며, 러너가 RunOptionsAsync를 부름.
     // DialogueSystem 프리팹의 러너 목록 순서는 LinePresenter, OptionsPresenter, OptionInputPresenter.
     public class OptionInputPresenter : DialoguePresenterBase
