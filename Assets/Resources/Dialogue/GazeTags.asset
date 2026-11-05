@@ -13,18 +13,25 @@ MonoBehaviour:
   m_Name: GazeTags
   m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.MarkupPalette
   BasicMarkers:
-  - Marker: bold
-    CustomColor: 0
-    Color: {r: 0, g: 0, b: 0, a: 0}
-    Boldened: 1
-    Italicised: 0
-    Underlined: 0
-    Strikedthrough: 0
   - Marker: i
     CustomColor: 0
     Color: {r: 0, g: 0, b: 0, a: 0}
     Boldened: 0
     Italicised: 1
+    Underlined: 0
+    Strikedthrough: 0
+  - Marker: red
+    CustomColor: 1
+    Color: {r: 0.8784314, g: 0.28235295, b: 0.28235295, a: 1}
+    Boldened: 0
+    Italicised: 0
+    Underlined: 0
+    Strikedthrough: 0
+  - Marker: name
+    CustomColor: 1
+    Color: {r: 1, g: 0.8235294, b: 0.47843137, a: 1}
+    Boldened: 0
+    Italicised: 0
     Underlined: 0
     Strikedthrough: 0
   CustomMarkers:

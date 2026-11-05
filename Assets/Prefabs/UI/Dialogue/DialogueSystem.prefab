@@ -803,6 +803,7 @@ GameObject:
   - component: {fileID: 8080717050662266275}
   - component: {fileID: 3326276646064941373}
   - component: {fileID: 7359851999316644694}
+  - component: {fileID: 8851312316167356933}
   m_Layer: 5
   m_Name: Dialogue Background
   m_TagString: Untagged
@@ -880,6 +881,21 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &8851312316167356933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925526302391503828}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b56f7738bf75970468c8421e8adafdc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.DialogueBackgroundFollow
+  sources:
+  - {fileID: 8502371565270064332}
+  - {fileID: 2563454590120095956}
 --- !u!1 &1959098016170282566
 GameObject:
   m_ObjectHideFlags: 0

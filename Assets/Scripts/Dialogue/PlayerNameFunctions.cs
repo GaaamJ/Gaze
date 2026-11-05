@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Yarn.Unity;
 using Gaze.Save;
 
@@ -10,14 +11,25 @@ namespace Gaze.Dialogue
     // Yarn에 넘기는 값은 이름 색 태그로 감쌈. 이름이 나오는 모든 대사가 손으로 태그를 달지 않아도 같은 색이 됨.
     public static class PlayerNameFunctions
     {
-        // 대사 속 이름 색. TMP <color> 태그에 그대로 들어감.
-        const string NameColor = "#FFD27A";
+        // 이름 색을 담은 팔레트(Resources/Dialogue/GazeTags)와 그 안의 마커 이름.
+        const string PalettePath = "Dialogue/GazeTags";
+        const string NameMarker = "name";
+
+        // 팔레트를 못 읽을 때 쓰는 색. TMP <color> 태그에 그대로 들어감.
+        const string FallbackColorTag = "<color=#FFD27A>";
 
         // 이 PC의 Windows 사용자 이름. 색 태그 없는 원본. 저장할 때는 이걸 씀.
         public static string PcUserName() => Environment.UserName;
 
-        // 대사에 찍을 이름. 색 태그로 감쌈.
-        static string Colored(string name) => $"<color={NameColor}>{name}</color>";
+        // 대사에 찍을 이름. 팔레트의 `name` 마커 색으로 감쌈. 색은 팔레트 애셋을 Inspector에서 고쳐 정함.
+        static string Colored(string name)
+        {
+            MarkupPalette palette = Resources.Load<MarkupPalette>(PalettePath);
+            if (palette != null && palette.PaletteForMarker(NameMarker, out MarkupPalette.CustomMarker marker))
+                return marker.Start + name + marker.End;
+
+            return FallbackColorTag + name + "</color>";
+        }
 
         // 이 PC의 Windows 사용자 이름.
         [YarnFunction("pc_user_name")]
