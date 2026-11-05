@@ -277,6 +277,8 @@ GameObject:
   - component: {fileID: 3846135392929966844}
   - component: {fileID: 469368250408933977}
   - component: {fileID: 7967554913512363486}
+  - component: {fileID: 2286338337701900247}
+  - component: {fileID: 8730468185564089297}
   m_Layer: 5
   m_Name: LastLine
   m_TagString: Untagged
@@ -403,6 +405,31 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!225 &2286338337701900247
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910558305908546140}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &8730468185564089297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910558305908546140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73de3d91b223b3f4f9876d342d0e4c95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gaze.Dialogue.AlphaFollow
+  source: {fileID: 2563454590120095956}
 --- !u!1 &1030209760822217531
 GameObject:
   m_ObjectHideFlags: 0
@@ -965,7 +992,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.OptionsPresenter
   canvasGroup: {fileID: 2563454590120095956}
   optionViewPrefab: {fileID: 2576261519635394347, guid: 980624452922fa14bb6e583b8fea052c, type: 3}
-  showsLastLine: 0
+  showsLastLine: 1
   lastLineText: {fileID: 7967554913512363486}
   lastLineContainer: {fileID: 0}
   lastLineCharacterNameText: {fileID: 0}

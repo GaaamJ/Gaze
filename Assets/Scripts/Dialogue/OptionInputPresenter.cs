@@ -64,8 +64,8 @@ namespace Gaze.Dialogue
 
         void OnCancel(InputAction.CallbackContext context) => TryCancelDialogue();
 
-        // 선택지가 끝날 때까지 optionsRunning을 켜 두고 ↑↓ 연결을 건 뒤 null을 돌려줌.
-        // 흐름: 선택 가능 여부 확인 → LinkUpDown → 선택지 취소 대기 → OptionItem 정리 대기 → null.
+        // 선택지가 끝날 때까지 optionsRunning을 켜 두고 ←→ 연결을 건 뒤 null을 돌려줌.
+        // 흐름: 선택 가능 여부 확인 → LinkLeftRight → 선택지 취소 대기 → OptionItem 정리 대기 → null.
         public override async YarnTask<DialogueOption?> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken cancellationToken)
         {
             // 고를 수 있는 선택지가 없으면 OptionsPresenter는 바로 null을 돌려주므로, 여기서 기다리면 대화가 멈춤.
@@ -74,7 +74,7 @@ namespace Gaze.Dialogue
 
             // OptionsPresenter가 러너 목록에서 앞에 있어 이 시점에는 OptionItem이 이미 켜져 있음.
             if (optionsRoot != null)
-                LinkUpDown(optionsRoot);
+                LinkLeftRight(optionsRoot);
 
             optionsToken = cancellationToken.NextContentToken;
             optionsRunning = true;
@@ -94,9 +94,9 @@ namespace Gaze.Dialogue
             return null;
         }
 
-        // root 아래 켜진 OptionItem의 내비게이션을 순환형 ↑↓로 연결함.
-        // 선택지는 가로로 놓이지만 조작은 ↑↓만 쓰므로 표시 순서대로 ↑=이전, ↓=다음을 직접 이음.
-        public void LinkUpDown(Transform root)
+        // root 아래 켜진 OptionItem의 내비게이션을 순환형 ←→로 연결함.
+        // 조작은 ←→만 쓰므로 표시 순서대로 ←=이전, →=다음을 직접 이음. ↑↓는 연결하지 않아 움직이지 않음.
+        public void LinkLeftRight(Transform root)
         {
             shownItems.Clear();
             foreach (Transform child in root)
@@ -111,8 +111,8 @@ namespace Gaze.Dialogue
                 shownItems[i].navigation = new Navigation
                 {
                     mode = Navigation.Mode.Explicit,
-                    selectOnUp = count > 1 ? shownItems[(i - 1 + count) % count] : null,
-                    selectOnDown = count > 1 ? shownItems[(i + 1) % count] : null,
+                    selectOnLeft = count > 1 ? shownItems[(i - 1 + count) % count] : null,
+                    selectOnRight = count > 1 ? shownItems[(i + 1) % count] : null,
                 };
             }
         }

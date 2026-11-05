@@ -80,7 +80,7 @@ namespace Gaze.Dialogue.Tests
         }
 
         [Test]
-        public void LinkUpDown_FollowsShownOrderAndSkipsHidden()
+        public void LinkLeftRight_FollowsShownOrderAndSkipsHidden()
         {
             var root = new GameObject("Root").transform;
             root.SetParent(go.transform);
@@ -93,16 +93,16 @@ namespace Gaze.Dialogue.Tests
             }
             items[3].gameObject.SetActive(false);
 
-            presenter.LinkUpDown(root);
+            presenter.LinkLeftRight(root);
 
             Assert.AreEqual(UnityEngine.UI.Navigation.Mode.Explicit, items[0].navigation.mode);
-            Assert.AreSame(items[1], items[0].navigation.selectOnDown);
-            Assert.AreSame(items[2], items[1].navigation.selectOnDown);
-            Assert.AreSame(items[0], items[1].navigation.selectOnUp);
-            Assert.AreSame(items[0], items[2].navigation.selectOnDown);
-            Assert.AreSame(items[2], items[0].navigation.selectOnUp);
-            Assert.IsNull(items[0].navigation.selectOnLeft);
-            Assert.IsNull(items[0].navigation.selectOnRight);
+            Assert.AreSame(items[1], items[0].navigation.selectOnRight);
+            Assert.AreSame(items[2], items[1].navigation.selectOnRight);
+            Assert.AreSame(items[0], items[1].navigation.selectOnLeft);
+            Assert.AreSame(items[0], items[2].navigation.selectOnRight);
+            Assert.AreSame(items[2], items[0].navigation.selectOnLeft);
+            Assert.IsNull(items[0].navigation.selectOnUp);
+            Assert.IsNull(items[0].navigation.selectOnDown);
         }
 
         [Test]
