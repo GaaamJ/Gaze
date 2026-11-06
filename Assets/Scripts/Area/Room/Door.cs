@@ -26,11 +26,7 @@ namespace Gaze.Area
         {
             if (PlayerMovement.TryFrom(other, out _))
                 WaitingForExit = false;
-            OnColliderExit(other);
         }
-
-        // 다른 콜라이더가 이 문의 트리거에서 나갈 때. 라리스가 아닌 것(빛 범위 등)도 옴.
-        protected virtual void OnColliderExit(Collider2D other) { }
 
         // 다른 Room의 문을 지나 이 문에 도착했을 때 RoomSceneLoader가 부름.
         internal void Arrive(string fromScene, string fromDoorId) => OnArrived(fromScene, fromDoorId);
@@ -44,8 +40,11 @@ namespace Gaze.Area
         // 넘어갈 Scene과 도착할 문의 id를 정함. 넘어갈 곳이 없으면 false.
         protected abstract bool ResolveTarget(out string targetScene, out string targetDoorId);
 
+        // Room 이동이 시작된 뒤 한 번. 들어갈 때마다 바뀌는 문처럼 들어간 것을 세는 문이 덮어씀.
+        protected virtual void OnEntered() { }
+
         // 라리스인지 → 문이 켜져 있고 도착 직후가 아닌지 → 입력이 잠겨 있지 않은지 → CanEnter → 행선지가 있는지 확인한 뒤
-        // Room 이동을 시작함. 시작했으면 true.
+        // Room 이동을 시작하고 OnEntered를 부름. 시작했으면 true.
         internal bool TryEnter(Collider2D other)
         {
             if (!PlayerMovement.TryFrom(other, out PlayerMovement laris))
@@ -61,7 +60,10 @@ namespace Gaze.Area
             if (!CanEnter() || !ResolveTarget(out string targetScene, out string targetDoorId))
                 return false;
 
-            return RoomSceneTransition.Begin(targetScene, targetDoorId, doorId);
+            if (!RoomSceneTransition.Begin(targetScene, targetDoorId, doorId))
+                return false;
+            OnEntered();
+            return true;
         }
     }
 }
