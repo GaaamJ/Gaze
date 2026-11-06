@@ -9,20 +9,20 @@ EditorBuildSettings:
     path: Assets/Scenes/Core.unity
     guid: 90f7435e1b390fa45916d948cbd28c97
   - enabled: 1
-    path: Assets/Scenes/Room03.unity
-    guid: ffe80d164ebd19341beb1c4e074e195b
-  - enabled: 1
-    path: Assets/Scenes/LivingRoom.unity
-    guid: 4d8466ca49e2a894d9d5af2e0c1715d1
-  - enabled: 1
-    path: Assets/Scenes/FallingRoom.unity
-    guid: 0de580052cd11174ba6dfe9070399a37
-  - enabled: 1
-    path: Assets/Scenes/Room02.unity
-    guid: 878e7ad6dd33f324b9e181119e16cc17
-  - enabled: 1
     path: Assets/Scenes/Base.unity
     guid: 125f426ac33458c40830c37af4a319c2
+  - enabled: 1
+    path: Assets/Scenes/Corridor.unity
+    guid: 4d8466ca49e2a894d9d5af2e0c1715d1
+  - enabled: 1
+    path: Assets/Scenes/EVRoom.unity
+    guid: adc5dee6f7b3cc24e810ac19d7336ce5
+  - enabled: 1
+    path: Assets/Scenes/Kitchen.unity
+    guid: cbc16027036ae17498f6e1306020fc71
+  - enabled: 1
+    path: Assets/Scenes/KeyRoom.unity
+    guid: 878e7ad6dd33f324b9e181119e16cc17
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

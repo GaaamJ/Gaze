@@ -47,7 +47,7 @@ TagManager:
   - name: BackProp
     uniqueID: 1140610011
     locked: 0
-  - name: Player
+  - name: World
     uniqueID: 611459297
     locked: 0
   - name: FrontProp

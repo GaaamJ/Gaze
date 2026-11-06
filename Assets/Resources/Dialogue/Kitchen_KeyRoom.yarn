@@ -1,0 +1,63 @@
+﻿title: Apartment_FallingDeath
+color: red
+position: 213,8
+---
+// 암전 아니면 낙하하는 컷씬?
+<<Cutscene Blackout>>
+<<wait 1.5>>
+소녀는 문을 열고 깜깜한 앞으로 나아갔다.
+얼마나 걸어갔을까.<br>어느 순간 소녀의 발밑에는 아무것도 없었다. 오직 시꺼먼 구덩이뿐.
+Girl: 아...?
+// wait
+Girl: [shake]꺄아아아악![/shake]
+<<wait 1.5>>
+// 콰직! 하는 효과음
+<<CutsceneEnd>>
+// 떨어진 컷씬 재생
+<<Cutscene FallingDie>>
+Girl: [shake]케흑...... 쿨럭, 컥......![/shake]
+Girl: 아, 아아......<br>아파...아...
+피가 섞인 가래가 끓어오르는 쇳소리를 내며, 소녀는 입을 열었다.
+// 떨어진 소녀가 손을 들어 올리는 컷신?
+Girl: 너무 아, 파... 나, 너,무 아파아...<br>[shake]{player_name()}......[/shake]
+Girl: 흑, 흐으윽......<br>거, 거기 있지, [shake]{player_name()}......?[/shake]
+-> (여기 있다고 답한다.)
+Girl: 헤, 헤헤... 다행, 이야.<br>지, 금까지... 케헥, 켁, 죽을 때...는...<br>혼자 였는데...
+소녀의 몸이 바르르 경련했다.<br>마치 마지막으로 쉬는 숨처럼.
+// 컷씬 자동 종료
+// 뭔가 임팩트 있는 사망 후 연출 하나 있어도 괜찮을듯 종소리 데엥~ 아니면 암전후 공통연출같은거
+===
+
+title: Apartment_FallingDeath_Respawn
+color: red
+position: 423,9
+---
+Girl: ... ...[pause=1500/]<br>... ...[pause=1500/]<br>... ...
+<<Cutscene Blackout>>
+<<wait 3>>
+<<CutsceneEnd>>
+Girl: 후우...! 조금 괜찮아졌어...!
+Girl: 마, 맞아!<br>{player_name()}! 거, 거기 있지? 그렇지?
+-> (여기 있다고 답한다.)
+소녀는 눈물을 훔쳐 내고 배시시 웃어 보였다.
+Girl: 다행이다아... 다행이야!<br>히히, 네가 남아 있어서 다행이야!
+Girl: 그나저나 저 방, 진짜 완전 반칙!<br>너도 그렇게 생각하지!
+Girl: 그야 분명 지난 번에는 괜찮았단 말이야.
+소녀는 팔을 돌려 자신의 등을 더듬었다.<br>자그마한 몸이 바르르 떨렸다.
+Girl: 으으, 생각하기도 싫어...<br>[shake]내, 내 몸이 터지는 느낌...[/shake]
+Girl: 그래도 이번엔 뭔가, 뭔가 덜 무서웠어.<br>[wave]{player_name()} 때문일지도?<br>그러니까 고마워, 또 다른 나![/wave]
+===
+
+title: Apartment_FallingDeath_Refuse
+color: red
+position: 792,8
+---
+Girl: [shake]으으, 진짜 아무것도 안 보이네...[/shake]<br>{player_name()}, 조심해서 가자!
+===
+
+title: Apartment_FallingDeath_Refuse_Recheck
+color: red
+position: 792,8
+---
+Girl: 소녀는 몸을
+===
