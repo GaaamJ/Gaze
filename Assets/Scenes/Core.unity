@@ -185,11 +185,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Player.PlayerSprite
   movement: {fileID: 97015913}
   spriteRenderer: {fileID: 97015920}
-  down: {fileID: -2131073498, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
-  up: {fileID: 9133839876004317546, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
-  left: {fileID: 3339889221897421838, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
-  leftDown: {fileID: -1913655522418471621, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
-  leftUp: {fileID: -7225736133559629788, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
+  down: {fileID: -4550248653804315850, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
+  up: {fileID: -4550248653804315850, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
+  left: {fileID: -4550248653804315850, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
+  leftDown: {fileID: -4550248653804315850, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
+  leftUp: {fileID: -4550248653804315850, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
 --- !u!114 &97015916
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -253,17 +253,17 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.2}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.875, y: 1}
-    newSize: {x: 0.875, y: 1}
+    oldSize: {x: 0.5416667, y: 1.375}
+    newSize: {x: 0.5416667, y: 1.375}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.6, y: 1}
+  m_Size: {x: 0.6, y: 0.6}
   m_EdgeRadius: 0
 --- !u!50 &97015919
 Rigidbody2D:
@@ -341,12 +341,12 @@ SpriteRenderer:
   m_SortingLayer: 3
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -2131073498, guid: 3b4aa45cff2314b4281aeff14cc2314a, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4c7566bade8a79844af3319efd32a2ee, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.875, y: 1}
+  m_Size: {x: 0.5416667, y: 1.375}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -407,6 +407,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 374190508029987790, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 921090457343010250, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: inputLock
       value: 
@@ -462,6 +466,14 @@ PrefabInstance:
     - target: {fileID: 4928790383144942650, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_SizeDelta.y
       value: 624
+      objectReference: {fileID: 0}
+    - target: {fileID: 6415375700942840069, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_Alpha
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7359851999316644694, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_Alpha
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -578,9 +590,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.2D.Runtime::UnityEngine.Rendering.Universal.PixelPerfectCamera
   m_ComponentVersion: 1
-  m_AssetsPPU: 16
-  m_RefResolutionX: 320
-  m_RefResolutionY: 180
+  m_AssetsPPU: 24
+  m_RefResolutionX: 640
+  m_RefResolutionY: 360
   m_CropFrame: 0
   m_GridSnapping: 0
   m_FilterMode: 0
@@ -676,7 +688,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.625
+  orthographic size: 7.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -939,7 +951,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
+  m_Radius: 0.7
 --- !u!4 &1233284579
 Transform:
   m_ObjectHideFlags: 0

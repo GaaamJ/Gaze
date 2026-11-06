@@ -12,7 +12,7 @@ namespace Gaze.Area
     public class PixelSnap : MonoBehaviour
     {
         [Tooltip("격자 PPU")]
-        [SerializeField, Min(1)] int pixelsPerUnit = 16;
+        [SerializeField, Min(1)] int pixelsPerUnit = 24;
 
 #if UNITY_EDITOR
         const float Epsilon = 0.0001f;

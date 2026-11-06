@@ -880,7 +880,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 906506b94352f5941ab81b76cacb6307, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gaze.Area.PixelSnap
-  pixelsPerUnit: 16
+  pixelsPerUnit: 24
 --- !u!1 &1690848667
 GameObject:
   m_ObjectHideFlags: 0
