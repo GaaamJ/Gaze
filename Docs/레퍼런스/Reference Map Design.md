@@ -17,9 +17,9 @@
 | OMORI | 20×15 (32px) | ~1/10 |
 | Undertale | ~16×12 (20px, estimated) | ~1/8 |
 | Depersonalization | unknown (~480×270 estimated) | ~1/6 |
-| Gaze now | 26.7×15 (24px, PixelPerfectCamera ref 640×360, 16:9) | ~1/10 |
+| Gaze now | 13.3×7.5 (24px, PixelPerfectCamera ref 320×180, 16:9) | ~1/5.3 |
 
-- Gaze's camera was ~34×19 (girl 2–3× smaller than any reference) until 2026-10-29, then 320×240, 320×180 from 2026-11-02 (16:9, no side bars), and 640×360 at 24 PPU since 2026-11-06 (girl ~19×34px). Room sizes below assume the old 20×11 screen; the screen now holds ~27×15 tiles.
+- Gaze's camera was ~34×19 (girl 2–3× smaller than any reference) until 2026-10-29, then 320×240, 320×180 from 2026-11-02 (16:9, no side bars), 640×360 at 24 PPU on 2026-11-06 (girl ~19×34px), then 320×180 at 24 PPU the same day because the girl felt too small. Room sizes below assume the old 20×11 screen; the screen now holds ~13×7.5 tiles, so most rooms are wider than one screen and the camera must follow.
 
 
 # OneShot
