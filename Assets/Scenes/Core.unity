@@ -360,6 +360,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DialogueSystem
       objectReference: {fileID: 0}
+    - target: {fileID: 2687782343961581468, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4896530558945115022, guid: 68bccfabc77410a4080a5f8b243be31e, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -695,7 +699,7 @@ MonoBehaviour:
   roomLoader: {fileID: 1196390259}
   laris: {fileID: 97015913}
   faderPrefab: {fileID: 309018246855460046, guid: 4b105c0474d238349ae140a8fb40ccf8, type: 3}
-  defaultRoom: Room01
+  defaultRoom: Base
 --- !u!4 &1196390258
 Transform:
   m_ObjectHideFlags: 0
