@@ -27,7 +27,7 @@
 | `Door`                | 문의 공통 부분(abstract). 소녀가 들어가면 행선지 문으로 이동.<br>이 문의 위치가 도착 위치.<br>자식 클래스가 `ResolveTarget`으로 행선지를, `CanEnter`로 들어갈 조건을 정함. |
 | `NormalDoor`            | 행선지가 하나인 문. `targetScene`·`targetDoorId`로 이어짐.                           |
 | `LockedDoor`          | 스위치가 켜져야 들어갈 수 있는 문. 행선지는 `NormalDoor`와 같음.<br>잠겨 있을 때 대사는 재생하지 않음. → [[스위치 시스템]] |
-| `ShiftingDoor`        | 안 볼 때 바뀌는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>소녀의 빛 범위(`LarisLight`)가 문에서 벗어나면 다음으로 한 칸 바뀌고, 문에 들어가기 전까지 다시 안 바뀜. 방이 밝으면 기본 행선지로 고정. → [[빛 시스템]] |
+| `ShiftingDoor`        | 들어갈 때마다 다음 방이 나오는 문. 기본 행선지와 바뀌는 행선지 목록을 차례로 돎.<br>빛·방 밝기와 상관없음. |
 | `RoomSceneTransition` | 문이 `Core`의 `RoomSceneLoader`를 찾아 이동을 맡기는 다리.                             |
 | `PixelSnap`           | 에디터에서 오브젝트 위치를 픽셀 격자(24 PPU)에 맞춤. 플레이 중에는 아무것도 안 함.                   |
 
@@ -91,15 +91,14 @@ sequenceDiagram
 
 - **바뀌는 문 놓기**
 	1. 문 오브젝트에 Trigger 콜라이더와 `ShiftingDoor`를 붙임.
-	2. 기본 행선지(`defaultTargetScene`·`defaultTargetDoorId`)를 고름. 방이 밝으면 늘 여기로 감.
+	2. 기본 행선지(`defaultTargetScene`·`defaultTargetDoorId`)를 고름. 처음 들어갈 때 여기로 감.
 	3. `행선지 더하기`로 바뀌는 행선지(`shiftingTargets`)를 원하는 만큼 더함.
-		- Ex. 거실의 문: 기본 `Room01/South`, 목록 `Room02/South`
-		- 빛 밖으로 나가면 기본 → 1번째 → 2번째 → … → 기본 순서로 한 칸 바뀜.
-		- 한 칸 바뀐 뒤로는 몇 번을 빛 밖으로 나가도 그대로. 문에 들어갔다 돌아오면 다시 한 칸 바뀔 수 있음.
+		- Ex. 거실의 문: 기본 `Base`, 목록 `Room02`
+		- 들어갈 때마다 기본 → 1번째 → 2번째 → … → 기본 순서로 다음 방이 나옴.
 	4. 행선지마다 있는 버튼으로 각 방의 문을 이 문에 이음.
-	- 바뀐 것을 저장하지 않음. 방을 다시 불러오면 기본 행선지부터.
-		- 다만 문으로 도착하면, 떠나온 Room의 문을 가리키는 행선지부터 시작함. 막 나온 방으로 바로 돌아갈 수 있음.
-		- 도착 문은 `Door.OnArrived`로 떠나온 Room 이름과 들어간 문 id를 받음.
+	- 들어간 횟수는 문마다 정적 기록에 남아서 방을 다시 불러와도 이어짐.
+		- 세이브에는 남지 않음. 게임을 다시 켜면 기본 행선지부터.
+		- 들어간 뒤 실제로 Room 이동이 시작됐을 때만 셈(`Door.OnEntered`).
 
 - **벽 칠하기**
 	- `Prototype_Wall_Rule`(RuleTile)로 방 전체를 속까지 채워 칠함.
@@ -123,5 +122,6 @@ sequenceDiagram
 - `반대쪽 문도 이 문으로 잇기`는 상대 씬의 `NormalDoor`(와 자식 클래스)만 찾음.
 	- `NormalDoor`에서 `ShiftingDoor`로 버튼을 누르면 상대를 못 찾음. `ShiftingDoor` 쪽에서 누르면 됨.
 
-- `ShiftingDoor`는 빛 범위 콜라이더와 문 트리거가 서로 닿아야 바뀜.
-	- 플레이로 아직 확인 안 함. 안 바뀌면 두 오브젝트의 Layer가 Physics 2D 충돌 표에서 서로 닿는지 봄.
+- `ShiftingDoor`의 들어간 횟수는 죽어도 되돌아가지 않음.
+	- 스위치처럼 리스폰 지점에서 확정하는 방식이 아님. 필요해지면 정함.
+	- 플레이로 아직 확인 안 함.
